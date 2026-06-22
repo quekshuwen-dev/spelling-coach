@@ -258,16 +258,27 @@ body{padding-bottom:80px}
   <div class="hdr">
     <span class="ico">🔊</span>
     <h1>Listen &amp; Write!</h1>
-    <p>The app reads each word aloud.<br>Write it on your paper!</p>
+    <p>Tap the big button to hear each word.<br>Write it on your paper!</p>
+  </div>
+  <!-- Sound check card -->
+  <div class="card" id="sound-test-card" style="border:3px solid #FFB300;background:#FFFDE7">
+    <div class="ctitle" style="color:#E65100">⚠️ First: check your sound</div>
+    <p style="font-size:13px;color:#5D4037;margin-bottom:12px;line-height:1.6">Turn your phone volume UP, then tap below to test:</p>
+    <button class="bb ye" onclick="testSound(this)" style="font-size:17px;margin-bottom:8px">🔔 Test Sound Now</button>
+    <div id="sound-result" style="font-size:13px;text-align:center;min-height:20px;color:#555"></div>
+    <button class="bb wh sm" onclick="document.getElementById('sound-test-card').style.display='none'" style="margin-top:10px;font-size:13px">✅ Sound works — hide this</button>
   </div>
   <div class="card">
     <div class="stage-ctr" id="d-ctr">Word 1 of 10</div>
     <div class="prog-bg"><div class="prog-fill" id="d-prog" style="width:0%"></div></div>
     <div class="stage">
-      <span class="stage-ico" id="d-ico">🔊</span>
-      <div class="stage-hint" id="d-hint">Getting ready…</div>
+      <span class="stage-ico" id="d-ico">👆</span>
+      <div class="stage-hint" id="d-hint">Tap the button below to hear the word!</div>
     </div>
-    <button class="bb pu" onclick="hearNow()" id="hear-btn" style="font-size:17px;margin-bottom:10px">🔊 Hear Word Again</button>
+    <button class="bb pu" id="hear-btn" onclick="hearNow(this)"
+      style="font-size:20px;min-height:74px;border-radius:20px;margin-bottom:12px">
+      🔊 Tap to Hear Word
+    </button>
     <div class="gap"></div>
     <button class="bb gr" onclick="nxtWord()" id="d-next" style="display:none;font-size:17px">➡️ Next Word</button>
     <button class="bb gr" onclick="goP('pg-mark')" id="d-done" style="display:none;font-size:17px">✅ Done! Mark my work</button>
@@ -588,27 +599,56 @@ WORDS: word1, word2, word3
 }
 
 // ── Play word ──────────────────────────────────────────
-function playW(i){say(W[i].t,W[i].l);}
+function playW(i){ say(W[i].t, W[i].l, null, function(){ toast("Could not play. Try again!"); }); }
 
-function say(text,lang){
-  if(!('speechSynthesis' in window)){
-    toast('Your browser does not support audio. Please use Chrome.');
-    return null;
+function testSound(btn){
+  // Simple test — speaks "Hello" right on the tap event
+  if(!window.speechSynthesis){
+    document.getElementById('sound-result').textContent='❌ Your browser cannot play sound. Please use Chrome.';
+    return;
   }
-  speechSynthesis.cancel();
-  var u=new SpeechSynthesisUtterance(text);
-  u.rate=0.75; u.pitch=1.0; u.volume=1.0;
-  var voices=speechSynthesis.getVoices();
+  window.speechSynthesis.cancel();
+  var u=new SpeechSynthesisUtterance('Hello! Sound is working!');
+  u.lang='en-US'; u.rate=0.9; u.volume=1.0;
+  u.onstart=function(){ document.getElementById('sound-result').textContent='🔊 Playing…'; };
+  u.onend=function(){ document.getElementById('sound-result').textContent='✅ Sound is working! You can hide this.'; };
+  u.onerror=function(e){ document.getElementById('sound-result').textContent='❌ Error: '+e.error+'. Try turning volume up and tapping again.'; };
+  window.speechSynthesis.speak(u);
+}
+
+// Core speak function — MUST be called directly inside a click/touch handler on Android
+function say(text, lang, onDone, onErr){
+  if(!window.speechSynthesis){
+    toast('No text-to-speech. Please use Chrome.');
+    if(onErr) onErr();
+    return;
+  }
+  window.speechSynthesis.cancel();
+  var u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.78;
+  u.pitch = 1.0;
+  u.volume = 1.0;
+
+  // Pick voice
+  var voices = window.speechSynthesis.getVoices();
   if(lang==='zh'||lang==='py'){
-    var zv=voices.find(v=>v.lang==='zh-CN')||voices.find(v=>v.lang.startsWith('zh'));
-    if(zv){u.voice=zv;u.lang=zv.lang;}else{u.lang='zh-CN';}
+    var zv = voices.find(v=>v.lang==='zh-CN') || voices.find(v=>v.lang.startsWith('zh'));
+    if(zv){ u.voice=zv; u.lang=zv.lang; } else { u.lang='zh-CN'; }
   } else {
-    var ev=voices.find(v=>v.lang==='en-GB')||voices.find(v=>v.lang==='en-US')||voices.find(v=>v.lang.startsWith('en'));
-    if(ev){u.voice=ev;u.lang=ev.lang;}else{u.lang='en-US';}
+    var ev = voices.find(v=>v.lang==='en-GB') || voices.find(v=>v.lang==='en-US') || voices.find(v=>v.lang.startsWith('en'));
+    if(ev){ u.voice=ev; u.lang=ev.lang; } else { u.lang='en-US'; }
   }
-  // delay 150ms — fixes Android/iOS stutter after cancel()
-  setTimeout(()=>{try{speechSynthesis.speak(u);}catch(e){toast('Audio error. Try tapping again.');}},150);
-  return u;
+
+  if(onDone) u.onend = onDone;
+  if(onErr)  u.onerror = onErr;
+
+  // Android Chrome needs speak() called with NO setTimeout — must be synchronous in the tap handler
+  try{
+    window.speechSynthesis.speak(u);
+  } catch(e){
+    toast('Audio error: '+e.message+'. Try tapping again.');
+    if(onErr) onErr();
+  }
 }
 
 // ── Dictation ──────────────────────────────────────────
@@ -616,7 +656,7 @@ function shuffle(a){var b=[...a];for(var i=b.length-1;i>0;i--){var j=Math.floor(
 
 function initDict(){
   dictIdx=0;
-  var idx=W.map((_,i)=>i);
+  var idx=W.map(function(_,i){return i;});
   dictOrder=testOrd==='mix'?shuffle(idx):[...idx];
   showWord();
 }
@@ -626,167 +666,57 @@ function showWord(){
   document.getElementById('d-prog').style.width=pct+'%';
   document.getElementById('d-ctr').textContent='Word '+(dictIdx+1)+' of '+total;
   document.getElementById('d-ico').textContent='👆';
-  document.getElementById('d-hint').textContent='Tap the big button below to hear the word!';
+  document.getElementById('d-hint').textContent='Tap the button below to hear the word!';
   document.getElementById('d-next').style.display='none';
   document.getElementById('d-done').style.display='none';
-  // Make the hear button extra prominent — word only plays when user taps
   var hb=document.getElementById('hear-btn');
-  hb.style.display='';
-  hb.style.fontSize='20px';
-  hb.textContent='🔊 Tap to Hear Word '+( dictIdx+1);
+  hb.disabled=false;
+  hb.textContent='🔊 Tap to Hear Word '+(dictIdx+1)+' of '+total;
 }
 
-function sayDict(idx){
-  var w=W[idx];
-  var ico=document.getElementById('d-ico');
-  var hb=document.getElementById('hear-btn');
+// hearNow is called directly by onclick — this is the user gesture Android needs
+function hearNow(btn){
+  var w = W[dictOrder[dictIdx]];
+  var ico = document.getElementById('d-ico');
+  var hb = document.getElementById('hear-btn');
+
   ico.textContent='🔊'; ico.classList.add('speaking');
   hb.disabled=true; hb.textContent='🔊 Playing…';
-  var u=say(w.t,w.l);
-  if(u){
-    u.onend=()=>{
-      ico.classList.remove('speaking');
-      hb.disabled=false;
-      var last=dictIdx>=dictOrder.length-1;
-      ico.textContent=last?'🏁':'✅';
-      hb.textContent='🔊 Hear Again';
-      document.getElementById('d-hint').textContent=last
-        ?'Last word! Write it on paper, then tap "Done".'
-        :'Write it on paper, then tap "Next Word".';
-      document.getElementById(last?'d-done':'d-next').style.display='';
-    };
-    u.onerror=()=>{
-      ico.classList.remove('speaking');
-      ico.textContent='❌';
-      hb.disabled=false; hb.textContent='🔊 Try Again';
-      document.getElementById('d-hint').textContent='Sound did not play. Tap the button again!';
-    };
-  } else {
-    ico.classList.remove('speaking');
-    hb.disabled=false;
-    document.getElementById('d-hint').textContent='⚠️ No sound. Please open this page in Chrome browser.';
-  }
-}
-
-function hearNow(){
-  // This is triggered by user tap — safe to play audio on mobile
-  speechSynthesis.cancel(); // clear any stuck audio
   document.getElementById('d-next').style.display='none';
   document.getElementById('d-done').style.display='none';
-  sayDict(dictOrder[dictIdx]);
+
+  say(w.t, w.l,
+    // onDone
+    function(){
+      ico.classList.remove('speaking');
+      hb.disabled=false;
+      var last = dictIdx >= dictOrder.length-1;
+      ico.textContent = last?'🏁':'✅';
+      hb.textContent = '🔊 Hear Again';
+      document.getElementById('d-hint').textContent = last
+        ? 'Last word! Write it down, then tap "Done".'
+        : 'Write it down, then tap "Next Word" when ready.';
+      document.getElementById(last?'d-done':'d-next').style.display='';
+    },
+    // onErr
+    function(){
+      ico.classList.remove('speaking');
+      ico.textContent='❌';
+      hb.disabled=false;
+      hb.textContent='🔊 Tap to Try Again';
+      document.getElementById('d-hint').textContent='Could not play sound. Turn volume up and tap again!';
+    }
+  );
 }
-function nxtWord(){dictIdx++;showWord();}
 
-// ── Mark work ──────────────────────────────────────────
-function markUp(e){
-  var f=e.target.files[0]; if(!f) return;
-  var r=new FileReader();
-  r.onload=ev=>{
-    markData=ev.target.result;
-    document.getElementById('mark-img').src=markData;
-    document.getElementById('mark-prev').style.display='block';
-    document.getElementById('mark-card').style.display='none';
-  };
-  r.readAsDataURL(f); e.target.value='';
-}
-function clearMark(){markData=null;document.getElementById('mark-prev').style.display='none';}
+function nxtWord(){ dictIdx++; showWord(); }
 
-async function doMark(){
-  if(!markData) return;
-  if(!navigator.onLine){toast('No internet connection. Please connect and try again.');return;}
-  var btn=document.getElementById('mark-btn');
-  btn.disabled=true; btn.textContent='⏳ Marking…';
-  document.getElementById('mark-card').style.display='block';
-  document.getElementById('mark-title').textContent='Marking your work…';
-  var mt=document.getElementById('mark-txt');
-  mt.innerHTML='<div class="dots"><span></span><span></span><span></span></div> Reading your handwriting…';
-  var ow=dictOrder.map(i=>W[i]);
-  try{
-    var resp=await callAI([
-      {type:'image',source:{type:'base64',media_type:'image/jpeg',data:markData.split(',')[1]}},
-      {type:'text',text:`You are a warm, encouraging Primary 1 teacher in Singapore. A child wrote spelling answers on paper after listening to words read aloud.
-
-The correct words in order (${testOrd==='mix'?'shuffled/random order':'same order as given'}):
-${ow.map((w,i)=>(i+1)+'. '+w.t).join('\n')}
-
-Look carefully at the child's handwritten answers in the photo and mark each one.
-
-For EACH word:
-- ✅ if correct: give a short fun cheer!
-- ❌ if wrong: show what they wrote → the correct version → a simple kind explanation (use words a 7-year-old understands)
-- Also check: capital letters, punctuation, hanyu pinyin tone marks
-
-At the end:
-- One big encouraging message
-- Score out of ${ow.length}
-- One helpful tip for the hardest mistake
-
-SCORE: X/${ow.length}
-
-Always be warm, kind and encouraging. Never make the child feel bad!`}
-    ]);
-    mt.textContent=resp;
-    document.getElementById('mark-title').textContent='📝 Here are your results!';
-    var m=resp.match(/SCORE:\s*(\d+)\s*\/\s*(\d+)/i);
-    if(m) score={ok:parseInt(m[1]),total:parseInt(m[2])};
-  }catch(e){
-    mt.textContent='Could not read the photo. Please try a clearer, well-lit image.\n\nError: '+e.message;
+// ── Voice preload — load voices as early as possible ───
+if(window.speechSynthesis){
+  window.speechSynthesis.getVoices();
+  if(window.speechSynthesis.onvoiceschanged!==undefined){
+    window.speechSynthesis.onvoiceschanged=function(){ window.speechSynthesis.getVoices(); };
   }
-  btn.disabled=false; btn.textContent='🪄 Mark My Work!';
-}
-
-// ── Results ────────────────────────────────────────────
-function renderRes(){
-  if(!score) return;
-  var pct=Math.round((score.ok/score.total)*100);
-  var stars=pct>=90?'⭐⭐⭐':pct>=70?'⭐⭐':'⭐';
-  var ico=pct===100?'🎉':pct>=80?'🌟':pct>=60?'👍':'💪';
-  var msg=['💪 Keep going — practice makes perfect!','👍 Good effort! Keep practising!','🌟 Nearly perfect! Amazing!','🎉 Perfect score! You are a star!'];
-  document.getElementById('r-ico').textContent=ico;
-  document.getElementById('r-title').textContent=pct===100?'Perfect! 🎉':'Well done!';
-  document.getElementById('r-msg').textContent=msg[pct>=90?3:pct>=70?2:pct>=50?1:0];
-  document.getElementById('r-ok').textContent=score.ok;
-  document.getElementById('r-ng').textContent=score.total-score.ok;
-  document.getElementById('r-st').textContent=stars;
-  document.getElementById('r-hist').innerHTML=dictOrder.map((wi,i)=>{
-    var w=W[wi];
-    return`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1.5px solid #f0f0f8;font-size:14px">
-      <span style="font-weight:600">${i+1}. ${w.t}</span>
-      ${w.m?`<span style="font-size:11px;color:var(--tx2);flex:1;padding:0 6px">${w.m}</span>`:''}
-      <span class="wrow-lang l-${w.l}" style="font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700">${w.l.toUpperCase()}</span>
-    </div>`;
-  }).join('');
-}
-
-// ── AI ─────────────────────────────────────────────────
-async function callAI(content){
-  var r=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1200,messages:[{role:'user',content}]})
-  });
-  var d=await r.json();
-  if(d.error) throw new Error(d.error.message);
-  var b=d.content&&d.content.find(b=>b.type==='text');
-  if(!b) throw new Error('No response');
-  return b.text;
-}
-
-// ── Voice preload ──────────────────────────────────────
-// Load voices as soon as possible (needed for Android Chrome)
-if('speechSynthesis' in window){
-  speechSynthesis.getVoices();
-  if(speechSynthesis.onvoiceschanged!==undefined){
-    speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
-  }
-  // Warm up audio on first user interaction — fixes iOS/Android silent bug
-  document.addEventListener('touchstart', function warmup(){
-    if(speechSynthesis.speaking) return;
-    var u=new SpeechSynthesisUtterance('');
-    u.volume=0; // silent warmup
-    try{speechSynthesis.speak(u);}catch(e){}
-    document.removeEventListener('touchstart', warmup);
-  }, {once:true, passive:true});
 }
 </script>
 </body>

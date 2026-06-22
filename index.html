@@ -591,17 +591,23 @@ WORDS: word1, word2, word3
 function playW(i){say(W[i].t,W[i].l);}
 
 function say(text,lang){
-  if(!('speechSynthesis' in window)) return null;
-  var u=new SpeechSynthesisUtterance(text);
-  u.rate=0.72; u.pitch=1.1;
-  var voices=speechSynthesis.getVoices();
-  if(lang==='zh'||lang==='py'){
-    var zv=voices.find(v=>v.lang.startsWith('zh')); u.lang=zv?zv.lang:'zh-CN';
-  } else {
-    var ev=voices.find(v=>v.lang==='en-SG'||v.lang==='en-GB'||v.lang.startsWith('en')); u.lang=ev?ev.lang:'en-SG';
+  if(!('speechSynthesis' in window)){
+    toast('Your browser does not support audio. Please use Chrome.');
+    return null;
   }
   speechSynthesis.cancel();
-  setTimeout(()=>speechSynthesis.speak(u),80);
+  var u=new SpeechSynthesisUtterance(text);
+  u.rate=0.75; u.pitch=1.0; u.volume=1.0;
+  var voices=speechSynthesis.getVoices();
+  if(lang==='zh'||lang==='py'){
+    var zv=voices.find(v=>v.lang==='zh-CN')||voices.find(v=>v.lang.startsWith('zh'));
+    if(zv){u.voice=zv;u.lang=zv.lang;}else{u.lang='zh-CN';}
+  } else {
+    var ev=voices.find(v=>v.lang==='en-GB')||voices.find(v=>v.lang==='en-US')||voices.find(v=>v.lang.startsWith('en'));
+    if(ev){u.voice=ev;u.lang=ev.lang;}else{u.lang='en-US';}
+  }
+  // delay 150ms — fixes Android/iOS stutter after cancel()
+  setTimeout(()=>{try{speechSynthesis.speak(u);}catch(e){toast('Audio error. Try tapping again.');}},150);
   return u;
 }
 
@@ -619,39 +625,54 @@ function showWord(){
   var total=dictOrder.length, pct=Math.round((dictIdx/total)*100);
   document.getElementById('d-prog').style.width=pct+'%';
   document.getElementById('d-ctr').textContent='Word '+(dictIdx+1)+' of '+total;
-  document.getElementById('d-ico').textContent='🔊';
-  document.getElementById('d-hint').textContent='Listen carefully and write it on your paper!';
+  document.getElementById('d-ico').textContent='👆';
+  document.getElementById('d-hint').textContent='Tap the big button below to hear the word!';
   document.getElementById('d-next').style.display='none';
   document.getElementById('d-done').style.display='none';
-  document.getElementById('hear-btn').style.display='';
-  setTimeout(()=>sayDict(dictOrder[dictIdx]),700);
+  // Make the hear button extra prominent — word only plays when user taps
+  var hb=document.getElementById('hear-btn');
+  hb.style.display='';
+  hb.style.fontSize='20px';
+  hb.textContent='🔊 Tap to Hear Word '+( dictIdx+1);
 }
 
 function sayDict(idx){
   var w=W[idx];
   var ico=document.getElementById('d-ico');
-  ico.classList.add('speaking');
+  var hb=document.getElementById('hear-btn');
+  ico.textContent='🔊'; ico.classList.add('speaking');
+  hb.disabled=true; hb.textContent='🔊 Playing…';
   var u=say(w.t,w.l);
   if(u){
     u.onend=()=>{
       ico.classList.remove('speaking');
+      hb.disabled=false;
       var last=dictIdx>=dictOrder.length-1;
       ico.textContent=last?'🏁':'✅';
+      hb.textContent='🔊 Hear Again';
       document.getElementById('d-hint').textContent=last
-        ?'Last word! Write it down, then tap "Done".'
-        :'Write it down, then tap "Next Word" when ready.';
+        ?'Last word! Write it on paper, then tap "Done".'
+        :'Write it on paper, then tap "Next Word".';
       document.getElementById(last?'d-done':'d-next').style.display='';
+    };
+    u.onerror=()=>{
+      ico.classList.remove('speaking');
+      ico.textContent='❌';
+      hb.disabled=false; hb.textContent='🔊 Try Again';
+      document.getElementById('d-hint').textContent='Sound did not play. Tap the button again!';
     };
   } else {
     ico.classList.remove('speaking');
-    document.getElementById('d-hint').textContent='⚠️ Sound not working. Please use Chrome browser.';
+    hb.disabled=false;
+    document.getElementById('d-hint').textContent='⚠️ No sound. Please open this page in Chrome browser.';
   }
 }
 
 function hearNow(){
+  // This is triggered by user tap — safe to play audio on mobile
+  speechSynthesis.cancel(); // clear any stuck audio
   document.getElementById('d-next').style.display='none';
   document.getElementById('d-done').style.display='none';
-  document.getElementById('d-ico').textContent='🔊';
   sayDict(dictOrder[dictIdx]);
 }
 function nxtWord(){dictIdx++;showWord();}
@@ -752,9 +773,20 @@ async function callAI(content){
 }
 
 // ── Voice preload ──────────────────────────────────────
+// Load voices as soon as possible (needed for Android Chrome)
 if('speechSynthesis' in window){
   speechSynthesis.getVoices();
-  if(speechSynthesis.onvoiceschanged!==undefined) speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
+  if(speechSynthesis.onvoiceschanged!==undefined){
+    speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
+  }
+  // Warm up audio on first user interaction — fixes iOS/Android silent bug
+  document.addEventListener('touchstart', function warmup(){
+    if(speechSynthesis.speaking) return;
+    var u=new SpeechSynthesisUtterance('');
+    u.volume=0; // silent warmup
+    try{speechSynthesis.speak(u);}catch(e){}
+    document.removeEventListener('touchstart', warmup);
+  }, {once:true, passive:true});
 }
 </script>
 </body>

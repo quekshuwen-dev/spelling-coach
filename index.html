@@ -137,14 +137,11 @@ body{padding-bottom:80px}
 </head>
 <body>
 
-<!-- Hidden audio element — this is what actually plays sound on Android -->
-<audio id="tts-audio" style="display:none" playsinline></audio>
-
 <!-- ═══ PAGE 1: WORDS ═══ -->
 <div class="pg on" id="pg-words">
   <div class="hdr">
     <span class="ico">📚</span>
-    <h1>Word List</h1>
+    <h1>Spelling List</h1>
     <p>Add your child's spelling words.<br>The app will read them aloud during the test!</p>
   </div>
 
@@ -256,6 +253,18 @@ body{padding-bottom:80px}
     <button class="bb gr" onclick="goP('pg-mark')" id="d-done" style="display:none;font-size:17px">✅ Done! Mark my work</button>
   </div>
   <div style="text-align:center"><button class="bb wh sm" onclick="goP('pg-words')" style="width:auto;padding:10px 22px">← Back</button></div>
+
+  <!-- Voice settings -->
+  <div class="card" style="margin-top:1rem">
+    <button class="sec-btn" onclick="toggleSec('s-voiceset')"><span>⚙️ &nbsp;Voice settings (if sound is unclear)</span><i class="arr">▼</i></button>
+    <div class="sec-body" id="s-voiceset">
+      <label style="font-size:13px;font-weight:600;color:var(--tx2);display:block;margin-bottom:6px;margin-top:8px">Choose voice:</label>
+      <select id="voice-select" onchange="onVoiceSelect()" style="width:100%;padding:12px;border-radius:12px;border:2px solid #ddd;font-size:14px;font-family:inherit;background:var(--wh);color:var(--tx);margin-bottom:12px;min-height:48px"></select>
+      <label style="font-size:13px;font-weight:600;color:var(--tx2);display:block;margin-bottom:6px">Speed: <span id="speed-val">Slow</span></label>
+      <input type="range" id="speed-slider" min="0.5" max="1.0" step="0.05" value="0.65" oninput="onSpeedChange()" style="width:100%;margin-bottom:12px">
+      <button class="bb wh sm" onclick="testVoice()">🔊 Test this voice</button>
+    </div>
+  </div>
 </div>
 
 <!-- ═══ PAGE 3: MARK ═══ -->
@@ -346,53 +355,132 @@ var SAMPLES={
 };
 
 // ── AUDIO via <audio> element ─────────────────────────
-// Uses Google Translate TTS — works reliably on Android Chrome
-// No Web Speech API issues, no permissions needed
-var audio = document.getElementById('tts-audio');
+// Uses the phone's built-in voice (Web Speech API)
+// Picks a clear, slow LADY voice for the children
 
-function getLangCode(l){
-  if(l==='zh') return 'zh-CN';
-  if(l==='py') return 'zh-CN'; // pinyin spoken in Chinese
-  return 'en-US';
+var pickedVoiceEN = null;  // chosen female English voice
+var pickedVoiceZH = null;  // chosen Chinese voice
+var voicesReady = false;
+var userVoiceURI = null;   // manually chosen voice
+var speakRate = 0.65;      // adjustable speed
+
+function loadVoices(){
+  if(!window.speechSynthesis) return;
+  var voices = window.speechSynthesis.getVoices();
+  if(!voices || !voices.length) return;
+
+  // ── Pick a FEMALE English voice (clear & friendly for kids) ──
+  // Preference order: known good female voices, then any with "female", then any English
+  var enPrefs = [
+    'Google UK English Female',
+    'Google US English',
+    'Microsoft Zira',
+    'Samantha',
+    'Karen',
+    'Tessa',
+    'Moira',
+    'Catherine',
+    'Serena'
+  ];
+  for(var i=0;i<enPrefs.length && !pickedVoiceEN;i++){
+    pickedVoiceEN = voices.find(function(v){ return v.name.indexOf(enPrefs[i])>-1; });
+  }
+  // fallback: any voice whose name says "female"
+  if(!pickedVoiceEN) pickedVoiceEN = voices.find(function(v){ return /female/i.test(v.name) && v.lang.indexOf('en')===0; });
+  // fallback: any English voice
+  if(!pickedVoiceEN) pickedVoiceEN = voices.find(function(v){ return v.lang==='en-GB'; })
+                                 || voices.find(function(v){ return v.lang==='en-US'; })
+                                 || voices.find(function(v){ return v.lang.indexOf('en')===0; });
+
+  // ── Pick a Chinese voice ──
+  pickedVoiceZH = voices.find(function(v){ return v.name.indexOf('Google')>-1 && v.lang.indexOf('zh')===0; })
+              || voices.find(function(v){ return v.lang==='zh-CN'; })
+              || voices.find(function(v){ return v.lang.indexOf('zh')===0; });
+
+  voicesReady = true;
 }
 
-function playAudio(text, lang, onDone, onErr){
-  var langCode = getLangCode(lang);
-  // Google Translate TTS URL — free, reliable on Android Chrome
-  var url = 'https://translate.google.com/translate_tts?ie=UTF-8&q='
-    + encodeURIComponent(text)
-    + '&tl=' + langCode
-    + '&client=tw-ob';
-
-  audio.src = url;
-  audio.onended = onDone || null;
-  audio.onerror = function(){
-    // Fallback to Web Speech API if Google TTS fails
-    trySpeechAPI(text, lang, onDone, onErr);
-  };
-  // play() returns a promise on modern browsers
-  var p = audio.play();
-  if(p && p.catch){
-    p.catch(function(e){
-      // If audio element fails, try Web Speech API
-      trySpeechAPI(text, lang, onDone, onErr);
-    });
+// Load voices now and whenever they become available
+if(window.speechSynthesis){
+  loadVoices();
+  if(window.speechSynthesis.onvoiceschanged !== undefined){
+    window.speechSynthesis.onvoiceschanged = function(){ loadVoices(); populateVoiceList(); };
   }
 }
 
-function trySpeechAPI(text, lang, onDone, onErr){
+// Main play function — MUST run synchronously inside the tap handler on Android
+function playAudio(text, lang, onDone, onErr){
   if(!window.speechSynthesis){
-    toast('❌ No audio available. Please check your phone volume.');
+    toast('Your browser cannot play voice. Please use Chrome.');
     if(onErr) onErr();
     return;
   }
+
+  // Make sure voices are loaded (Android loads them late)
+  if(!voicesReady) loadVoices();
+
+  // Stop anything currently playing
   window.speechSynthesis.cancel();
+
   var u = new SpeechSynthesisUtterance(text);
-  u.lang = getLangCode(lang);
-  u.rate = 0.8; u.volume = 1.0;
+  u.rate = speakRate;  // adjustable; default slow for kids
+  u.pitch = 1.05;    // slightly higher = friendly lady tone
+  u.volume = 1.0;
+
+  // If user manually chose a voice for English, use it
+  var voices = window.speechSynthesis.getVoices();
+  if(lang==='zh' || lang==='py'){
+    if(pickedVoiceZH){ u.voice = pickedVoiceZH; u.lang = pickedVoiceZH.lang; }
+    else u.lang = 'zh-CN';
+  } else {
+    var uv = userVoiceURI ? voices.find(function(v){return v.voiceURI===userVoiceURI;}) : null;
+    if(uv){ u.voice = uv; u.lang = uv.lang; }
+    else if(pickedVoiceEN){ u.voice = pickedVoiceEN; u.lang = pickedVoiceEN.lang; }
+    else u.lang = 'en-GB';
+  }
+
   if(onDone) u.onend = onDone;
-  if(onErr) u.onerror = function(){ toast('Could not play audio. Check volume!'); if(onErr) onErr(); };
+  u.onerror = function(ev){
+    if(ev.error==='interrupted' || ev.error==='canceled') return;
+    if(onErr) onErr();
+  };
+
+  // Speak directly — no setTimeout (Android needs it inside the user gesture)
   window.speechSynthesis.speak(u);
+
+  // Android sometimes pauses speechSynthesis — nudge it
+  setTimeout(function(){
+    if(window.speechSynthesis.paused) window.speechSynthesis.resume();
+  }, 100);
+}
+
+// ── Voice picker UI ────────────────────────────────────
+function populateVoiceList(){
+  if(!window.speechSynthesis) return;
+  var voices = window.speechSynthesis.getVoices();
+  var sel = document.getElementById('voice-select');
+  if(!sel) return;
+  // English voices only (for the picker)
+  var enVoices = voices.filter(function(v){ return v.lang.indexOf('en')===0; });
+  if(!enVoices.length){ sel.innerHTML='<option>Loading voices…</option>'; return; }
+  sel.innerHTML = enVoices.map(function(v){
+    var label = v.name + ' (' + v.lang + ')';
+    var isFemale = /female|zira|samantha|karen|tessa|moira|catherine|serena|google uk english female/i.test(v.name);
+    if(isFemale) label = '👩 ' + label;
+    var selected = (pickedVoiceEN && v.voiceURI===pickedVoiceEN.voiceURI) ? ' selected' : '';
+    return '<option value="'+v.voiceURI+'"'+selected+'>'+label+'</option>';
+  }).join('');
+}
+function onVoiceSelect(){
+  userVoiceURI = document.getElementById('voice-select').value;
+}
+function onSpeedChange(){
+  speakRate = parseFloat(document.getElementById('speed-slider').value);
+  var label = speakRate<=0.6?'Very slow':speakRate<=0.75?'Slow':speakRate<=0.9?'Normal':'Fast';
+  document.getElementById('speed-val').textContent = label;
+}
+function testVoice(){
+  playAudio('Hello! This is the voice for spelling.', 'en', null, function(){ toast('Could not play. Turn up volume.'); });
 }
 
 // ── Toast ──────────────────────────────────────────────
@@ -422,7 +510,7 @@ function goP(id){
   document.querySelectorAll('.ti').forEach(function(t){t.classList.remove('on');});
   var tb=document.getElementById(PTAB[id]); if(tb) tb.classList.add('on');
   window.scrollTo({top:0,behavior:'smooth'});
-  if(id==='pg-test') initDict();
+  if(id==='pg-test'){ initDict(); populateVoiceList(); }
   if(id==='pg-results') renderRes();
 }
 
@@ -581,31 +669,40 @@ function hearNow(){
   var w=W[dictOrder[dictIdx]];
   var ico=document.getElementById('d-ico');
   var hb=document.getElementById('hear-btn');
+  var last=dictIdx>=dictOrder.length-1;
+
   ico.textContent='🔊'; ico.classList.add('speaking');
   hb.disabled=true; hb.textContent='🔊 Playing…';
   document.getElementById('d-next').style.display='none';
   document.getElementById('d-done').style.display='none';
 
-  playAudio(w.t, w.l,
-    function(){ // onDone
-      ico.classList.remove('speaking');
-      hb.disabled=false;
-      var last=dictIdx>=dictOrder.length-1;
-      ico.textContent=last?'🏁':'✅';
-      hb.textContent='🔊 Hear Again';
-      document.getElementById('d-hint').textContent=last
-        ?'Last word! Write it on paper, then tap "Done".'
-        :'Write it on paper, then tap "Next Word".';
-      document.getElementById(last?'d-done':'d-next').style.display='';
-    },
-    function(){ // onErr
-      ico.classList.remove('speaking');
-      ico.textContent='❌';
-      hb.disabled=false;
-      hb.textContent='🔊 Tap to Try Again';
-      document.getElementById('d-hint').textContent='Could not play. Turn volume up and tap again!';
-    }
-  );
+  // Reveal Next/Done buttons after a moment regardless, so the child can always continue
+  // (Android sometimes does not fire onend reliably)
+  var revealed=false;
+  function reveal(){
+    if(revealed) return; revealed=true;
+    ico.classList.remove('speaking');
+    hb.disabled=false;
+    ico.textContent=last?'🏁':'✅';
+    hb.textContent='🔊 Hear Again';
+    document.getElementById('d-hint').textContent=last
+      ?'Last word! Write it on paper, then tap "Done".'
+      :'Write it on paper, then tap "Next Word".';
+    document.getElementById(last?'d-done':'d-next').style.display='';
+  }
+
+  playAudio(w.t, w.l, reveal, function(){
+    // genuine error
+    ico.classList.remove('speaking');
+    ico.textContent='🔊';
+    hb.disabled=false;
+    hb.textContent='🔊 Tap to Hear Again';
+  });
+
+  // Safety: estimate speaking time, then reveal next button
+  // (word length * 400ms, minimum 1.8s) — covers Android not firing onend
+  var ms = Math.max(1800, w.t.length * 450);
+  setTimeout(reveal, ms);
 }
 function nxtWord(){dictIdx++;showWord();}
 

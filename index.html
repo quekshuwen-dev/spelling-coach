@@ -3,75 +3,44 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Spelling Coach">
 <meta name="theme-color" content="#6C63FF">
 <title>✏️ Spelling Coach</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{
-  --pu:#6C63FF;--pud:#4B44CC;--pul:#EEEDFF;
-  --gr:#43A047;--re:#EF5350;--or:#FB8C00;--ye:#FFB300;
-  --bg:#F4F4FF;--wh:#fff;--tx:#1a1a2e;--tx2:#5a5a7a;
-  --sh:0 4px 18px rgba(108,99,255,.13)
-}
+:root{--pu:#6C63FF;--pud:#4B44CC;--pul:#EEEDFF;--gr:#43A047;--re:#EF5350;--or:#FB8C00;--bg:#F4F4FF;--wh:#fff;--tx:#1a1a2e;--tx2:#5a5a7a;--sh:0 4px 18px rgba(108,99,255,.13)}
 html,body{min-height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--tx);overflow-x:hidden}
 body{padding-bottom:80px}
-
 .pg{display:none;padding:1rem;max-width:500px;margin:0 auto}
 .pg.on{display:block}
-
 .hdr{text-align:center;padding:.75rem 0 1.25rem}
 .hdr .ico{font-size:52px;display:block;line-height:1;margin-bottom:.4rem}
 .hdr h1{font-size:24px;font-weight:800;color:var(--pu)}
 .hdr p{font-size:13px;color:var(--tx2);margin-top:3px;line-height:1.6}
-
 .card{background:var(--wh);border-radius:20px;padding:1.2rem;margin-bottom:.9rem;box-shadow:var(--sh)}
-.ctitle{font-size:14px;font-weight:700;color:var(--tx);margin-bottom:.85rem;display:flex;align-items:center;gap:8px}
-
+.ctitle{font-size:14px;font-weight:700;margin-bottom:.85rem;display:flex;align-items:center;gap:8px}
 .bb{width:100%;padding:18px 16px;border-radius:18px;border:none;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:var(--sh);min-height:62px;touch-action:manipulation;transition:transform .1s,opacity .1s;-webkit-appearance:none;line-height:1.2}
 .bb:active{transform:scale(.95);opacity:.85}
-.bb.pu{background:var(--pu);color:#fff}
-.bb.gr{background:var(--gr);color:#fff}
-.bb.or{background:var(--or);color:#fff}
-.bb.ye{background:var(--ye);color:#fff}
-.bb.re{background:var(--re);color:#fff}
+.bb.pu{background:var(--pu);color:#fff}.bb.gr{background:var(--gr);color:#fff}.bb.or{background:var(--or);color:#fff}
 .bb.wh{background:var(--wh);color:var(--pu);border:2.5px solid var(--pu);box-shadow:none}
 .bb.sm{font-size:14px;padding:12px 16px;min-height:48px;border-radius:14px}
-
 .inp{width:100%;padding:14px 16px;border-radius:14px;border:2.5px solid #ddd;font-size:17px;font-family:inherit;background:var(--wh);color:var(--tx);outline:none;min-height:52px;-webkit-appearance:none}
 .inp:focus{border-color:var(--pu)}
-
-/* Section toggles */
 .sec-btn{width:100%;padding:14px 16px;border-radius:16px;border:2.5px solid var(--pul);background:var(--pul);color:var(--pud);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:space-between;min-height:54px;touch-action:manipulation;margin-bottom:8px}
-.sec-btn .arr{transition:transform .25s;font-style:normal}
-.sec-btn.open .arr{transform:rotate(180deg)}
-.sec-body{display:none;padding-top:4px}
-.sec-body.open{display:block}
-
-/* Word rows */
+.sec-btn .arr{transition:transform .25s;font-style:normal}.sec-btn.open .arr{transform:rotate(180deg)}
+.sec-body{display:none;padding-top:4px}.sec-body.open{display:block}
 .wrow{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1.5px solid #f0f0f8}
 .wrow:last-child{border-bottom:none}
 .wplay{width:42px;height:42px;border-radius:50%;border:none;background:var(--pul);cursor:pointer;font-size:20px;flex-shrink:0;touch-action:manipulation;display:flex;align-items:center;justify-content:center}
 .wplay:active{background:var(--pu)}
-.wtxt{flex:1;min-width:0}
-.wword{font-size:17px;font-weight:700}
-.wmean{font-size:12px;color:var(--tx2);margin-top:2px}
+.wtxt{flex:1;min-width:0}.wword{font-size:17px;font-weight:700}.wmean{font-size:12px;color:var(--tx2);margin-top:2px}
 .wlang{font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700;flex-shrink:0}
-.l-en{background:#EDE7F6;color:#4527A0}
-.l-zh{background:#E8F5E9;color:#1B5E20}
-.l-py{background:#FFF3E0;color:#BF360C}
+.l-en{background:#EDE7F6;color:#4527A0}.l-zh{background:#E8F5E9;color:#1B5E20}.l-py{background:#FFF3E0;color:#BF360C}
 .wdel{width:34px;height:34px;border-radius:50%;border:none;background:#ffeaea;cursor:pointer;font-size:16px;flex-shrink:0;touch-action:manipulation}
-
-/* Upload zone */
 .upzone{border:3px dashed #c5c5e8;border-radius:18px;padding:1.75rem 1rem;text-align:center;background:var(--pul);position:relative;cursor:pointer}
 .upzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .upzone-ico{font-size:40px;display:block;margin-bottom:.5rem}
-.upzone-t{font-size:15px;font-weight:700;color:var(--pud)}
-.upzone-s{font-size:12px;color:var(--tx2);margin-top:4px}
+.upzone-t{font-size:15px;font-weight:700;color:var(--pud)}.upzone-s{font-size:12px;color:var(--tx2);margin-top:4px}
 .prev-img{width:100%;border-radius:16px;display:block;max-height:260px;object-fit:contain;background:#111;margin-bottom:12px}
-
-/* Mic */
 .mic-wrap{text-align:center;padding:.5rem 0 .25rem}
 .mic-big{width:90px;height:90px;border-radius:50%;border:none;background:var(--pu);cursor:pointer;display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 6px 24px rgba(108,99,255,.4);-webkit-appearance:none;touch-action:manipulation}
 .mic-big.rec{background:var(--re);animation:rp 1s infinite}
@@ -79,60 +48,37 @@ body{padding-bottom:80px}
 .mic-big svg{width:42px;height:42px;fill:#fff}
 .mic-lbl{font-size:14px;color:var(--tx2);margin-top:12px;min-height:44px;line-height:1.6;font-weight:500;text-align:center}
 .heard{background:var(--pul);border-radius:14px;padding:14px;font-size:20px;text-align:center;min-height:58px;margin:10px 0;color:var(--pud);font-weight:700}
-
-/* Progress */
 .prog-bg{height:12px;background:#e8e8f0;border-radius:12px;overflow:hidden;margin:10px 0}
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--pu),#a78bfa);border-radius:12px;transition:width .5s}
-
-/* Dictation */
 .stage{text-align:center;padding:1.5rem .5rem 1rem}
-.stage-ico{font-size:72px;display:block;margin-bottom:.75rem;line-height:1}
+.stage-ico{font-size:64px;display:block;margin-bottom:.5rem;line-height:1}
 .stage-ctr{font-size:13px;font-weight:700;color:var(--tx2);margin-bottom:4px}
-.stage-hint{font-size:16px;color:var(--tx2);line-height:1.65;min-height:52px}
-
-/* Order */
+.stage-hint{font-size:15px;color:var(--tx2);line-height:1.6;min-height:40px}
+.reveal-word{font-size:40px;font-weight:800;color:var(--pu);letter-spacing:2px;margin:12px 0;min-height:50px;filter:blur(14px);transition:filter .2s;user-select:none}
+.reveal-word.show{filter:none}
 .ord-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.1rem}
 .ord{border:3px solid #e0e0e0;border-radius:18px;padding:16px 8px;text-align:center;cursor:pointer;background:var(--wh);touch-action:manipulation;transition:all .15s}
 .ord.on{border-color:var(--pu);background:var(--pul)}
-.ord-ico{font-size:28px;display:block;margin-bottom:5px}
-.ord-t{font-size:14px;font-weight:700}
-.ord-s{font-size:11px;color:var(--tx2);margin-top:2px}
-
-/* AI result */
-.ai-box{background:var(--pul);border-radius:16px;padding:1.1rem;font-size:14px;line-height:1.9;white-space:pre-wrap;word-break:break-word;color:var(--tx);max-height:55vh;overflow-y:auto}
-
-/* Score */
+.ord-ico{font-size:28px;display:block;margin-bottom:5px}.ord-t{font-size:14px;font-weight:700}.ord-s{font-size:11px;color:var(--tx2);margin-top:2px}
+.ai-box{background:var(--pul);border-radius:16px;padding:1.1rem;font-size:14px;line-height:1.9;white-space:pre-wrap;word-break:break-word;max-height:55vh;overflow-y:auto}
 .sc-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem}
 .sc{background:var(--wh);border-radius:16px;padding:14px 6px;text-align:center;box-shadow:var(--sh)}
-.sc-n{font-size:28px;font-weight:800}
-.sc-l{font-size:11px;color:var(--tx2);margin-top:3px;font-weight:600}
-
-/* Tab bar */
+.sc-n{font-size:28px;font-weight:800}.sc-l{font-size:11px;color:var(--tx2);margin-top:3px;font-weight:600}
 .tbar{position:fixed;bottom:0;left:0;right:0;background:var(--wh);border-top:1.5px solid #eeeef8;display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom)}
 .ti{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px 6px;cursor:pointer;border:none;background:none;font-family:inherit;touch-action:manipulation;gap:3px;min-height:56px}
 .ti span{font-size:9px;font-weight:700;color:#bbb;letter-spacing:.3px}
 .ti svg{width:25px;height:25px;stroke:#bbb;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .ti.on svg{stroke:var(--pu)}.ti.on span{color:var(--pu)}
-
-/* Dots */
 .dots{display:inline-flex;gap:5px;vertical-align:middle}
 .dots span{width:8px;height:8px;border-radius:50%;background:var(--pu);display:inline-block;animation:dd 1.2s infinite}
 .dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
 @keyframes dd{0%,80%,100%{transform:scale(.5);opacity:.4}40%{transform:scale(1);opacity:1}}
-
-/* Toast */
 #toast{position:fixed;bottom:82px;left:50%;transform:translateX(-50%) translateY(8px);background:#1a1a2e;color:#fff;padding:11px 22px;border-radius:30px;font-size:13px;font-weight:600;z-index:9999;max-width:88vw;text-align:center;opacity:0;transition:all .25s;pointer-events:none}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* Lang toggle */
 .lang-row{display:flex;gap:8px;justify-content:center;margin-bottom:1rem}
 .lang-btn{padding:10px 18px;border-radius:30px;border:2px solid #ddd;background:var(--wh);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;min-height:46px;touch-action:manipulation}
 .lang-btn.on{background:var(--pu);border-color:var(--pu);color:#fff}
-
-.divider{border:none;border-top:2px solid #f0f0f8;margin:.9rem 0}
-.gap{height:10px}
-.speaking{animation:sp .5s infinite alternate}
-@keyframes sp{from{transform:scale(1)}to{transform:scale(1.1)}}
+.divider{border:none;border-top:2px solid #f0f0f8;margin:.9rem 0}.gap{height:10px}
 </style>
 </head>
 <body>
@@ -141,20 +87,16 @@ body{padding-bottom:80px}
 <div class="pg on" id="pg-words">
   <div class="hdr">
     <span class="ico">📚</span>
-    <h1>Spelling List</h1>
-    <p>Add your child's spelling words.<br>The app will read them aloud during the test!</p>
+    <h1>Word List</h1>
+    <p>Add your child's spelling words below</p>
   </div>
 
-  <!-- Photo scan -->
   <div class="card">
-    <button class="sec-btn" onclick="toggleSec('s-photo')"><span>📷 &nbsp;Scan photo of spelling list</span><i class="arr">▼</i></button>
+    <button class="sec-btn" onclick="toggleSec('s-photo')"><span>📷 &nbsp;Scan photo of list</span><i class="arr">▼</i></button>
     <div class="sec-body" id="s-photo">
-      <p style="font-size:13px;color:var(--tx2);margin-bottom:.85rem;line-height:1.6">Take a photo of the school spelling list. AI will read all the words for you!</p>
-      <label class="upzone">
-        <input type="file" accept="image/*" onchange="scanUp(event)">
-        <span class="upzone-ico">📷</span>
-        <div class="upzone-t">Tap to choose photo from gallery</div>
-        <div class="upzone-s">Or take a new photo with your camera</div>
+      <p style="font-size:13px;color:var(--tx2);margin-bottom:.85rem;line-height:1.6">Take a photo of the school spelling list — AI reads all the words!</p>
+      <label class="upzone"><input type="file" accept="image/*" onchange="scanUp(event)">
+        <span class="upzone-ico">📷</span><div class="upzone-t">Tap to choose photo</div><div class="upzone-s">From gallery or camera</div>
       </label>
       <div id="scan-prev" style="display:none;margin-top:12px">
         <img id="scan-img" class="prev-img" src="" alt="">
@@ -164,19 +106,16 @@ body{padding-bottom:80px}
     </div>
   </div>
 
-  <!-- Voice input -->
   <div class="card">
     <button class="sec-btn" onclick="toggleSec('s-voice')"><span>🎤 &nbsp;Speak the words</span><i class="arr">▼</i></button>
     <div class="sec-body" id="s-voice">
-      <p style="font-size:13px;color:var(--tx2);margin-bottom:.85rem;line-height:1.6">Tap the mic, say a word, tap mic again to stop, then tap Add.</p>
+      <p style="font-size:13px;color:var(--tx2);margin-bottom:.85rem;line-height:1.6">Tap mic, say a word, tap mic to stop, then Add.</p>
       <div class="lang-row">
         <button class="lang-btn on" id="lp-en" onclick="setVLang('en-SG')">🇬🇧 English</button>
         <button class="lang-btn" id="lp-zh" onclick="setVLang('zh-CN')">🇨🇳 Chinese</button>
       </div>
       <div class="mic-wrap">
-        <button class="mic-big" id="mic-btn" onclick="toggleMic()">
-          <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>
-        </button>
+        <button class="mic-big" id="mic-btn" onclick="toggleMic()"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg></button>
         <div class="mic-lbl" id="mic-lbl">Tap the mic and say a word</div>
       </div>
       <div class="heard" id="mic-heard">—</div>
@@ -187,7 +126,6 @@ body{padding-bottom:80px}
     </div>
   </div>
 
-  <!-- Type -->
   <div class="card">
     <button class="sec-btn" onclick="toggleSec('s-type')"><span>⌨️ &nbsp;Type the words</span><i class="arr">▼</i></button>
     <div class="sec-body" id="s-type">
@@ -199,7 +137,6 @@ body{padding-bottom:80px}
     </div>
   </div>
 
-  <!-- Samples -->
   <div class="card">
     <button class="sec-btn" onclick="toggleSec('s-sample')"><span>📖 &nbsp;Load sample words</span><i class="arr">▼</i></button>
     <div class="sec-body" id="s-sample">
@@ -211,13 +148,12 @@ body{padding-bottom:80px}
     </div>
   </div>
 
-  <!-- Word list -->
   <div class="card" id="wl-card" style="display:none">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
       <div class="ctitle" style="margin:0">📝 Words added (<span id="wc">0</span>)</div>
       <button class="bb wh sm" onclick="clearAll()" style="width:auto;padding:8px 14px;font-size:13px;min-height:38px">Clear all</button>
     </div>
-    <p style="font-size:12px;color:var(--tx2);margin-bottom:.75rem">Tap 🔊 to hear any word. Tap ✕ to remove.</p>
+    <p style="font-size:12px;color:var(--tx2);margin-bottom:.75rem">Tap 🔊 to hear a word. Tap ✕ to remove.</p>
     <div id="word-list"></div>
     <div class="divider"></div>
     <div class="ctitle">🎯 Test order</div>
@@ -234,37 +170,24 @@ body{padding-bottom:80px}
   <div class="hdr">
     <span class="ico">🔊</span>
     <h1>Listen &amp; Write!</h1>
-    <p>Tap the big button to hear each word.<br>Write it on your paper!</p>
+    <p>Tap the button to hear each word</p>
   </div>
   <div class="card">
     <div class="stage-ctr" id="d-ctr">Word 1 of 10</div>
     <div class="prog-bg"><div class="prog-fill" id="d-prog" style="width:0%"></div></div>
     <div class="stage">
       <span class="stage-ico" id="d-ico">👆</span>
+      <!-- The word, blurred — child can tap "show" if sound fails -->
+      <div class="reveal-word" id="d-word">—</div>
       <div class="stage-hint" id="d-hint">Tap the button below to hear the word!</div>
     </div>
-    <!-- BIG HEAR BUTTON -->
-    <button class="bb pu" id="hear-btn" onclick="hearNow()"
-      style="font-size:20px;min-height:78px;border-radius:22px;margin-bottom:14px">
-      🔊 Tap to Hear Word
-    </button>
+    <button class="bb pu" id="hear-btn" onclick="hearNow()" style="font-size:20px;min-height:74px;border-radius:22px;margin-bottom:10px">🔊 Tap to Hear Word</button>
+    <button class="bb wh sm" id="show-btn" onclick="toggleShow()" style="margin-bottom:12px">👁️ Show the word (if no sound)</button>
     <div class="gap"></div>
     <button class="bb gr" onclick="nxtWord()" id="d-next" style="display:none;font-size:17px">➡️ Next Word</button>
     <button class="bb gr" onclick="goP('pg-mark')" id="d-done" style="display:none;font-size:17px">✅ Done! Mark my work</button>
   </div>
   <div style="text-align:center"><button class="bb wh sm" onclick="goP('pg-words')" style="width:auto;padding:10px 22px">← Back</button></div>
-
-  <!-- Voice settings -->
-  <div class="card" style="margin-top:1rem">
-    <button class="sec-btn" onclick="toggleSec('s-voiceset')"><span>⚙️ &nbsp;Voice settings (if sound is unclear)</span><i class="arr">▼</i></button>
-    <div class="sec-body" id="s-voiceset">
-      <label style="font-size:13px;font-weight:600;color:var(--tx2);display:block;margin-bottom:6px;margin-top:8px">Choose voice:</label>
-      <select id="voice-select" onchange="onVoiceSelect()" style="width:100%;padding:12px;border-radius:12px;border:2px solid #ddd;font-size:14px;font-family:inherit;background:var(--wh);color:var(--tx);margin-bottom:12px;min-height:48px"></select>
-      <label style="font-size:13px;font-weight:600;color:var(--tx2);display:block;margin-bottom:6px">Speed: <span id="speed-val">Slow</span></label>
-      <input type="range" id="speed-slider" min="0.5" max="1.0" step="0.05" value="0.65" oninput="onSpeedChange()" style="width:100%;margin-bottom:12px">
-      <button class="bb wh sm" onclick="testVoice()">🔊 Test this voice</button>
-    </div>
-  </div>
 </div>
 
 <!-- ═══ PAGE 3: MARK ═══ -->
@@ -272,14 +195,11 @@ body{padding-bottom:80px}
   <div class="hdr">
     <span class="ico">📸</span>
     <h1>Mark My Work!</h1>
-    <p>Upload a photo of your written answers.<br>AI will mark it and explain mistakes.</p>
+    <p>Upload a photo of the written answers</p>
   </div>
   <div class="card">
-    <label class="upzone">
-      <input type="file" accept="image/*" onchange="markUp(event)">
-      <span class="upzone-ico">📷</span>
-      <div class="upzone-t">Tap to upload photo of your answers</div>
-      <div class="upzone-s">Take a clear photo of your written work</div>
+    <label class="upzone"><input type="file" accept="image/*" onchange="markUp(event)">
+      <span class="upzone-ico">📷</span><div class="upzone-t">Tap to upload your answers</div><div class="upzone-s">Take a clear photo of the writing</div>
     </label>
   </div>
   <div id="mark-prev" style="display:none">
@@ -312,10 +232,7 @@ body{padding-bottom:80px}
     <div class="sc"><div class="sc-n" id="r-ng" style="color:var(--re)">—</div><div class="sc-l">📝 Revise</div></div>
     <div class="sc"><div class="sc-n" id="r-st">⭐</div><div class="sc-l">Stars</div></div>
   </div>
-  <div class="card">
-    <div class="ctitle">📋 Words in this test</div>
-    <div id="r-hist"></div>
-  </div>
+  <div class="card"><div class="ctitle">📋 Words in this test</div><div id="r-hist"></div></div>
   <div style="display:flex;flex-direction:column;gap:10px">
     <button class="bb pu" onclick="goP('pg-test')" style="font-size:17px">🔄 Practise Again!</button>
     <button class="bb wh" onclick="goP('pg-words')" style="font-size:16px">📚 Change Word List</button>
@@ -324,419 +241,169 @@ body{padding-bottom:80px}
 
 <!-- Tab bar -->
 <div class="tbar">
-  <button class="ti on" id="tb-words" onclick="goP('pg-words')">
-    <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-    <span>WORDS</span>
-  </button>
-  <button class="ti" id="tb-test" onclick="goP('pg-test')">
-    <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-    <span>TEST</span>
-  </button>
-  <button class="ti" id="tb-mark" onclick="goP('pg-mark')">
-    <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-    <span>MARK</span>
-  </button>
-  <button class="ti" id="tb-results" onclick="goP('pg-results')">
-    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-    <span>RESULTS</span>
-  </button>
+  <button class="ti on" id="tb-words" onclick="goP('pg-words')"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>WORDS</span></button>
+  <button class="ti" id="tb-test" onclick="goP('pg-test')"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg><span>TEST</span></button>
+  <button class="ti" id="tb-mark" onclick="goP('pg-mark')"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>MARK</span></button>
+  <button class="ti" id="tb-results" onclick="goP('pg-results')"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><span>RESULTS</span></button>
 </div>
 <div id="toast"></div>
 
 <script>
-// ── State ─────────────────────────────────────────────
 var W=[], dictOrder=[], dictIdx=0, testOrd='seq', score=null, scanData=null, markData=null;
-var micRec=null, micOn=false, voiceLang='en-SG', heardWord='';
+var micRec=null, micOn=false, voiceLang='en-SG', heardWord='', wordShown=false;
 
 var SAMPLES={
-  en:[{t:'cat',m:'a small furry pet 🐱'},{t:'dog',m:'a pet that barks 🐶'},{t:'run',m:'to move fast 🏃'},{t:'sun',m:'the big star ☀️'},{t:'hat',m:'worn on your head 🎩'},{t:'sit',m:'rest on a chair'},{t:'cup',m:'you drink from this ☕'},{t:'bed',m:'you sleep here 🛏️'},{t:'big',m:'very large'},{t:'red',m:'a bright colour 🔴'},{t:'bus',m:'a big vehicle 🚌'},{t:'wet',m:'full of water 💧'}],
-  zh:[{t:'我',m:'wǒ — I / me'},{t:'你',m:'nǐ — you'},{t:'他',m:'tā — he'},{t:'她',m:'tā — she'},{t:'好',m:'hǎo — good'},{t:'大',m:'dà — big'},{t:'小',m:'xiǎo — small'},{t:'上',m:'shàng — up'},{t:'下',m:'xià — down'},{t:'人',m:'rén — person'},{t:'水',m:'shuǐ — water'},{t:'火',m:'huǒ — fire'}],
-  py:[{t:'māo',m:'猫 — cat 🐱'},{t:'gǒu',m:'狗 — dog 🐶'},{t:'shuǐ',m:'水 — water'},{t:'huǒ',m:'火 — fire'},{t:'rén',m:'人 — person'},{t:'shǒu',m:'手 — hand'},{t:'tài yáng',m:'太阳 — sun ☀️'},{t:'xiǎo',m:'小 — small'},{t:'dà',m:'大 — big'},{t:'shān',m:'山 — mountain'},{t:'rì',m:'日 — day'},{t:'yuè',m:'月 — moon 🌙'}]
+  en:[{t:'cat',m:'a small furry pet 🐱'},{t:'dog',m:'a pet that barks 🐶'},{t:'run',m:'to move fast 🏃'},{t:'sun',m:'the big star ☀️'},{t:'hat',m:'worn on the head 🎩'},{t:'sit',m:'rest on a chair'},{t:'cup',m:'you drink from this ☕'},{t:'bed',m:'you sleep here 🛏️'},{t:'big',m:'very large'},{t:'red',m:'a colour 🔴'}],
+  zh:[{t:'我',m:'wǒ — I / me'},{t:'你',m:'nǐ — you'},{t:'他',m:'tā — he'},{t:'好',m:'hǎo — good'},{t:'大',m:'dà — big'},{t:'小',m:'xiǎo — small'},{t:'人',m:'rén — person'},{t:'水',m:'shuǐ — water'},{t:'火',m:'huǒ — fire'},{t:'山',m:'shān — mountain'}],
+  py:[{t:'māo',m:'猫 — cat 🐱'},{t:'gǒu',m:'狗 — dog 🐶'},{t:'shuǐ',m:'水 — water'},{t:'huǒ',m:'火 — fire'},{t:'rén',m:'人 — person'},{t:'shǒu',m:'手 — hand'},{t:'dà',m:'大 — big'},{t:'xiǎo',m:'小 — small'},{t:'shān',m:'山 — mountain'},{t:'yuè',m:'月 — moon 🌙'}]
 };
 
-// ── AUDIO via <audio> element ─────────────────────────
-// Uses the phone's built-in voice (Web Speech API)
-// Picks a clear, slow LADY voice for the children
-
-var pickedVoiceEN = null;  // chosen female English voice
-var pickedVoiceZH = null;  // chosen Chinese voice
-var voicesReady = false;
-var userVoiceURI = null;   // manually chosen voice
-var speakRate = 0.65;      // adjustable speed
-
-function loadVoices(){
-  if(!window.speechSynthesis) return;
-  var voices = window.speechSynthesis.getVoices();
-  if(!voices || !voices.length) return;
-
-  // ── Pick a FEMALE English voice (clear & friendly for kids) ──
-  // Preference order: known good female voices, then any with "female", then any English
-  var enPrefs = [
-    'Google UK English Female',
-    'Google US English',
-    'Microsoft Zira',
-    'Samantha',
-    'Karen',
-    'Tessa',
-    'Moira',
-    'Catherine',
-    'Serena'
-  ];
-  for(var i=0;i<enPrefs.length && !pickedVoiceEN;i++){
-    pickedVoiceEN = voices.find(function(v){ return v.name.indexOf(enPrefs[i])>-1; });
-  }
-  // fallback: any voice whose name says "female"
-  if(!pickedVoiceEN) pickedVoiceEN = voices.find(function(v){ return /female/i.test(v.name) && v.lang.indexOf('en')===0; });
-  // fallback: any English voice
-  if(!pickedVoiceEN) pickedVoiceEN = voices.find(function(v){ return v.lang==='en-GB'; })
-                                 || voices.find(function(v){ return v.lang==='en-US'; })
-                                 || voices.find(function(v){ return v.lang.indexOf('en')===0; });
-
-  // ── Pick a Chinese voice ──
-  pickedVoiceZH = voices.find(function(v){ return v.name.indexOf('Google')>-1 && v.lang.indexOf('zh')===0; })
-              || voices.find(function(v){ return v.lang==='zh-CN'; })
-              || voices.find(function(v){ return v.lang.indexOf('zh')===0; });
-
-  voicesReady = true;
-}
-
-// Load voices now and whenever they become available
-if(window.speechSynthesis){
-  loadVoices();
-  if(window.speechSynthesis.onvoiceschanged !== undefined){
-    window.speechSynthesis.onvoiceschanged = function(){ loadVoices(); populateVoiceList(); };
-  }
-}
-
-// Main play function — MUST run synchronously inside the tap handler on Android
-function playAudio(text, lang, onDone, onErr){
-  if(!window.speechSynthesis){
-    toast('Your browser cannot play voice. Please use Chrome.');
-    if(onErr) onErr();
-    return;
-  }
-
-  // Make sure voices are loaded (Android loads them late)
-  if(!voicesReady) loadVoices();
-
-  // Stop anything currently playing
-  window.speechSynthesis.cancel();
-
-  var u = new SpeechSynthesisUtterance(text);
-  u.rate = speakRate;  // adjustable; default slow for kids
-  u.pitch = 1.05;    // slightly higher = friendly lady tone
-  u.volume = 1.0;
-
-  // If user manually chose a voice for English, use it
-  var voices = window.speechSynthesis.getVoices();
-  if(lang==='zh' || lang==='py'){
-    if(pickedVoiceZH){ u.voice = pickedVoiceZH; u.lang = pickedVoiceZH.lang; }
-    else u.lang = 'zh-CN';
-  } else {
-    var uv = userVoiceURI ? voices.find(function(v){return v.voiceURI===userVoiceURI;}) : null;
-    if(uv){ u.voice = uv; u.lang = uv.lang; }
-    else if(pickedVoiceEN){ u.voice = pickedVoiceEN; u.lang = pickedVoiceEN.lang; }
-    else u.lang = 'en-GB';
-  }
-
-  if(onDone) u.onend = onDone;
-  u.onerror = function(ev){
-    if(ev.error==='interrupted' || ev.error==='canceled') return;
-    if(onErr) onErr();
-  };
-
-  // Speak directly — no setTimeout (Android needs it inside the user gesture)
-  window.speechSynthesis.speak(u);
-
-  // Android sometimes pauses speechSynthesis — nudge it
-  setTimeout(function(){
-    if(window.speechSynthesis.paused) window.speechSynthesis.resume();
-  }, 100);
-}
-
-// ── Voice picker UI ────────────────────────────────────
-function populateVoiceList(){
-  if(!window.speechSynthesis) return;
-  var voices = window.speechSynthesis.getVoices();
-  var sel = document.getElementById('voice-select');
-  if(!sel) return;
-  // English voices only (for the picker)
-  var enVoices = voices.filter(function(v){ return v.lang.indexOf('en')===0; });
-  if(!enVoices.length){ sel.innerHTML='<option>Loading voices…</option>'; return; }
-  sel.innerHTML = enVoices.map(function(v){
-    var label = v.name + ' (' + v.lang + ')';
-    var isFemale = /female|zira|samantha|karen|tessa|moira|catherine|serena|google uk english female/i.test(v.name);
-    if(isFemale) label = '👩 ' + label;
-    var selected = (pickedVoiceEN && v.voiceURI===pickedVoiceEN.voiceURI) ? ' selected' : '';
-    return '<option value="'+v.voiceURI+'"'+selected+'>'+label+'</option>';
-  }).join('');
-}
-function onVoiceSelect(){
-  userVoiceURI = document.getElementById('voice-select').value;
-}
-function onSpeedChange(){
-  speakRate = parseFloat(document.getElementById('speed-slider').value);
-  var label = speakRate<=0.6?'Very slow':speakRate<=0.75?'Slow':speakRate<=0.9?'Normal':'Fast';
-  document.getElementById('speed-val').textContent = label;
-}
-function testVoice(){
-  playAudio('Hello! This is the voice for spelling.', 'en', null, function(){ toast('Could not play. Turn up volume.'); });
+// ── SOUND — simplest possible. Phone's own voice. ──────
+function speak(text, lang){
+  if(!('speechSynthesis' in window)) return false;
+  try{
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.rate = 0.7;
+    u.volume = 1.0;
+    u.lang = (lang==='zh'||lang==='py') ? 'zh-CN' : 'en-US';
+    // prefer a female voice if one exists
+    var vs = window.speechSynthesis.getVoices();
+    var f = vs.find(function(v){return /female|zira|samantha|karen/i.test(v.name) && v.lang.indexOf(u.lang.slice(0,2))===0;})
+         || vs.find(function(v){return v.lang===u.lang;});
+    if(f) u.voice = f;
+    window.speechSynthesis.speak(u);
+    return true;
+  }catch(e){ return false; }
 }
 
 // ── Toast ──────────────────────────────────────────────
-function toast(msg){
-  var t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('on');
-  clearTimeout(window._tt);
-  window._tt=setTimeout(function(){t.classList.remove('on');},3500);
-}
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');clearTimeout(window._tt);window._tt=setTimeout(function(){t.classList.remove('on');},3200);}
 
-// ── Section toggles ────────────────────────────────────
+// ── Sections ───────────────────────────────────────────
 function toggleSec(id){
-  var body=document.getElementById(id);
-  var btn=body.previousElementSibling;
-  var wasOpen=body.classList.contains('open');
-  document.querySelectorAll('.sec-body').forEach(function(b){b.classList.remove('open');});
-  document.querySelectorAll('.sec-btn').forEach(function(b){b.classList.remove('open');});
-  if(!wasOpen){body.classList.add('open');btn.classList.add('open');}
+  var b=document.getElementById(id), btn=b.previousElementSibling, was=b.classList.contains('open');
+  document.querySelectorAll('.sec-body').forEach(function(x){x.classList.remove('open');});
+  document.querySelectorAll('.sec-btn').forEach(function(x){x.classList.remove('open');});
+  if(!was){b.classList.add('open');btn.classList.add('open');}
 }
 
 // ── Page nav ───────────────────────────────────────────
-var PTAB={'pg-words':'tb-words','pg-test':'tb-test','pg-mark':'tb-mark','pg-results':'tb-results'};
+var PT={'pg-words':'tb-words','pg-test':'tb-test','pg-mark':'tb-mark','pg-results':'tb-results'};
 function goP(id){
   if(id!=='pg-words'&&W.length===0){toast('Please add some words first! 😊');return;}
   document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
   document.getElementById(id).classList.add('on');
   document.querySelectorAll('.ti').forEach(function(t){t.classList.remove('on');});
-  var tb=document.getElementById(PTAB[id]); if(tb) tb.classList.add('on');
+  var tb=document.getElementById(PT[id]); if(tb) tb.classList.add('on');
   window.scrollTo({top:0,behavior:'smooth'});
-  if(id==='pg-test'){ initDict(); populateVoiceList(); }
+  if(id==='pg-test') initDict();
   if(id==='pg-results') renderRes();
 }
 
-// ── Language detect ────────────────────────────────────
-function getLang(w){
-  if(/[\u4e00-\u9fff]/.test(w)) return 'zh';
-  if(/[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/.test(w)) return 'py';
-  return 'en';
-}
-
 // ── Words ──────────────────────────────────────────────
-function addW(t,m){
-  t=t.trim(); if(!t) return;
-  if(W.find(function(w){return w.t===t;})){toast('"'+t+'" already in list');return;}
-  W.push({t:t,l:getLang(t),m:m||''});
-  renderW();
-}
+function getLang(w){if(/[\u4e00-\u9fff]/.test(w))return 'zh';if(/[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/.test(w))return 'py';return 'en';}
+function addW(t,m){t=t.trim();if(!t)return;if(W.find(function(w){return w.t===t;})){toast('"'+t+'" already added');return;}W.push({t:t,l:getLang(t),m:m||''});renderW();}
 function delW(i){W.splice(i,1);renderW();}
 function clearAll(){W=[];renderW();}
-function setOrd(o){
-  testOrd=o;
-  document.getElementById('ord-seq').classList.toggle('on',o==='seq');
-  document.getElementById('ord-mix').classList.toggle('on',o==='mix');
-}
+function setOrd(o){testOrd=o;document.getElementById('ord-seq').classList.toggle('on',o==='seq');document.getElementById('ord-mix').classList.toggle('on',o==='mix');}
 function typeAdd(){var i=document.getElementById('tinp');addW(i.value,'');i.value='';}
 function loadS(l){SAMPLES[l].forEach(function(s){addW(s.t,s.m);});toast('✅ Sample words loaded!');}
-
 function renderW(){
   document.getElementById('wc').textContent=W.length;
   document.getElementById('wl-card').style.display=W.length?'block':'none';
   document.getElementById('word-list').innerHTML=W.map(function(w,i){
-    return '<div class="wrow">'
-      +'<button class="wplay" onclick="playW('+i+')">🔊</button>'
+    return '<div class="wrow"><button class="wplay" onclick="speak(W['+i+'].t,W['+i+'].l)">🔊</button>'
       +'<div class="wtxt"><div class="wword">'+w.t+'</div>'+(w.m?'<div class="wmean">'+w.m+'</div>':'')+'</div>'
       +'<span class="wlang l-'+w.l+'">'+w.l.toUpperCase()+'</span>'
-      +'<button class="wdel" onclick="delW('+i+')">✕</button>'
-      +'</div>';
+      +'<button class="wdel" onclick="delW('+i+')">✕</button></div>';
   }).join('');
 }
-function playW(i){ playAudio(W[i].t, W[i].l, null, null); }
 
 // ── Voice mic ──────────────────────────────────────────
-function setVLang(l){
-  voiceLang=l;
-  document.getElementById('lp-en').classList.toggle('on',l==='en-SG');
-  document.getElementById('lp-zh').classList.toggle('on',l==='zh-CN');
-}
+function setVLang(l){voiceLang=l;document.getElementById('lp-en').classList.toggle('on',l==='en-SG');document.getElementById('lp-zh').classList.toggle('on',l==='zh-CN');}
 function toggleMic(){
   if(micOn){stopMic();return;}
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){toast('Voice input needs Chrome. Please use the Type option instead.');return;}
-  micRec=new SR(); micRec.lang=voiceLang; micRec.continuous=true; micRec.interimResults=true;
-  micOn=true; heardWord='';
-  var btn=document.getElementById('mic-btn'),lbl=document.getElementById('mic-lbl'),box=document.getElementById('mic-heard');
-  btn.classList.add('rec');
-  lbl.textContent='🎤 Listening… say the word, then tap mic to stop';
-  box.textContent='…';
-  document.getElementById('mic-add').style.display='none';
-  document.getElementById('mic-retry').style.display='none';
-  micRec.onresult=function(e){
-    var f='',tmp='';
-    for(var i=0;i<e.results.length;i++){
-      if(e.results[i].isFinal)f+=e.results[i][0].transcript+' ';
-      else tmp+=e.results[i][0].transcript;
-    }
-    var c=(f+tmp).trim();
-    if(c){heardWord=c;box.textContent=c;lbl.textContent='Tap mic to stop';}
-  };
-  micRec.onerror=function(e){
-    if(e.error==='no-speech'||e.error==='aborted')return;
-    if(e.error==='not-allowed'){lbl.textContent='Mic blocked. Please use the Type option.';btn.classList.remove('rec');micOn=false;}
-  };
-  micRec.onend=function(){
-    if(micOn){try{micRec.start();}catch(_){}return;}
-    btn.classList.remove('rec');
-    if(heardWord){lbl.textContent='Did you say: "'+heardWord+'"?';document.getElementById('mic-add').style.display='';document.getElementById('mic-retry').style.display='';}
-    else lbl.textContent='Could not hear. Try again or use Type option.';
-  };
-  try{micRec.start();}catch(e){lbl.textContent='Could not start mic. Use Type option instead.';micOn=false;btn.classList.remove('rec');}
+  if(!SR){toast('Voice needs Chrome. Please use Type instead.');return;}
+  micRec=new SR();micRec.lang=voiceLang;micRec.continuous=true;micRec.interimResults=true;
+  micOn=true;heardWord='';
+  var b=document.getElementById('mic-btn'),l=document.getElementById('mic-lbl'),x=document.getElementById('mic-heard');
+  b.classList.add('rec');l.textContent='🎤 Listening… tap mic to stop';x.textContent='…';
+  document.getElementById('mic-add').style.display='none';document.getElementById('mic-retry').style.display='none';
+  micRec.onresult=function(e){var f='',t='';for(var i=0;i<e.results.length;i++){if(e.results[i].isFinal)f+=e.results[i][0].transcript+' ';else t+=e.results[i][0].transcript;}var c=(f+t).trim();if(c){heardWord=c;x.textContent=c;}};
+  micRec.onerror=function(e){if(e.error==='no-speech'||e.error==='aborted')return;if(e.error==='not-allowed'){l.textContent='Mic blocked. Use Type instead.';b.classList.remove('rec');micOn=false;}};
+  micRec.onend=function(){if(micOn){try{micRec.start();}catch(_){}return;}b.classList.remove('rec');if(heardWord){l.textContent='Did you say: "'+heardWord+'"?';document.getElementById('mic-add').style.display='';document.getElementById('mic-retry').style.display='';}else l.textContent='Could not hear. Try again.';};
+  try{micRec.start();}catch(e){l.textContent='Could not start. Use Type instead.';micOn=false;b.classList.remove('rec');}
 }
 function stopMic(){micOn=false;if(micRec){try{micRec.stop();}catch(_){}micRec=null;}document.getElementById('mic-btn').classList.remove('rec');}
-function confirmVoice(){
-  if(!heardWord)return;
-  heardWord.split(/[,，、\s]+/).filter(Boolean).forEach(function(p){addW(p.trim(),'');});
-  document.getElementById('mic-heard').textContent='✅ Added!';
-  document.getElementById('mic-lbl').textContent='Tap mic to add another word!';
-  document.getElementById('mic-add').style.display='none';
-  document.getElementById('mic-retry').style.display='none';
-  heardWord='';
-}
-function retryVoice(){
-  heardWord='';
-  document.getElementById('mic-heard').textContent='—';
-  document.getElementById('mic-lbl').textContent='Tap the mic and say a word';
-  document.getElementById('mic-add').style.display='none';
-  document.getElementById('mic-retry').style.display='none';
-}
+function confirmVoice(){if(!heardWord)return;heardWord.split(/[,，、\s]+/).filter(Boolean).forEach(function(p){addW(p.trim(),'');});document.getElementById('mic-heard').textContent='✅ Added!';document.getElementById('mic-lbl').textContent='Tap mic to add another!';document.getElementById('mic-add').style.display='none';document.getElementById('mic-retry').style.display='none';heardWord='';}
+function retryVoice(){heardWord='';document.getElementById('mic-heard').textContent='—';document.getElementById('mic-lbl').textContent='Tap the mic and say a word';document.getElementById('mic-add').style.display='none';document.getElementById('mic-retry').style.display='none';}
 
 // ── Scan ──────────────────────────────────────────────
-function scanUp(e){
-  var f=e.target.files[0];if(!f)return;
-  var r=new FileReader();
-  r.onload=function(ev){
-    scanData=ev.target.result;
-    document.getElementById('scan-img').src=scanData;
-    document.getElementById('scan-prev').style.display='block';
-    document.getElementById('scan-out').style.display='none';
-  };
-  r.readAsDataURL(f);e.target.value='';
-}
+function scanUp(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){scanData=ev.target.result;document.getElementById('scan-img').src=scanData;document.getElementById('scan-prev').style.display='block';document.getElementById('scan-out').style.display='none';};r.readAsDataURL(f);e.target.value='';}
 async function doScan(){
-  if(!scanData)return;
-  if(!navigator.onLine){toast('No internet. Please connect first.');return;}
+  if(!scanData)return;if(!navigator.onLine){toast('No internet. Please connect.');return;}
   var btn=document.getElementById('scan-btn');btn.disabled=true;btn.textContent='⏳ Reading…';
   document.getElementById('scan-out').style.display='block';
-  var st=document.getElementById('scan-txt');
-  st.innerHTML='<div class="dots"><span></span><span></span><span></span></div> Reading your list…';
+  var st=document.getElementById('scan-txt');st.innerHTML='<div class="dots"><span></span><span></span><span></span></div> Reading your list…';
   try{
-    var resp=await callAI([
-      {type:'image',source:{type:'base64',media_type:'image/jpeg',data:scanData.split(',')[1]}},
-      {type:'text',text:'You are helping a Primary 1 student in Singapore. The image shows their school spelling or 听写 word list.\n\nRead every single word or phrase on the list.\n\nFor EACH item:\n- Number it\n- Write the word exactly as on the list\n- If Chinese characters: add Hanyu Pinyin with tone marks and simple English meaning in brackets\n- If English: add a simple meaning a 7-year-old understands\n- If Pinyin: confirm or correct it\n\nBe friendly.\n\nOn the LAST LINE write exactly:\nWORDS: word1, word2, word3\n(all words comma-separated, exactly as on the list)'}
-    ]);
+    var resp=await callAI([{type:'image',source:{type:'base64',media_type:'image/jpeg',data:scanData.split(',')[1]}},{type:'text',text:'You are helping a Primary 1 student in Singapore. The image shows their school spelling or 听写 word list.\n\nRead every word on the list.\n\nFor EACH item:\n- Number it\n- Write the word exactly as shown\n- If Chinese: add Hanyu Pinyin with tone marks and simple English meaning\n- If English: add a simple meaning a 7-year-old understands\n\nBe friendly.\n\nOn the LAST LINE write exactly:\nWORDS: word1, word2, word3'}]);
     var m=resp.match(/WORDS:\s*(.+)/i);
-    if(m){
-      var ws=m[1].split(/[,，]+/).map(function(w){return w.trim();}).filter(Boolean);
-      ws.forEach(function(w){addW(w,'');});
-      st.textContent=resp.replace(/WORDS:.+/i,'').trim()+'\n\n✅ '+ws.length+' words added!';
-    } else { st.textContent=resp; }
-  }catch(e){st.textContent='Could not read photo. Try a clearer, well-lit image.\n\nError: '+e.message;}
+    if(m){var ws=m[1].split(/[,，]+/).map(function(w){return w.trim();}).filter(Boolean);ws.forEach(function(w){addW(w,'');});st.textContent=resp.replace(/WORDS:.+/i,'').trim()+'\n\n✅ '+ws.length+' words added!';}
+    else st.textContent=resp;
+  }catch(e){st.textContent='Could not read photo. Try a clearer image.\n\nError: '+e.message;}
   btn.disabled=false;btn.textContent='🪄 Read This List!';
 }
 
 // ── Dictation ─────────────────────────────────────────
-function shuffle(a){var b=[...a];for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
-function initDict(){
-  dictIdx=0;
-  var idx=W.map(function(_,i){return i;});
-  dictOrder=testOrd==='mix'?shuffle(idx):[...idx];
-  showWord();
-}
+function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
+function initDict(){dictIdx=0;var idx=W.map(function(_,i){return i;});dictOrder=testOrd==='mix'?shuffle(idx):idx.slice();showWord();}
 function showWord(){
   var total=dictOrder.length,pct=Math.round((dictIdx/total)*100);
   document.getElementById('d-prog').style.width=pct+'%';
   document.getElementById('d-ctr').textContent='Word '+(dictIdx+1)+' of '+total;
   document.getElementById('d-ico').textContent='👆';
   document.getElementById('d-hint').textContent='Tap the button below to hear the word!';
+  document.getElementById('d-word').textContent=W[dictOrder[dictIdx]].t;
+  document.getElementById('d-word').classList.remove('show');
+  wordShown=false;
+  document.getElementById('show-btn').textContent='👁️ Show the word (if no sound)';
   document.getElementById('d-next').style.display='none';
   document.getElementById('d-done').style.display='none';
-  var hb=document.getElementById('hear-btn');
-  hb.disabled=false;
-  hb.textContent='🔊 Tap to Hear Word '+(dictIdx+1)+' of '+total;
+  var hb=document.getElementById('hear-btn');hb.textContent='🔊 Tap to Hear Word '+(dictIdx+1);
 }
-
-// hearNow — called directly by onclick (user gesture — Android requires this)
 function hearNow(){
   var w=W[dictOrder[dictIdx]];
-  var ico=document.getElementById('d-ico');
-  var hb=document.getElementById('hear-btn');
+  document.getElementById('d-ico').textContent='🔊';
+  var ok=speak(w.t,w.l);
+  if(!ok) toast('No sound on this phone — tap "Show the word" button instead.');
+  // Always reveal Next/Done so the test never gets stuck
   var last=dictIdx>=dictOrder.length-1;
-
-  ico.textContent='🔊'; ico.classList.add('speaking');
-  hb.disabled=true; hb.textContent='🔊 Playing…';
-  document.getElementById('d-next').style.display='none';
-  document.getElementById('d-done').style.display='none';
-
-  // Reveal Next/Done buttons after a moment regardless, so the child can always continue
-  // (Android sometimes does not fire onend reliably)
-  var revealed=false;
-  function reveal(){
-    if(revealed) return; revealed=true;
-    ico.classList.remove('speaking');
-    hb.disabled=false;
-    ico.textContent=last?'🏁':'✅';
-    hb.textContent='🔊 Hear Again';
-    document.getElementById('d-hint').textContent=last
-      ?'Last word! Write it on paper, then tap "Done".'
-      :'Write it on paper, then tap "Next Word".';
-    document.getElementById(last?'d-done':'d-next').style.display='';
-  }
-
-  playAudio(w.t, w.l, reveal, function(){
-    // genuine error
-    ico.classList.remove('speaking');
-    ico.textContent='🔊';
-    hb.disabled=false;
-    hb.textContent='🔊 Tap to Hear Again';
-  });
-
-  // Safety: estimate speaking time, then reveal next button
-  // (word length * 400ms, minimum 1.8s) — covers Android not firing onend
-  var ms = Math.max(1800, w.t.length * 450);
-  setTimeout(reveal, ms);
+  document.getElementById('d-hint').textContent=last?'Last word! Write it, then tap Done.':'Write it, then tap Next Word.';
+  document.getElementById(last?'d-done':'d-next').style.display='';
+}
+function toggleShow(){
+  wordShown=!wordShown;
+  var el=document.getElementById('d-word');
+  el.classList.toggle('show',wordShown);
+  document.getElementById('show-btn').textContent=wordShown?'🙈 Hide the word':'👁️ Show the word (if no sound)';
 }
 function nxtWord(){dictIdx++;showWord();}
 
 // ── Mark ──────────────────────────────────────────────
-function markUp(e){
-  var f=e.target.files[0];if(!f)return;
-  var r=new FileReader();
-  r.onload=function(ev){
-    markData=ev.target.result;
-    document.getElementById('mark-img').src=markData;
-    document.getElementById('mark-prev').style.display='block';
-    document.getElementById('mark-card').style.display='none';
-  };
-  r.readAsDataURL(f);e.target.value='';
-}
+function markUp(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){markData=ev.target.result;document.getElementById('mark-img').src=markData;document.getElementById('mark-prev').style.display='block';document.getElementById('mark-card').style.display='none';};r.readAsDataURL(f);e.target.value='';}
 function clearMark(){markData=null;document.getElementById('mark-prev').style.display='none';}
 async function doMark(){
-  if(!markData)return;
-  if(!navigator.onLine){toast('No internet. Please connect first.');return;}
+  if(!markData)return;if(!navigator.onLine){toast('No internet. Please connect.');return;}
   var btn=document.getElementById('mark-btn');btn.disabled=true;btn.textContent='⏳ Marking…';
-  document.getElementById('mark-card').style.display='block';
-  document.getElementById('mark-title').textContent='Marking your work…';
-  var mt=document.getElementById('mark-txt');
-  mt.innerHTML='<div class="dots"><span></span><span></span><span></span></div> Reading your handwriting…';
+  document.getElementById('mark-card').style.display='block';document.getElementById('mark-title').textContent='Marking…';
+  var mt=document.getElementById('mark-txt');mt.innerHTML='<div class="dots"><span></span><span></span><span></span></div> Reading your handwriting…';
   var ow=dictOrder.map(function(i){return W[i];});
   try{
-    var resp=await callAI([
-      {type:'image',source:{type:'base64',media_type:'image/jpeg',data:markData.split(',')[1]}},
-      {type:'text',text:'You are a warm, encouraging Primary 1 teacher in Singapore. A child wrote spelling answers on paper.\n\nCorrect words in order ('+( testOrd==='mix'?'shuffled':'in sequence')+'):\n'+ow.map(function(w,i){return(i+1)+'. '+w.t;}).join('\n')+'\n\nMark each answer from the photo.\n\nFor EACH word:\n- ✅ if correct: short cheer!\n- ❌ if wrong: what they wrote → correct → simple kind reason (7-year-old level)\n- Check spelling, capitals, punctuation, pinyin tones\n\nAt the end:\n- Encouraging message\n- Score out of '+ow.length+'\n- One helpful tip\n\nSCORE: X/'+ow.length+'\n\nAlways be warm and kind!'}
-    ]);
-    mt.textContent=resp;
-    document.getElementById('mark-title').textContent='📝 Here are your results!';
-    var m=resp.match(/SCORE:\s*(\d+)\s*\/\s*(\d+)/i);
-    if(m) score={ok:parseInt(m[1]),total:parseInt(m[2])};
+    var resp=await callAI([{type:'image',source:{type:'base64',media_type:'image/jpeg',data:markData.split(',')[1]}},{type:'text',text:'You are a warm, encouraging Primary 1 teacher in Singapore. A child wrote spelling answers on paper.\n\nCorrect words in order:\n'+ow.map(function(w,i){return(i+1)+'. '+w.t;}).join('\n')+'\n\nMark each answer from the photo.\n\nFor EACH word:\n- ✅ if correct: a short cheer!\n- ❌ if wrong: what they wrote → correct → simple kind reason (7-year-old level)\n- Check spelling, capitals, punctuation, pinyin tones\n\nAt the end:\n- Encouraging message\n- Score out of '+ow.length+'\n- One helpful tip\n\nSCORE: X/'+ow.length+'\n\nBe warm and kind!'}]);
+    mt.textContent=resp;document.getElementById('mark-title').textContent='📝 Your results!';
+    var m=resp.match(/SCORE:\s*(\d+)\s*\/\s*(\d+)/i);if(m)score={ok:parseInt(m[1]),total:parseInt(m[2])};
   }catch(e){mt.textContent='Could not read photo. Try a clearer image.\n\nError: '+e.message;}
   btn.disabled=false;btn.textContent='🪄 Mark My Work!';
 }
@@ -747,36 +414,28 @@ function renderRes(){
   var pct=Math.round((score.ok/score.total)*100);
   var stars=pct>=90?'⭐⭐⭐':pct>=70?'⭐⭐':'⭐';
   var ico=pct===100?'🎉':pct>=80?'🌟':pct>=60?'👍':'💪';
-  var msgs=['💪 Keep going!','👍 Good effort! Keep practising!','🌟 Nearly perfect! Amazing!','🎉 Perfect score! You are a star!'];
+  var msgs=['💪 Keep going!','👍 Good effort!','🌟 Nearly perfect!','🎉 Perfect! You are a star!'];
   document.getElementById('r-ico').textContent=ico;
   document.getElementById('r-title').textContent=pct===100?'Perfect! 🎉':'Well done!';
   document.getElementById('r-msg').textContent=msgs[pct>=90?3:pct>=70?2:pct>=50?1:0];
   document.getElementById('r-ok').textContent=score.ok;
   document.getElementById('r-ng').textContent=score.total-score.ok;
   document.getElementById('r-st').textContent=stars;
-  document.getElementById('r-hist').innerHTML=dictOrder.map(function(wi,i){
-    var w=W[wi];
-    return'<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1.5px solid #f0f0f8;font-size:14px">'
-      +'<span style="font-weight:600">'+(i+1)+'. '+w.t+'</span>'
-      +(w.m?'<span style="font-size:11px;color:var(--tx2);flex:1;padding:0 6px">'+w.m+'</span>':'')
-      +'<span class="wlang l-'+w.l+'" style="font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700">'+w.l.toUpperCase()+'</span>'
-      +'</div>';
-  }).join('');
+  document.getElementById('r-hist').innerHTML=dictOrder.map(function(wi,i){var w=W[wi];return'<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1.5px solid #f0f0f8;font-size:14px"><span style="font-weight:600">'+(i+1)+'. '+w.t+'</span>'+(w.m?'<span style="font-size:11px;color:var(--tx2);flex:1;padding:0 6px">'+w.m+'</span>':'')+'<span class="wlang l-'+w.l+'" style="font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700">'+w.l.toUpperCase()+'</span></div>';}).join('');
 }
 
 // ── AI ─────────────────────────────────────────────────
 async function callAI(content){
-  var r=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1200,messages:[{role:'user',content:content}]})
-  });
+  var r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1200,messages:[{role:'user',content:content}]})});
   var d=await r.json();
-  if(d.error) throw new Error(d.error.message);
+  if(d.error)throw new Error(d.error.message);
   var b=d.content&&d.content.find(function(b){return b.type==='text';});
-  if(!b) throw new Error('No response');
+  if(!b)throw new Error('No response');
   return b.text;
 }
+
+// Preload voices
+if('speechSynthesis' in window){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=function(){window.speechSynthesis.getVoices();};}
 </script>
 </body>
 </html>

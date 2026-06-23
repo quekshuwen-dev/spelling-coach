@@ -7,14 +7,14 @@
 <title>✏️ Spelling Coach</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--pu:#6C63FF;--pud:#4B44CC;--pul:#EEEDFF;--gr:#43A047;--re:#EF5350;--or:#FB8C00;--bg:#F4F4FF;--wh:#fff;--tx:#1a1a2e;--tx2:#5a5a7a;--sh:0 4px 18px rgba(108,99,255,.13)}
+:root{--pu:#7C5CFC;--pud:#5A3FD6;--pul:#F0ECFF;--gr:#34C759;--re:#FF4D6D;--or:#FF9F1C;--ye:#FFD60A;--bg:#FFF8F0;--wh:#fff;--tx:#2D2A45;--tx2:#6B6890;--sh:0 6px 22px rgba(124,92,252,.18)}
 html,body{min-height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--tx);overflow-x:hidden}
 body{padding-bottom:80px}
 .pg{display:none;padding:1rem;max-width:500px;margin:0 auto}
 .pg.on{display:block}
 .hdr{text-align:center;padding:.75rem 0 1.25rem}
-.hdr .ico{font-size:52px;display:block;line-height:1;margin-bottom:.4rem}
-.hdr h1{font-size:24px;font-weight:800;color:var(--pu)}
+.hdr .ico{font-size:62px;display:block;line-height:1;margin-bottom:.4rem;animation:bob 2.5s ease-in-out infinite}@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.hdr h1{font-size:27px;font-weight:800;color:var(--pu)}
 .hdr p{font-size:13px;color:var(--tx2);margin-top:3px;line-height:1.6}
 .card{background:var(--wh);border-radius:20px;padding:1.2rem;margin-bottom:.9rem;box-shadow:var(--sh)}
 .ctitle{font-size:14px;font-weight:700;margin-bottom:.85rem;display:flex;align-items:center;gap:8px}
@@ -86,9 +86,9 @@ body{padding-bottom:80px}
 <!-- ═══ PAGE 1: WORDS ═══ -->
 <div class="pg on" id="pg-words">
   <div class="hdr">
-    <span class="ico">📚</span>
-    <h1>Word List</h1>
-    <p>Add your child's spelling words below</p>
+    <span class="ico" id="mascot1">🦉</span>
+    <h1>My Spelling Words</h1>
+    <p>Let's add words to learn! 🌈</p>
   </div>
 
   <div class="card">
@@ -161,16 +161,16 @@ body{padding-bottom:80px}
       <div class="ord on" id="ord-seq" onclick="setOrd('seq')"><span class="ord-ico">1️⃣</span><div class="ord-t">In Order</div><div class="ord-s">Same as list</div></div>
       <div class="ord" id="ord-mix" onclick="setOrd('mix')"><span class="ord-ico">🔀</span><div class="ord-t">Shuffled</div><div class="ord-s">Random order</div></div>
     </div>
-    <button class="bb gr" onclick="goP('pg-test')" style="font-size:18px">▶️ Start Spelling Test!</button>
+    <button class="bb gr" onclick="goP('pg-test')" style="font-size:18px">🎮 START!</button>
   </div>
 </div>
 
 <!-- ═══ PAGE 2: TEST ═══ -->
 <div class="pg" id="pg-test">
   <div class="hdr">
-    <span class="ico">🔊</span>
+    <span class="ico">👂</span>
     <h1>Listen &amp; Write!</h1>
-    <p>Tap the button to hear each word</p>
+    <p>Tap the big button, hear the word,<br>then write it on your paper! ✏️</p>
   </div>
   <div class="card">
     <div class="stage-ctr" id="d-ctr">Word 1 of 10</div>
@@ -181,11 +181,11 @@ body{padding-bottom:80px}
       <div class="reveal-word" id="d-word">—</div>
       <div class="stage-hint" id="d-hint">Tap the button below to hear the word!</div>
     </div>
-    <button class="bb pu" id="hear-btn" onclick="hearNow()" style="font-size:20px;min-height:74px;border-radius:22px;margin-bottom:10px">🔊 Tap to Hear Word</button>
+    <button class="bb pu" id="hear-btn" onclick="hearNow()" style="font-size:24px;min-height:96px;border-radius:28px;margin-bottom:12px">🔊 HEAR THE WORD</button>
     <button class="bb wh sm" id="show-btn" onclick="toggleShow()" style="margin-bottom:12px">👁️ Show the word (if no sound)</button>
     <div class="gap"></div>
-    <button class="bb gr" onclick="nxtWord()" id="d-next" style="display:none;font-size:17px">➡️ Next Word</button>
-    <button class="bb gr" onclick="goP('pg-mark')" id="d-done" style="display:none;font-size:17px">✅ Done! Mark my work</button>
+    <button class="bb gr" onclick="nxtWord()" id="d-next" style="display:none;font-size:17px">👉 Next Word</button>
+    <button class="bb gr" onclick="goP('pg-mark')" id="d-done" style="display:none;font-size:17px">🎉 I'm Done!</button>
   </div>
   <div style="text-align:center"><button class="bb wh sm" onclick="goP('pg-words')" style="width:auto;padding:10px 22px">← Back</button></div>
 </div>
@@ -194,8 +194,8 @@ body{padding-bottom:80px}
 <div class="pg" id="pg-mark">
   <div class="hdr">
     <span class="ico">📸</span>
-    <h1>Mark My Work!</h1>
-    <p>Upload a photo of the written answers</p>
+    <h1>Check My Work!</h1>
+    <p>Take a photo of your writing<br>to see how you did! 🌟</p>
   </div>
   <div class="card">
     <label class="upzone"><input type="file" accept="image/*" onchange="markUp(event)">
@@ -214,7 +214,7 @@ body{padding-bottom:80px}
       <div class="ctitle">⭐ <span id="mark-title">Marking…</span></div>
       <div class="ai-box" id="mark-txt"></div>
       <div class="gap"></div>
-      <button class="bb gr" onclick="goP('pg-results')" style="font-size:16px">🏆 See Full Results!</button>
+      <button class="bb gr" onclick="goP('pg-results')" style="font-size:16px">🏆 See My Stars!</button>
     </div>
   </div>
   <div style="text-align:center"><button class="bb wh sm" onclick="goP('pg-test')" style="width:auto;padding:10px 22px">← Back</button></div>
@@ -234,7 +234,7 @@ body{padding-bottom:80px}
   </div>
   <div class="card"><div class="ctitle">📋 Words in this test</div><div id="r-hist"></div></div>
   <div style="display:flex;flex-direction:column;gap:10px">
-    <button class="bb pu" onclick="goP('pg-test')" style="font-size:17px">🔄 Practise Again!</button>
+    <button class="bb pu" onclick="goP('pg-test')" style="font-size:17px">🔁 Play Again!</button>
     <button class="bb wh" onclick="goP('pg-words')" style="font-size:16px">📚 Change Word List</button>
   </div>
 </div>
@@ -409,9 +409,23 @@ async function doMark(){
 }
 
 // ── Results ────────────────────────────────────────────
+function celebrate(){
+  var emojis=['⭐','🎉','🌟','✨','🎊','💫'];
+  for(var i=0;i<18;i++){
+    (function(n){
+      var e=document.createElement('div');
+      e.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+      e.style.cssText='position:fixed;top:-40px;left:'+(Math.random()*100)+'vw;font-size:'+(20+Math.random()*16)+'px;z-index:9999;pointer-events:none;transition:transform 2.5s ease-in,opacity 2.5s';
+      document.body.appendChild(e);
+      setTimeout(function(){ e.style.transform='translateY(110vh) rotate('+(Math.random()*360)+'deg)'; e.style.opacity='0'; },30);
+      setTimeout(function(){ e.remove(); },2600);
+    })(i);
+  }
+}
 function renderRes(){
   if(!score)return;
   var pct=Math.round((score.ok/score.total)*100);
+  if(pct>=70) setTimeout(celebrate,300);
   var stars=pct>=90?'⭐⭐⭐':pct>=70?'⭐⭐':'⭐';
   var ico=pct===100?'🎉':pct>=80?'🌟':pct>=60?'👍':'💪';
   var msgs=['💪 Keep going!','👍 Good effort!','🌟 Nearly perfect!','🎉 Perfect! You are a star!'];

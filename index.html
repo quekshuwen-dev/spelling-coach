@@ -3,94 +3,132 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#6C63FF">
+<meta name="theme-color" content="#7C5CFC">
 <title>✏️ Spelling Coach</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--pu:#7C5CFC;--pud:#5A3FD6;--pul:#F0ECFF;--gr:#34C759;--re:#FF4D6D;--or:#FF9F1C;--ye:#FFD60A;--bg:#FFF8F0;--wh:#fff;--tx:#2D2A45;--tx2:#6B6890;--sh:0 6px 22px rgba(124,92,252,.18)}
+:root{
+  --pu:#7C5CFC;--pud:#5A3FD6;--pul:#F0ECFF;
+  --gr:#34C759;--re:#FF4D6D;--or:#FF9F1C;--ye:#FFD60A;
+  --bg:#FFF8F0;--wh:#fff;--tx:#2D2A45;--tx2:#6B6890;
+  --sh:0 6px 22px rgba(124,92,252,.18)
+}
 html,body{min-height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--tx);overflow-x:hidden}
-body{padding-bottom:80px}
+body{padding-bottom:82px}
 .pg{display:none;padding:1rem;max-width:500px;margin:0 auto}
 .pg.on{display:block}
+/* Header */
 .hdr{text-align:center;padding:.75rem 0 1.25rem}
-.hdr .ico{font-size:62px;display:block;line-height:1;margin-bottom:.4rem;animation:bob 2.5s ease-in-out infinite}@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-.hdr h1{font-size:27px;font-weight:800;color:var(--pu)}
-.hdr p{font-size:13px;color:var(--tx2);margin-top:3px;line-height:1.6}
+.hdr .ico{font-size:62px;display:block;line-height:1;margin-bottom:.5rem;animation:bob 2.5s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.hdr h1{font-size:26px;font-weight:800;color:var(--pu)}
+.hdr p{font-size:13px;color:var(--tx2);margin-top:4px;line-height:1.6}
+/* Cards */
 .card{background:var(--wh);border-radius:20px;padding:1.2rem;margin-bottom:.9rem;box-shadow:var(--sh)}
 .ctitle{font-size:14px;font-weight:700;margin-bottom:.85rem;display:flex;align-items:center;gap:8px}
+/* Buttons */
 .bb{width:100%;padding:18px 16px;border-radius:18px;border:none;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:var(--sh);min-height:62px;touch-action:manipulation;transition:transform .1s,opacity .1s;-webkit-appearance:none;line-height:1.2}
 .bb:active{transform:scale(.95);opacity:.85}
-.bb.pu{background:var(--pu);color:#fff}.bb.gr{background:var(--gr);color:#fff}.bb.or{background:var(--or);color:#fff}
+.bb.pu{background:var(--pu);color:#fff}
+.bb.gr{background:var(--gr);color:#fff}
+.bb.or{background:var(--or);color:#fff}
 .bb.wh{background:var(--wh);color:var(--pu);border:2.5px solid var(--pu);box-shadow:none}
 .bb.sm{font-size:14px;padding:12px 16px;min-height:48px;border-radius:14px}
+/* Input */
 .inp{width:100%;padding:14px 16px;border-radius:14px;border:2.5px solid #ddd;font-size:17px;font-family:inherit;background:var(--wh);color:var(--tx);outline:none;min-height:52px;-webkit-appearance:none}
 .inp:focus{border-color:var(--pu)}
+/* Sections */
 .sec-btn{width:100%;padding:14px 16px;border-radius:16px;border:2.5px solid var(--pul);background:var(--pul);color:var(--pud);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:space-between;min-height:54px;touch-action:manipulation;margin-bottom:8px}
-.sec-btn .arr{transition:transform .25s;font-style:normal}.sec-btn.open .arr{transform:rotate(180deg)}
-.sec-body{display:none;padding-top:4px}.sec-body.open{display:block}
+.sec-btn .arr{transition:transform .25s;font-style:normal}
+.sec-btn.open .arr{transform:rotate(180deg)}
+.sec-body{display:none;padding-top:4px}
+.sec-body.open{display:block}
+/* Word rows */
 .wrow{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1.5px solid #f0f0f8}
 .wrow:last-child{border-bottom:none}
 .wplay{width:42px;height:42px;border-radius:50%;border:none;background:var(--pul);cursor:pointer;font-size:20px;flex-shrink:0;touch-action:manipulation;display:flex;align-items:center;justify-content:center}
 .wplay:active{background:var(--pu)}
-.wtxt{flex:1;min-width:0}.wword{font-size:17px;font-weight:700}.wmean{font-size:12px;color:var(--tx2);margin-top:2px}
+.wtxt{flex:1;min-width:0}
+.wword{font-size:17px;font-weight:700}
+.wmean{font-size:12px;color:var(--tx2);margin-top:2px}
 .wlang{font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700;flex-shrink:0}
-.l-en{background:#EDE7F6;color:#4527A0}.l-zh{background:#E8F5E9;color:#1B5E20}.l-py{background:#FFF3E0;color:#BF360C}
+.l-en{background:#EDE7F6;color:#4527A0}
+.l-zh{background:#E8F5E9;color:#1B5E20}
+.l-py{background:#FFF3E0;color:#BF360C}
 .wdel{width:34px;height:34px;border-radius:50%;border:none;background:#ffeaea;cursor:pointer;font-size:16px;flex-shrink:0;touch-action:manipulation}
+/* Upload zone */
 .upzone{border:3px dashed #c5c5e8;border-radius:18px;padding:1.75rem 1rem;text-align:center;background:var(--pul);position:relative;cursor:pointer}
 .upzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .upzone-ico{font-size:40px;display:block;margin-bottom:.5rem}
-.upzone-t{font-size:15px;font-weight:700;color:var(--pud)}.upzone-s{font-size:12px;color:var(--tx2);margin-top:4px}
+.upzone-t{font-size:15px;font-weight:700;color:var(--pud)}
+.upzone-s{font-size:12px;color:var(--tx2);margin-top:4px}
 .prev-img{width:100%;border-radius:16px;display:block;max-height:260px;object-fit:contain;background:#111;margin-bottom:12px}
+/* Mic */
 .mic-wrap{text-align:center;padding:.5rem 0 .25rem}
-.mic-big{width:90px;height:90px;border-radius:50%;border:none;background:var(--pu);cursor:pointer;display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 6px 24px rgba(108,99,255,.4);-webkit-appearance:none;touch-action:manipulation}
+.mic-big{width:90px;height:90px;border-radius:50%;border:none;background:var(--pu);cursor:pointer;display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 6px 24px rgba(124,92,252,.4);-webkit-appearance:none;touch-action:manipulation}
 .mic-big.rec{background:var(--re);animation:rp 1s infinite}
-@keyframes rp{0%,100%{box-shadow:0 0 0 0 rgba(239,83,80,.5)}50%{box-shadow:0 0 0 22px rgba(239,83,80,0)}}
+@keyframes rp{0%,100%{box-shadow:0 0 0 0 rgba(255,77,109,.5)}50%{box-shadow:0 0 0 22px rgba(255,77,109,0)}}
 .mic-big svg{width:42px;height:42px;fill:#fff}
 .mic-lbl{font-size:14px;color:var(--tx2);margin-top:12px;min-height:44px;line-height:1.6;font-weight:500;text-align:center}
 .heard{background:var(--pul);border-radius:14px;padding:14px;font-size:20px;text-align:center;min-height:58px;margin:10px 0;color:var(--pud);font-weight:700}
+/* Progress */
 .prog-bg{height:12px;background:#e8e8f0;border-radius:12px;overflow:hidden;margin:10px 0}
-.prog-fill{height:100%;background:linear-gradient(90deg,var(--pu),#a78bfa);border-radius:12px;transition:width .5s}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--pu),#c084fc);border-radius:12px;transition:width .5s}
+/* Dictation stage */
 .stage{text-align:center;padding:1.5rem .5rem 1rem}
 .stage-ico{font-size:64px;display:block;margin-bottom:.5rem;line-height:1}
 .stage-ctr{font-size:13px;font-weight:700;color:var(--tx2);margin-bottom:4px}
 .stage-hint{font-size:15px;color:var(--tx2);line-height:1.6;min-height:40px}
-.reveal-word{font-size:40px;font-weight:800;color:var(--pu);letter-spacing:2px;margin:12px 0;min-height:50px;filter:blur(14px);transition:filter .2s;user-select:none}
+.reveal-word{font-size:38px;font-weight:800;color:var(--pu);letter-spacing:2px;margin:12px 0;min-height:50px;filter:blur(14px);transition:filter .3s;user-select:none}
 .reveal-word.show{filter:none}
+/* Order */
 .ord-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.1rem}
 .ord{border:3px solid #e0e0e0;border-radius:18px;padding:16px 8px;text-align:center;cursor:pointer;background:var(--wh);touch-action:manipulation;transition:all .15s}
 .ord.on{border-color:var(--pu);background:var(--pul)}
-.ord-ico{font-size:28px;display:block;margin-bottom:5px}.ord-t{font-size:14px;font-weight:700}.ord-s{font-size:11px;color:var(--tx2);margin-top:2px}
+.ord-ico{font-size:28px;display:block;margin-bottom:5px}
+.ord-t{font-size:14px;font-weight:700}
+.ord-s{font-size:11px;color:var(--tx2);margin-top:2px}
+/* AI box */
 .ai-box{background:var(--pul);border-radius:16px;padding:1.1rem;font-size:14px;line-height:1.9;white-space:pre-wrap;word-break:break-word;max-height:55vh;overflow-y:auto}
+/* Score */
 .sc-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem}
 .sc{background:var(--wh);border-radius:16px;padding:14px 6px;text-align:center;box-shadow:var(--sh)}
-.sc-n{font-size:28px;font-weight:800}.sc-l{font-size:11px;color:var(--tx2);margin-top:3px;font-weight:600}
-.tbar{position:fixed;bottom:0;left:0;right:0;background:var(--wh);border-top:1.5px solid #eeeef8;display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom)}
-.ti{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px 6px;cursor:pointer;border:none;background:none;font-family:inherit;touch-action:manipulation;gap:3px;min-height:56px}
-.ti span{font-size:9px;font-weight:700;color:#bbb;letter-spacing:.3px}
-.ti svg{width:25px;height:25px;stroke:#bbb;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.ti.on svg{stroke:var(--pu)}.ti.on span{color:var(--pu)}
-.dots{display:inline-flex;gap:5px;vertical-align:middle}
-.dots span{width:8px;height:8px;border-radius:50%;background:var(--pu);display:inline-block;animation:dd 1.2s infinite}
-.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
-@keyframes dd{0%,80%,100%{transform:scale(.5);opacity:.4}40%{transform:scale(1);opacity:1}}
-#toast{position:fixed;bottom:82px;left:50%;transform:translateX(-50%) translateY(8px);background:#1a1a2e;color:#fff;padding:11px 22px;border-radius:30px;font-size:13px;font-weight:600;z-index:9999;max-width:88vw;text-align:center;opacity:0;transition:all .25s;pointer-events:none}
-#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.sc-n{font-size:28px;font-weight:800}
+.sc-l{font-size:11px;color:var(--tx2);margin-top:3px;font-weight:600}
+/* Letter bubbles */
+.letter-bubble{background:var(--pul);color:var(--pud);border-radius:14px;padding:12px 10px;font-size:26px;font-weight:900;min-width:44px;text-align:center;box-shadow:0 3px 0 rgba(0,0,0,.1)}
+/* Lang toggle */
 .lang-row{display:flex;gap:8px;justify-content:center;margin-bottom:1rem}
 .lang-btn{padding:10px 18px;border-radius:30px;border:2px solid #ddd;background:var(--wh);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;min-height:46px;touch-action:manipulation}
 .lang-btn.on{background:var(--pu);border-color:var(--pu);color:#fff}
-.divider{border:none;border-top:2px solid #f0f0f8;margin:.9rem 0}.gap{height:10px}
+/* Tab bar */
+.tbar{position:fixed;bottom:0;left:0;right:0;background:var(--wh);border-top:1.5px solid #eeeef8;display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+.ti{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px 2px 5px;cursor:pointer;border:none;background:none;font-family:inherit;touch-action:manipulation;gap:2px;min-height:54px}
+.ti span{font-size:8px;font-weight:700;color:#bbb;letter-spacing:.2px}
+.ti svg{width:22px;height:22px;stroke:#bbb;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ti.on svg{stroke:var(--pu)}.ti.on span{color:var(--pu)}
+/* Dots loader */
+.dots{display:inline-flex;gap:5px;vertical-align:middle}
+.dots span{width:8px;height:8px;border-radius:50%;background:var(--pu);display:inline-block;animation:dd 1.2s infinite}
+.dots span:nth-child(2){animation-delay:.2s}
+.dots span:nth-child(3){animation-delay:.4s}
+@keyframes dd{0%,80%,100%{transform:scale(.5);opacity:.4}40%{transform:scale(1);opacity:1}}
+/* Toast */
+#toast{position:fixed;bottom:86px;left:50%;transform:translateX(-50%) translateY(8px);background:#2D2A45;color:#fff;padding:11px 22px;border-radius:30px;font-size:13px;font-weight:600;z-index:9999;max-width:88vw;text-align:center;opacity:0;transition:all .25s;pointer-events:none}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.divider{border:none;border-top:2px solid #f0f0f8;margin:.9rem 0}
+.gap{height:10px}
 </style>
 </head>
 <body>
 
-<!-- ═══ PAGE 1: WORDS ═══ -->
+<!-- PAGE 1: WORDS -->
 <div class="pg on" id="pg-words">
   <div class="hdr">
-    <span class="ico" id="mascot1">🦉</span>
+    <span class="ico">🦉</span>
     <h1>My Spelling Words</h1>
-    <p>Let's add words to learn! 🌈</p>
+    <p>Let's add words to learn today! 🌈</p>
   </div>
-
   <div class="card">
     <button class="sec-btn" onclick="toggleSec('s-photo')"><span>📷 &nbsp;Scan photo of list</span><i class="arr">▼</i></button>
     <div class="sec-body" id="s-photo">
@@ -105,7 +143,6 @@ body{padding-bottom:80px}
       </div>
     </div>
   </div>
-
   <div class="card">
     <button class="sec-btn" onclick="toggleSec('s-voice')"><span>🎤 &nbsp;Speak the words</span><i class="arr">▼</i></button>
     <div class="sec-body" id="s-voice">
@@ -125,7 +162,6 @@ body{padding-bottom:80px}
       </div>
     </div>
   </div>
-
   <div class="card">
     <button class="sec-btn" onclick="toggleSec('s-type')"><span>⌨️ &nbsp;Type the words</span><i class="arr">▼</i></button>
     <div class="sec-body" id="s-type">
@@ -136,7 +172,6 @@ body{padding-bottom:80px}
       </div>
     </div>
   </div>
-
   <div class="card">
     <button class="sec-btn" onclick="toggleSec('s-sample')"><span>📖 &nbsp;Load sample words</span><i class="arr">▼</i></button>
     <div class="sec-body" id="s-sample">
@@ -147,7 +182,6 @@ body{padding-bottom:80px}
       </div>
     </div>
   </div>
-
   <div class="card" id="wl-card" style="display:none">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
       <div class="ctitle" style="margin:0">📝 Words added (<span id="wc">0</span>)</div>
@@ -165,7 +199,7 @@ body{padding-bottom:80px}
   </div>
 </div>
 
-<!-- ═══ PAGE 2: TEST ═══ -->
+<!-- PAGE 2: TEST -->
 <div class="pg" id="pg-test">
   <div class="hdr">
     <span class="ico">👂</span>
@@ -177,11 +211,10 @@ body{padding-bottom:80px}
     <div class="prog-bg"><div class="prog-fill" id="d-prog" style="width:0%"></div></div>
     <div class="stage">
       <span class="stage-ico" id="d-ico">👆</span>
-      <!-- The word, blurred — child can tap "show" if sound fails -->
       <div class="reveal-word" id="d-word">—</div>
       <div class="stage-hint" id="d-hint">Tap the button below to hear the word!</div>
     </div>
-    <button class="bb pu" id="hear-btn" onclick="hearNow()" style="font-size:24px;min-height:96px;border-radius:28px;margin-bottom:12px">🔊 HEAR THE WORD</button>
+    <button class="bb pu" id="hear-btn" onclick="hearNow()" style="font-size:22px;min-height:88px;border-radius:24px;margin-bottom:10px">🔊 HEAR THE WORD</button>
     <button class="bb wh sm" id="show-btn" onclick="toggleShow()" style="margin-bottom:12px">👁️ Show the word (if no sound)</button>
     <div class="gap"></div>
     <button class="bb gr" onclick="nxtWord()" id="d-next" style="display:none;font-size:17px">👉 Next Word</button>
@@ -190,7 +223,7 @@ body{padding-bottom:80px}
   <div style="text-align:center"><button class="bb wh sm" onclick="goP('pg-words')" style="width:auto;padding:10px 22px">← Back</button></div>
 </div>
 
-<!-- ═══ PAGE 3: MARK ═══ -->
+<!-- PAGE 3: MARK -->
 <div class="pg" id="pg-mark">
   <div class="hdr">
     <span class="ico">📸</span>
@@ -199,7 +232,7 @@ body{padding-bottom:80px}
   </div>
   <div class="card">
     <label class="upzone"><input type="file" accept="image/*" onchange="markUp(event)">
-      <span class="upzone-ico">📷</span><div class="upzone-t">Tap to upload your answers</div><div class="upzone-s">Take a clear photo of the writing</div>
+      <span class="upzone-ico">📷</span><div class="upzone-t">Tap to upload your answers</div><div class="upzone-s">Take a clear photo of your writing</div>
     </label>
   </div>
   <div id="mark-prev" style="display:none">
@@ -220,7 +253,7 @@ body{padding-bottom:80px}
   <div style="text-align:center"><button class="bb wh sm" onclick="goP('pg-test')" style="width:auto;padding:10px 22px">← Back</button></div>
 </div>
 
-<!-- ═══ PAGE 4: RESULTS ═══ -->
+<!-- PAGE 4: RESULTS -->
 <div class="pg" id="pg-results">
   <div class="hdr">
     <span class="ico" id="r-ico">🏆</span>
@@ -239,70 +272,164 @@ body{padding-bottom:80px}
   </div>
 </div>
 
+<!-- PAGE 5: WORD LOOKUP -->
+<div class="pg" id="pg-lookup">
+  <div class="hdr">
+    <span class="ico">🔍</span>
+    <h1>Word Lookup</h1>
+    <p>Say or type any word — get the spelling<br>and what it means! 📖</p>
+  </div>
+  <!-- Input method -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem">
+    <button class="bb pu" id="lu-mic-tab" onclick="setLUTab('mic')" style="font-size:15px;min-height:54px">🎤 Speak a word</button>
+    <button class="bb wh" id="lu-type-tab" onclick="setLUTab('type')" style="font-size:15px;min-height:54px">⌨️ Type a word</button>
+  </div>
+  <!-- Mic panel -->
+  <div class="card" id="lu-mic-panel">
+    <div class="lang-row">
+      <button class="lang-btn on" id="lu-lang-en" onclick="setLULang('en-SG')">🇬🇧 English</button>
+      <button class="lang-btn" id="lu-lang-zh" onclick="setLULang('zh-CN')">🇨🇳 Chinese</button>
+    </div>
+    <div class="mic-wrap">
+      <button class="mic-big" id="lu-mic-btn" onclick="toggleLUMic()"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg></button>
+      <div class="mic-lbl" id="lu-mic-lbl">Tap the mic and say a word clearly!</div>
+    </div>
+    <div class="heard" id="lu-heard">—</div>
+    <div style="display:flex;gap:8px;justify-content:center">
+      <button class="bb gr" id="lu-mic-look" onclick="doLookup(document.getElementById('lu-heard').textContent)" style="display:none;font-size:16px">🔍 Look up this word!</button>
+      <button class="bb wh sm" id="lu-mic-retry" onclick="retryLUMic()" style="display:none">🔄 Try again</button>
+    </div>
+  </div>
+  <!-- Type panel -->
+  <div class="card" id="lu-type-panel" style="display:none">
+    <p style="font-size:13px;color:var(--tx2);margin-bottom:.85rem">Type any word to get its spelling and meaning:</p>
+    <div style="display:flex;gap:8px">
+      <input class="inp" id="lu-inp" placeholder="Type a word here…" onkeydown="if(event.key==='Enter')doLookup(this.value)">
+      <button class="bb pu sm" onclick="doLookup(document.getElementById('lu-inp').value)" style="flex-shrink:0;width:58px;font-size:22px;padding:0;min-height:52px">🔍</button>
+    </div>
+  </div>
+  <!-- Parent types for child — full word entry with read aloud + meaning -->
+  <div class="card" style="background:linear-gradient(135deg,#FFF8E1,#FFF3CD);border:2px solid #FFD60A">
+    <div class="ctitle" style="color:#7D5A00">👨‍👩‍👧 Parent types for child</div>
+    <p style="font-size:13px;color:var(--tx2);margin-bottom:.85rem;line-height:1.6">
+      Type a word below — the app will read it aloud and show the full meaning to your child!
+    </p>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;gap:8px">
+        <input class="inp" id="parent-inp" placeholder="Type any word (English or Chinese)…" onkeydown="if(event.key==='Enter')parentLookup()">
+        <button class="bb pu sm" onclick="parentLookup()" style="flex-shrink:0;width:58px;font-size:22px;padding:0;min-height:52px">▶️</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="bb wh sm" onclick="parentLookup()" style="flex:1;min-height:46px;font-size:14px">🔊 Read &amp; explain to child</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div class="card" id="lu-result" style="display:none">
+    <div style="text-align:center;margin-bottom:1rem">
+      <div style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">The Word</div>
+      <div id="lu-word-big" style="font-size:38px;font-weight:800;color:var(--pu);letter-spacing:3px;line-height:1.2"></div>
+      <button onclick="speakLU()" style="margin-top:10px;background:var(--pul);border:none;border-radius:30px;padding:8px 18px;font-size:14px;font-weight:700;color:var(--pud);cursor:pointer;touch-action:manipulation">🔊 Hear it</button>
+    </div>
+    <div class="divider"></div>
+    <div style="margin-bottom:1rem">
+      <div style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Spelling — Letter by Letter</div>
+      <div id="lu-spelling" style="display:flex;flex-wrap:wrap;gap:7px;justify-content:center"></div>
+    </div>
+    <div class="divider"></div>
+    <div>
+      <div style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">What does it mean?</div>
+      <div id="lu-def" class="ai-box" style="font-size:15px;line-height:1.8"></div>
+    </div>
+    <!-- Stroke guide (Chinese only) -->
+    <div id="lu-stroke-section" style="display:none;margin-top:1rem">
+      <div class="divider"></div>
+      <div style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">✏️ How to write it (stroke guide)</div>
+      <div id="lu-stroke-frames" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:10px"></div>
+      <a id="lu-bihua-link" href="" target="_blank" rel="noopener" style="display:block;background:var(--pul);border-radius:14px;padding:12px 16px;text-align:center;font-size:14px;font-weight:700;color:var(--pud);text-decoration:none">
+        🖊️ See full stroke animation on bihua.app ↗
+      </a>
+    </div>
+    <div style="margin-top:1rem">
+      <button class="bb gr" id="lu-add-btn" onclick="addLUWord()" style="font-size:15px;min-height:54px">➕ Add to my spelling list</button>
+    </div>
+  </div>
+  <!-- History -->
+  <div class="card" id="lu-hist-card" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+      <div class="ctitle" style="margin:0">📚 Words I looked up</div>
+      <button class="bb wh sm" onclick="clearLUHist()" style="width:auto;padding:6px 12px;font-size:12px;min-height:34px">Clear</button>
+    </div>
+    <div id="lu-hist-list"></div>
+    <div style="margin-top:1rem">
+      <button class="bb or" onclick="addAllLU()" style="font-size:15px">➕ Add ALL to spelling list</button>
+    </div>
+  </div>
+</div>
+
 <!-- Tab bar -->
 <div class="tbar">
   <button class="ti on" id="tb-words" onclick="goP('pg-words')"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>WORDS</span></button>
   <button class="ti" id="tb-test" onclick="goP('pg-test')"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg><span>TEST</span></button>
   <button class="ti" id="tb-mark" onclick="goP('pg-mark')"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>MARK</span></button>
   <button class="ti" id="tb-results" onclick="goP('pg-results')"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><span>RESULTS</span></button>
+  <button class="ti" id="tb-lookup" onclick="goP('pg-lookup')"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35M11 8v6M8 11h6"/></svg><span>LOOKUP</span></button>
 </div>
+
 <div id="toast"></div>
 
 <script>
-var W=[], dictOrder=[], dictIdx=0, testOrd='seq', score=null, scanData=null, markData=null;
-var micRec=null, micOn=false, voiceLang='en-SG', heardWord='', wordShown=false;
+// ── State ─────────────────────────────────────────────
+var W=[], dictOrder=[], dictIdx=0, testOrd='seq', score=null;
+var scanData=null, markData=null, wordShown=false;
+var micRec=null, micOn=false, voiceLang='en-SG', heardWord='';
+var luMicRec=null, luMicOn=false, luLang='en-SG', currentLUWord='', luHistory=[];
 
 var SAMPLES={
-  en:[{t:'cat',m:'a small furry pet 🐱'},{t:'dog',m:'a pet that barks 🐶'},{t:'run',m:'to move fast 🏃'},{t:'sun',m:'the big star ☀️'},{t:'hat',m:'worn on the head 🎩'},{t:'sit',m:'rest on a chair'},{t:'cup',m:'you drink from this ☕'},{t:'bed',m:'you sleep here 🛏️'},{t:'big',m:'very large'},{t:'red',m:'a colour 🔴'}],
-  zh:[{t:'我',m:'wǒ — I / me'},{t:'你',m:'nǐ — you'},{t:'他',m:'tā — he'},{t:'好',m:'hǎo — good'},{t:'大',m:'dà — big'},{t:'小',m:'xiǎo — small'},{t:'人',m:'rén — person'},{t:'水',m:'shuǐ — water'},{t:'火',m:'huǒ — fire'},{t:'山',m:'shān — mountain'}],
-  py:[{t:'māo',m:'猫 — cat 🐱'},{t:'gǒu',m:'狗 — dog 🐶'},{t:'shuǐ',m:'水 — water'},{t:'huǒ',m:'火 — fire'},{t:'rén',m:'人 — person'},{t:'shǒu',m:'手 — hand'},{t:'dà',m:'大 — big'},{t:'xiǎo',m:'小 — small'},{t:'shān',m:'山 — mountain'},{t:'yuè',m:'月 — moon 🌙'}]
+  en:[{t:'cat',m:'small furry pet 🐱'},{t:'dog',m:'pet that barks 🐶'},{t:'run',m:'to move fast 🏃'},{t:'sun',m:'the big star ☀️'},{t:'hat',m:'worn on your head 🎩'},{t:'sit',m:'rest on a chair'},{t:'cup',m:'you drink from this ☕'},{t:'bed',m:'you sleep here 🛏️'},{t:'big',m:'very large'},{t:'red',m:'a colour 🔴'}],
+  zh:[{t:'我',m:'wǒ — I/me'},{t:'你',m:'nǐ — you'},{t:'他',m:'tā — he'},{t:'好',m:'hǎo — good'},{t:'大',m:'dà — big'},{t:'小',m:'xiǎo — small'},{t:'人',m:'rén — person'},{t:'水',m:'shuǐ — water'},{t:'火',m:'huǒ — fire'},{t:'山',m:'shān — mountain'}],
+  py:[{t:'māo',m:'猫 cat 🐱'},{t:'gǒu',m:'狗 dog 🐶'},{t:'shuǐ',m:'水 water'},{t:'huǒ',m:'火 fire'},{t:'rén',m:'人 person'},{t:'shǒu',m:'手 hand'},{t:'dà',m:'大 big'},{t:'xiǎo',m:'小 small'},{t:'shān',m:'山 mountain'},{t:'yuè',m:'月 moon 🌙'}]
 };
-
-// ── SOUND — simplest possible. Phone's own voice. ──────
-function speak(text, lang){
-  if(!('speechSynthesis' in window)) return false;
-  try{
-    window.speechSynthesis.cancel();
-    var u = new SpeechSynthesisUtterance(text);
-    u.rate = 0.7;
-    u.volume = 1.0;
-    u.lang = (lang==='zh'||lang==='py') ? 'zh-CN' : 'en-US';
-    // prefer a female voice if one exists
-    var vs = window.speechSynthesis.getVoices();
-    var f = vs.find(function(v){return /female|zira|samantha|karen/i.test(v.name) && v.lang.indexOf(u.lang.slice(0,2))===0;})
-         || vs.find(function(v){return v.lang===u.lang;});
-    if(f) u.voice = f;
-    window.speechSynthesis.speak(u);
-    return true;
-  }catch(e){ return false; }
-}
 
 // ── Toast ──────────────────────────────────────────────
 function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');clearTimeout(window._tt);window._tt=setTimeout(function(){t.classList.remove('on');},3200);}
 
 // ── Sections ───────────────────────────────────────────
-function toggleSec(id){
-  var b=document.getElementById(id), btn=b.previousElementSibling, was=b.classList.contains('open');
-  document.querySelectorAll('.sec-body').forEach(function(x){x.classList.remove('open');});
-  document.querySelectorAll('.sec-btn').forEach(function(x){x.classList.remove('open');});
-  if(!was){b.classList.add('open');btn.classList.add('open');}
-}
+function toggleSec(id){var b=document.getElementById(id),btn=b.previousElementSibling,was=b.classList.contains('open');document.querySelectorAll('.sec-body').forEach(function(x){x.classList.remove('open');});document.querySelectorAll('.sec-btn').forEach(function(x){x.classList.remove('open');});if(!was){b.classList.add('open');btn.classList.add('open');}}
 
 // ── Page nav ───────────────────────────────────────────
-var PT={'pg-words':'tb-words','pg-test':'tb-test','pg-mark':'tb-mark','pg-results':'tb-results'};
+var PT={'pg-words':'tb-words','pg-test':'tb-test','pg-mark':'tb-mark','pg-results':'tb-results','pg-lookup':'tb-lookup'};
 function goP(id){
-  if(id!=='pg-words'&&W.length===0){toast('Please add some words first! 😊');return;}
+  if(id!=='pg-words'&&id!=='pg-lookup'&&W.length===0){toast('Please add some words first! 😊');return;}
   document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
   document.getElementById(id).classList.add('on');
   document.querySelectorAll('.ti').forEach(function(t){t.classList.remove('on');});
-  var tb=document.getElementById(PT[id]); if(tb) tb.classList.add('on');
+  var tb=document.getElementById(PT[id]);if(tb)tb.classList.add('on');
   window.scrollTo({top:0,behavior:'smooth'});
-  if(id==='pg-test') initDict();
-  if(id==='pg-results') renderRes();
+  if(id==='pg-test')initDict();
+  if(id==='pg-results')renderRes();
+}
+
+// ── Language detect ────────────────────────────────────
+function getLang(w){if(/[\u4e00-\u9fff]/.test(w))return 'zh';if(/[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/.test(w))return 'py';return 'en';}
+
+// ── Speech (simple) ────────────────────────────────────
+function speak(text,lang){
+  if(!window.speechSynthesis)return;
+  try{
+    window.speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(text);
+    u.rate=0.7;u.volume=1.0;
+    u.lang=(lang==='zh'||lang==='py')?'zh-CN':'en-US';
+    var vs=window.speechSynthesis.getVoices();
+    var fv=vs.find(function(v){return /female|zira|samantha|karen/i.test(v.name)&&v.lang.indexOf(u.lang.slice(0,2))===0;})||vs.find(function(v){return v.lang===u.lang;});
+    if(fv)u.voice=fv;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
 }
 
 // ── Words ──────────────────────────────────────────────
-function getLang(w){if(/[\u4e00-\u9fff]/.test(w))return 'zh';if(/[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/.test(w))return 'py';return 'en';}
 function addW(t,m){t=t.trim();if(!t)return;if(W.find(function(w){return w.t===t;})){toast('"'+t+'" already added');return;}W.push({t:t,l:getLang(t),m:m||''});renderW();}
 function delW(i){W.splice(i,1);renderW();}
 function clearAll(){W=[];renderW();}
@@ -313,14 +440,14 @@ function renderW(){
   document.getElementById('wc').textContent=W.length;
   document.getElementById('wl-card').style.display=W.length?'block':'none';
   document.getElementById('word-list').innerHTML=W.map(function(w,i){
-    return '<div class="wrow"><button class="wplay" onclick="speak(W['+i+'].t,W['+i+'].l)">🔊</button>'
+    return '<div class="wrow"><button class="wplay" onclick="speak(\''+w.t.replace(/'/g,"\\'")+'\',\''+w.l+'\')">🔊</button>'
       +'<div class="wtxt"><div class="wword">'+w.t+'</div>'+(w.m?'<div class="wmean">'+w.m+'</div>':'')+'</div>'
       +'<span class="wlang l-'+w.l+'">'+w.l.toUpperCase()+'</span>'
       +'<button class="wdel" onclick="delW('+i+')">✕</button></div>';
   }).join('');
 }
 
-// ── Voice mic ──────────────────────────────────────────
+// ── Mic (add words) ────────────────────────────────────
 function setVLang(l){voiceLang=l;document.getElementById('lp-en').classList.toggle('on',l==='en-SG');document.getElementById('lp-zh').classList.toggle('on',l==='zh-CN');}
 function toggleMic(){
   if(micOn){stopMic();return;}
@@ -332,12 +459,12 @@ function toggleMic(){
   b.classList.add('rec');l.textContent='🎤 Listening… tap mic to stop';x.textContent='…';
   document.getElementById('mic-add').style.display='none';document.getElementById('mic-retry').style.display='none';
   micRec.onresult=function(e){var f='',t='';for(var i=0;i<e.results.length;i++){if(e.results[i].isFinal)f+=e.results[i][0].transcript+' ';else t+=e.results[i][0].transcript;}var c=(f+t).trim();if(c){heardWord=c;x.textContent=c;}};
-  micRec.onerror=function(e){if(e.error==='no-speech'||e.error==='aborted')return;if(e.error==='not-allowed'){l.textContent='Mic blocked. Use Type instead.';b.classList.remove('rec');micOn=false;}};
-  micRec.onend=function(){if(micOn){try{micRec.start();}catch(_){}return;}b.classList.remove('rec');if(heardWord){l.textContent='Did you say: "'+heardWord+'"?';document.getElementById('mic-add').style.display='';document.getElementById('mic-retry').style.display='';}else l.textContent='Could not hear. Try again.';};
-  try{micRec.start();}catch(e){l.textContent='Could not start. Use Type instead.';micOn=false;b.classList.remove('rec');}
+  micRec.onerror=function(e){if(e.error==='no-speech'||e.error==='aborted')return;l.textContent=e.error==='not-allowed'?'Mic blocked. Use Type instead.':'Could not hear. Try again.';b.classList.remove('rec');micOn=false;};
+  micRec.onend=function(){if(micOn){try{micRec.start();}catch(_){}return;}b.classList.remove('rec');if(heardWord){l.textContent='You said: "'+heardWord+'"';document.getElementById('mic-add').style.display='';document.getElementById('mic-retry').style.display='';}else l.textContent='Could not hear. Try again.';};
+  try{micRec.start();}catch(e){l.textContent='Could not start mic.';micOn=false;b.classList.remove('rec');}
 }
 function stopMic(){micOn=false;if(micRec){try{micRec.stop();}catch(_){}micRec=null;}document.getElementById('mic-btn').classList.remove('rec');}
-function confirmVoice(){if(!heardWord)return;heardWord.split(/[,，、\s]+/).filter(Boolean).forEach(function(p){addW(p.trim(),'');});document.getElementById('mic-heard').textContent='✅ Added!';document.getElementById('mic-lbl').textContent='Tap mic to add another!';document.getElementById('mic-add').style.display='none';document.getElementById('mic-retry').style.display='none';heardWord='';}
+function confirmVoice(){if(!heardWord)return;heardWord.split(/[,，\s]+/).filter(Boolean).forEach(function(p){addW(p.trim(),'');});document.getElementById('mic-heard').textContent='✅ Added!';document.getElementById('mic-lbl').textContent='Tap mic to add another!';document.getElementById('mic-add').style.display='none';document.getElementById('mic-retry').style.display='none';heardWord='';}
 function retryVoice(){heardWord='';document.getElementById('mic-heard').textContent='—';document.getElementById('mic-lbl').textContent='Tap the mic and say a word';document.getElementById('mic-add').style.display='none';document.getElementById('mic-retry').style.display='none';}
 
 // ── Scan ──────────────────────────────────────────────
@@ -346,9 +473,10 @@ async function doScan(){
   if(!scanData)return;if(!navigator.onLine){toast('No internet. Please connect.');return;}
   var btn=document.getElementById('scan-btn');btn.disabled=true;btn.textContent='⏳ Reading…';
   document.getElementById('scan-out').style.display='block';
-  var st=document.getElementById('scan-txt');st.innerHTML='<div class="dots"><span></span><span></span><span></span></div> Reading your list…';
+  var st=document.getElementById('scan-txt');
+  st.innerHTML='<div class="dots"><span></span><span></span><span></span></div> Reading list…';
   try{
-    var resp=await callAI([{type:'image',source:{type:'base64',media_type:'image/jpeg',data:scanData.split(',')[1]}},{type:'text',text:'You are helping a Primary 1 student in Singapore. The image shows their school spelling or 听写 word list.\n\nRead every word on the list.\n\nFor EACH item:\n- Number it\n- Write the word exactly as shown\n- If Chinese: add Hanyu Pinyin with tone marks and simple English meaning\n- If English: add a simple meaning a 7-year-old understands\n\nBe friendly.\n\nOn the LAST LINE write exactly:\nWORDS: word1, word2, word3'}]);
+    var resp=await callAI([{type:'image',source:{type:'base64',media_type:'image/jpeg',data:scanData.split(',')[1]}},{type:'text',text:'You are helping a Primary 1 student in Singapore. The image shows their school spelling or 听写 word list. Read every word. For EACH item: number it, write the word exactly as shown, if Chinese add Hanyu Pinyin with tone marks and simple English meaning, if English add simple meaning a 7-year-old understands. Be friendly. On the LAST LINE write exactly: WORDS: word1, word2, word3'}]);
     var m=resp.match(/WORDS:\s*(.+)/i);
     if(m){var ws=m[1].split(/[,，]+/).map(function(w){return w.trim();}).filter(Boolean);ws.forEach(function(w){addW(w,'');});st.textContent=resp.replace(/WORDS:.+/i,'').trim()+'\n\n✅ '+ws.length+' words added!';}
     else st.textContent=resp;
@@ -364,31 +492,24 @@ function showWord(){
   document.getElementById('d-prog').style.width=pct+'%';
   document.getElementById('d-ctr').textContent='Word '+(dictIdx+1)+' of '+total;
   document.getElementById('d-ico').textContent='👆';
-  document.getElementById('d-hint').textContent='Tap the button below to hear the word!';
   document.getElementById('d-word').textContent=W[dictOrder[dictIdx]].t;
   document.getElementById('d-word').classList.remove('show');
   wordShown=false;
   document.getElementById('show-btn').textContent='👁️ Show the word (if no sound)';
+  document.getElementById('d-hint').textContent='Tap the button below to hear the word!';
   document.getElementById('d-next').style.display='none';
   document.getElementById('d-done').style.display='none';
-  var hb=document.getElementById('hear-btn');hb.textContent='🔊 Tap to Hear Word '+(dictIdx+1);
+  document.getElementById('hear-btn').textContent='🔊 HEAR THE WORD';
 }
 function hearNow(){
   var w=W[dictOrder[dictIdx]];
   document.getElementById('d-ico').textContent='🔊';
-  var ok=speak(w.t,w.l);
-  if(!ok) toast('No sound on this phone — tap "Show the word" button instead.');
-  // Always reveal Next/Done so the test never gets stuck
+  speak(w.t,w.l);
   var last=dictIdx>=dictOrder.length-1;
   document.getElementById('d-hint').textContent=last?'Last word! Write it, then tap Done.':'Write it, then tap Next Word.';
   document.getElementById(last?'d-done':'d-next').style.display='';
 }
-function toggleShow(){
-  wordShown=!wordShown;
-  var el=document.getElementById('d-word');
-  el.classList.toggle('show',wordShown);
-  document.getElementById('show-btn').textContent=wordShown?'🙈 Hide the word':'👁️ Show the word (if no sound)';
-}
+function toggleShow(){wordShown=!wordShown;document.getElementById('d-word').classList.toggle('show',wordShown);document.getElementById('show-btn').textContent=wordShown?'🙈 Hide the word':'👁️ Show the word (if no sound)';}
 function nxtWord(){dictIdx++;showWord();}
 
 // ── Mark ──────────────────────────────────────────────
@@ -398,10 +519,11 @@ async function doMark(){
   if(!markData)return;if(!navigator.onLine){toast('No internet. Please connect.');return;}
   var btn=document.getElementById('mark-btn');btn.disabled=true;btn.textContent='⏳ Marking…';
   document.getElementById('mark-card').style.display='block';document.getElementById('mark-title').textContent='Marking…';
-  var mt=document.getElementById('mark-txt');mt.innerHTML='<div class="dots"><span></span><span></span><span></span></div> Reading your handwriting…';
+  var mt=document.getElementById('mark-txt');
+  mt.innerHTML='<div class="dots"><span></span><span></span><span></span></div> Reading handwriting…';
   var ow=dictOrder.map(function(i){return W[i];});
   try{
-    var resp=await callAI([{type:'image',source:{type:'base64',media_type:'image/jpeg',data:markData.split(',')[1]}},{type:'text',text:'You are a warm, encouraging Primary 1 teacher in Singapore. A child wrote spelling answers on paper.\n\nCorrect words in order:\n'+ow.map(function(w,i){return(i+1)+'. '+w.t;}).join('\n')+'\n\nMark each answer from the photo.\n\nFor EACH word:\n- ✅ if correct: a short cheer!\n- ❌ if wrong: what they wrote → correct → simple kind reason (7-year-old level)\n- Check spelling, capitals, punctuation, pinyin tones\n\nAt the end:\n- Encouraging message\n- Score out of '+ow.length+'\n- One helpful tip\n\nSCORE: X/'+ow.length+'\n\nBe warm and kind!'}]);
+    var resp=await callAI([{type:'image',source:{type:'base64',media_type:'image/jpeg',data:markData.split(',')[1]}},{type:'text',text:'You are a warm encouraging Primary 1 teacher in Singapore. A child wrote spelling answers on paper. Correct words in order: '+ow.map(function(w,i){return(i+1)+'. '+w.t;}).join(', ')+'. Mark each answer from the photo. For EACH word: show ✅ if correct with a cheer, or ❌ if wrong showing what they wrote → correct answer → simple kind reason for a 7-year-old. Check spelling, capitals, punctuation, pinyin tones. End with an encouraging message, score out of '+ow.length+', and one helpful tip. Write SCORE: X/'+ow.length+' at the end. Be warm and kind!'}]);
     mt.textContent=resp;document.getElementById('mark-title').textContent='📝 Your results!';
     var m=resp.match(/SCORE:\s*(\d+)\s*\/\s*(\d+)/i);if(m)score={ok:parseInt(m[1]),total:parseInt(m[2])};
   }catch(e){mt.textContent='Could not read photo. Try a clearer image.\n\nError: '+e.message;}
@@ -410,25 +532,25 @@ async function doMark(){
 
 // ── Results ────────────────────────────────────────────
 function celebrate(){
-  var emojis=['⭐','🎉','🌟','✨','🎊','💫'];
-  for(var i=0;i<18;i++){
-    (function(n){
+  var emojis=['⭐','🎉','🌟','✨','🎊','💫','🏆'];
+  for(var i=0;i<20;i++){
+    (function(){
       var e=document.createElement('div');
       e.textContent=emojis[Math.floor(Math.random()*emojis.length)];
-      e.style.cssText='position:fixed;top:-40px;left:'+(Math.random()*100)+'vw;font-size:'+(20+Math.random()*16)+'px;z-index:9999;pointer-events:none;transition:transform 2.5s ease-in,opacity 2.5s';
+      e.style.cssText='position:fixed;top:-40px;left:'+(Math.random()*100)+'vw;font-size:'+(18+Math.random()*18)+'px;z-index:9999;pointer-events:none;transition:transform 2.5s ease-in,opacity 2.5s';
       document.body.appendChild(e);
-      setTimeout(function(){ e.style.transform='translateY(110vh) rotate('+(Math.random()*360)+'deg)'; e.style.opacity='0'; },30);
-      setTimeout(function(){ e.remove(); },2600);
-    })(i);
+      setTimeout(function(){e.style.transform='translateY(110vh) rotate('+(Math.random()*360)+'deg)';e.style.opacity='0';},30);
+      setTimeout(function(){e.remove();},2800);
+    })();
   }
 }
 function renderRes(){
   if(!score)return;
   var pct=Math.round((score.ok/score.total)*100);
-  if(pct>=70) setTimeout(celebrate,300);
   var stars=pct>=90?'⭐⭐⭐':pct>=70?'⭐⭐':'⭐';
   var ico=pct===100?'🎉':pct>=80?'🌟':pct>=60?'👍':'💪';
-  var msgs=['💪 Keep going!','👍 Good effort!','🌟 Nearly perfect!','🎉 Perfect! You are a star!'];
+  var msgs=['💪 Keep going — you can do it!','👍 Good effort! Keep practising!','🌟 Nearly perfect! Amazing!','🎉 Perfect! You are a star!'];
+  if(pct>=70)setTimeout(celebrate,300);
   document.getElementById('r-ico').textContent=ico;
   document.getElementById('r-title').textContent=pct===100?'Perfect! 🎉':'Well done!';
   document.getElementById('r-msg').textContent=msgs[pct>=90?3:pct>=70?2:pct>=50?1:0];
@@ -438,18 +560,259 @@ function renderRes(){
   document.getElementById('r-hist').innerHTML=dictOrder.map(function(wi,i){var w=W[wi];return'<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1.5px solid #f0f0f8;font-size:14px"><span style="font-weight:600">'+(i+1)+'. '+w.t+'</span>'+(w.m?'<span style="font-size:11px;color:var(--tx2);flex:1;padding:0 6px">'+w.m+'</span>':'')+'<span class="wlang l-'+w.l+'" style="font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700">'+w.l.toUpperCase()+'</span></div>';}).join('');
 }
 
-// ── AI ─────────────────────────────────────────────────
-async function callAI(content){
-  var r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1200,messages:[{role:'user',content:content}]})});
+// ── WORD LOOKUP ────────────────────────────────────────
+function setLUTab(tab){
+  var isMic=tab==='mic';
+  document.getElementById('lu-mic-panel').style.display=isMic?'block':'none';
+  document.getElementById('lu-type-panel').style.display=isMic?'none':'block';
+  document.getElementById('lu-mic-tab').className='bb '+(isMic?'pu':'wh');
+  document.getElementById('lu-type-tab').className='bb '+(isMic?'wh':'pu');
+}
+function setLULang(l){luLang=l;document.getElementById('lu-lang-en').classList.toggle('on',l==='en-SG');document.getElementById('lu-lang-zh').classList.toggle('on',l==='zh-CN');}
+
+function toggleLUMic(){
+  if(luMicOn){stopLUMic();return;}
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){toast('Voice needs Chrome. Please type instead.');return;}
+  luMicRec=new SR();luMicRec.lang=luLang;luMicRec.continuous=true;luMicRec.interimResults=true;
+  luMicOn=true;
+  var btn=document.getElementById('lu-mic-btn'),lbl=document.getElementById('lu-mic-lbl'),box=document.getElementById('lu-heard');
+  btn.classList.add('rec');lbl.textContent='🎤 Listening… tap mic to stop';box.textContent='…';
+  document.getElementById('lu-mic-look').style.display='none';document.getElementById('lu-mic-retry').style.display='none';
+  luMicRec.onresult=function(e){var f='',t='';for(var i=0;i<e.results.length;i++){if(e.results[i].isFinal)f+=e.results[i][0].transcript+' ';else t+=e.results[i][0].transcript;}var c=(f+t).trim();if(c)box.textContent=c;};
+  luMicRec.onerror=function(e){if(e.error==='no-speech'||e.error==='aborted')return;lbl.textContent=e.error==='not-allowed'?'Mic blocked. Please type instead.':'Could not hear. Try again.';btn.classList.remove('rec');luMicOn=false;};
+  luMicRec.onend=function(){if(luMicOn){try{luMicRec.start();}catch(_){}return;}btn.classList.remove('rec');var heard=box.textContent.trim();if(heard&&heard!=='—'&&heard!=='…'){lbl.textContent='You said: "'+heard+'"';document.getElementById('lu-mic-look').style.display='';document.getElementById('lu-mic-retry').style.display='';}else lbl.textContent='Could not hear. Try again or type the word.';};
+  try{luMicRec.start();}catch(e){lbl.textContent='Could not start mic.';luMicOn=false;btn.classList.remove('rec');}
+}
+function stopLUMic(){luMicOn=false;if(luMicRec){try{luMicRec.stop();}catch(_){}luMicRec=null;}document.getElementById('lu-mic-btn').classList.remove('rec');}
+function retryLUMic(){document.getElementById('lu-heard').textContent='—';document.getElementById('lu-mic-lbl').textContent='Tap the mic and say a word clearly!';document.getElementById('lu-mic-look').style.display='none';document.getElementById('lu-mic-retry').style.display='none';}
+
+async function doLookup(rawWord){
+  if(!rawWord||rawWord==='—'||rawWord==='…')return;
+  var word=rawWord.trim().split(/\s+/).slice(0,3).join(' ').replace(/[^\w\u4e00-\u9fff\u0300-\u036f\s\-']/g,'').trim();
+  if(!word){toast('Please say or type a word first!');return;}
+  if(!navigator.onLine){toast('No internet. Please connect to look up words.');return;}
+
+  currentLUWord=word;
+  var lang=getLang(word);
+
+  // Show result card
+  var rc=document.getElementById('lu-result');
+  rc.style.display='block';
+  document.getElementById('lu-word-big').textContent=word;
+  showStrokeGuide(word);
+
+  // Show letter bubbles
+  var spEl=document.getElementById('lu-spelling');
+  var colours=['#FFE4E4','#FFF3D4','#E4FFE9','#E4EEFF','#F9E4FF','#FFE4F4','#E4FFF9','#FFFEE4'];
+  var txCols=['#C0392B','#B7770D','#196F3D','#154360','#6C3483','#C0235E','#117A65','#9A7D0A'];
+  if(lang==='en'){
+    spEl.innerHTML=word.split('').map(function(lt,i){var ci=i%colours.length;return'<div class="letter-bubble" style="background:'+colours[ci]+';color:'+txCols[ci]+'">'+lt+'</div>';}).join('');
+  } else {
+    spEl.innerHTML='<div class="letter-bubble" style="font-size:30px;padding:14px 20px">'+word+'</div>';
+  }
+
+  // Speak the word
+  speak(word, lang);
+
+  // AI definition
+  var defEl=document.getElementById('lu-def');
+  defEl.innerHTML='<div class="dots"><span></span><span></span><span></span></div> Getting the meaning…';
+  document.getElementById('lu-add-btn').textContent='➕ Add to my spelling list';
+
+  var prompt;
+  if(lang==='zh'){
+    prompt='The Chinese word is: '+word+'. Explain for a Primary 1 student in Singapore (age 6-7). Give: 1) Hanyu Pinyin with correct tone marks. 2) English meaning in 1 simple sentence. 3) One short example sentence in Chinese with English translation. 4) A fun tip to remember it. Use simple cheerful language with emojis! Keep it short.';
+  } else if(lang==='py'){
+    prompt='The Hanyu Pinyin is: '+word+'. Explain for a Primary 1 student in Singapore (age 6-7). Give: 1) Whether the pinyin spelling is correct. 2) The Chinese character(s) it represents. 3) English meaning in 1 simple sentence. 4) One short example. Use fun language with emojis!';
+  } else {
+    prompt='The English word is: '+word+'. Explain for a Primary 1 student in Singapore (age 6-7). Give: 1) What it means in ONE very simple sentence (like talking to a 6-year-old). 2) ONE short fun example sentence. 3) A rhyme or easy tip to remember the spelling. 4) A similar easy word they might know. Use cheerful encouraging language with fun emojis! Keep it short and simple.';
+  }
+
+  try{
+    // Check built-in dictionary first (works offline and on file://)
+    var dictKey = word.toLowerCase().trim();
+    var resp;
+    if(DICT[dictKey]){
+      resp = DICT[dictKey];
+    } else if(DICT[word]){
+      // Chinese characters — check exact
+      resp = DICT[word];
+    } else {
+      // Not in local dictionary — try AI (needs internet + https://)
+      resp = await callAI([{type:'text',text:prompt}], 900);
+    }
+    defEl.textContent=resp;
+    // Save to history
+    luHistory.unshift({word:word,lang:lang});
+    if(luHistory.length>15)luHistory.pop();
+    renderLUHist();
+    // Clear inputs
+    document.getElementById('lu-inp').value='';
+    document.getElementById('lu-heard').textContent='—';
+    document.getElementById('lu-mic-lbl').textContent='Tap the mic and say a word clearly!';
+    document.getElementById('lu-mic-look').style.display='none';
+    document.getElementById('lu-mic-retry').style.display='none';
+  }catch(e){
+    var msg = e.message || 'unknown error';
+    var hint = '';
+    if(msg.indexOf('file:')>-1 || msg.indexOf('Failed to fetch')>-1){
+      hint = '\n\n👉 To get AI meanings for ANY word:\nOpen the app using your GitHub Pages link:\nhttps://quekshuwen-dev.github.io/spelling-coach\n\nBuilt-in meanings work for common Primary 1 words without internet!';
+    } else if(msg.indexOf('API error')>-1){
+      hint = '\n\nThe AI service had an error. Please try again in a moment.';
+    } else {
+      hint = '\n\nPlease check your internet connection and try again.';
+    }
+    defEl.textContent = '⚠️ Could not get meaning.\n' + msg + hint;
+    console.error('Lookup error:', e);
+  }
+}
+
+function speakLU(){if(currentLUWord)speak(currentLUWord,getLang(currentLUWord));}
+
+function addLUWord(){
+  if(!currentLUWord)return;
+  addW(currentLUWord,'');
+  toast('✅ "'+currentLUWord+'" added to spelling list!');
+  document.getElementById('lu-add-btn').textContent='✅ Added!';
+  setTimeout(function(){document.getElementById('lu-add-btn').textContent='➕ Add to my spelling list';},2000);
+}
+
+function clearLUHist(){luHistory=[];document.getElementById('lu-hist-card').style.display='none';}
+function addAllLU(){luHistory.forEach(function(h){addW(h.word,'');});toast('✅ All '+luHistory.length+' words added!');}
+function renderLUHist(){
+  var hc=document.getElementById('lu-hist-card'),hl=document.getElementById('lu-hist-list');
+  if(!luHistory.length){hc.style.display='none';return;}
+  hc.style.display='block';
+  hl.innerHTML=luHistory.map(function(h){
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1.5px solid #f0f0f8">'
+      +'<div style="font-size:18px;font-weight:800;color:var(--pu);flex:1">'+h.word+'</div>'
+      +'<span class="wlang l-'+h.lang+'" style="font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700">'+h.lang.toUpperCase()+'</span>'
+      +'<button onclick="doLookup(\''+h.word.replace(/'/g,"\\'")+'\')" style="background:var(--pul);border:none;border-radius:20px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--pud);cursor:pointer;touch-action:manipulation">Look up again</button>'
+      +'</div>';
+  }).join('');
+}
+
+// ── Parent lookup (types for child) ──────────────────
+function parentLookup(){
+  var word = document.getElementById('parent-inp').value.trim();
+  if(!word){ toast('Please type a word first!'); return; }
+  doLookup(word);
+  document.getElementById('parent-inp').value = '';
+}
+
+// ── Stroke guide for Chinese characters ───────────────
+function showStrokeGuide(word){
+  var sec = document.getElementById('lu-stroke-section');
+  var frames = document.getElementById('lu-stroke-frames');
+  var link = document.getElementById('lu-bihua-link');
+
+  // Only show for Chinese characters
+  var isChinese = /[一-鿿]/.test(word);
+  if(!isChinese){ sec.style.display='none'; return; }
+
+  sec.style.display='block';
+
+  // bihua.app link — works for any Chinese word/character
+  var encoded = encodeURIComponent(word);
+  link.href = 'https://www.bihua.app/en/bihua?words=' + encoded;
+
+  // Show character preview boxes — one per character
+  var chars = word.split('').filter(function(ch){ return /[一-鿿]/.test(ch); });
+  frames.innerHTML = chars.map(function(ch){
+    return '<a href="https://www.bihua.app/en/bihua?words='+encodeURIComponent(ch)+'" target="_blank" rel="noopener" '
+      + 'style="display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;background:var(--pul);border-radius:14px;padding:12px 16px;min-width:64px">'
+      + '<span style="font-size:36px;line-height:1">'+ch+'</span>'
+      + '<span style="font-size:11px;color:var(--pud);font-weight:700">Tap to write</span>'
+      + '</a>';
+  }).join('');
+}
+
+// ── Anthropic API ──────────────────────────────────────
+// ── Built-in dictionary (works offline / file://) ────
+var DICT = {
+  "cat":"A cat is a small, soft animal that purrs and meows. Cats are great pets!\n\nExample: The cat sat on the mat.\n\nSpelling tip: C-A-T! Rhymes with bat, hat, and rat. \u{1F431}",
+  "dog":"A dog is a friendly animal that barks and wags its tail. Dogs love to play! \u{1F436}\n\nExample: My dog likes to run in the park.\n\nSpelling tip: D-O-G! Rhymes with log and fog.",
+  "run":"Run means to move your legs very fast - faster than walking! \u{1F3C3}\n\nExample: I run to school every day.\n\nSpelling tip: R-U-N! Rhymes with sun and fun.",
+  "sun":"The sun is the big bright star in the sky that gives us light and warmth! \u2600\uFE0F\n\nExample: The sun is bright and yellow.\n\nSpelling tip: S-U-N! Rhymes with fun and run.",
+  "hat":"A hat is something you wear on your head to keep the sun away! \u{1F3A9}\n\nExample: I wear a hat when it is hot.\n\nSpelling tip: H-A-T! Rhymes with cat and bat.",
+  "sit":"Sit means to rest your bottom on a chair or the floor. \u{1FA91}\n\nExample: Please sit down on your chair.\n\nSpelling tip: S-I-T! Rhymes with bit and hit.",
+  "cup":"A cup is what you drink from. You can put water, juice, or tea in a cup! \u2615\n\nExample: I drink water from my cup.\n\nSpelling tip: C-U-P! Rhymes with pup.",
+  "bed":"A bed is where you sleep at night. It is soft and comfortable! \u{1F6CF}\uFE0F\n\nExample: I go to bed at nine o clock.\n\nSpelling tip: B-E-D! Rhymes with red and fed.",
+  "big":"Big means something is very large in size! \u{1F418}\n\nExample: The elephant is very big.\n\nSpelling tip: B-I-G! Rhymes with pig and dig.",
+  "red":"Red is a bright colour - like apples and strawberries! \u{1F534}\n\nExample: My bag is red.\n\nSpelling tip: R-E-D! Rhymes with bed and fed.",
+  "bus":"A bus is a big vehicle with many seats that carries lots of people! \u{1F68C}\n\nExample: I take the bus to school.\n\nSpelling tip: B-U-S! Rhymes with us.",
+  "wet":"Wet means covered with water - the opposite of dry! \u{1F4A7}\n\nExample: I got wet in the rain.\n\nSpelling tip: W-E-T! Rhymes with pet and set.",
+  "hot":"Hot means something has a high temperature - like the sun or hot soup! \u{1F321}\uFE0F\n\nExample: The soup is very hot.\n\nSpelling tip: H-O-T! Rhymes with pot and dot.",
+  "fan":"A fan blows cool air to make you feel less hot! \u{1F300}\n\nExample: The fan keeps me cool.\n\nSpelling tip: F-A-N! Rhymes with can and man.",
+  "leg":"Your leg is the part of your body you use to walk, run, and jump! \u{1F9B5}\n\nExample: I hurt my leg when I fell.\n\nSpelling tip: L-E-G! Rhymes with peg and beg.",
+  "map":"A map is a drawing that shows you where places are! \u{1F5FA}\uFE0F\n\nExample: We use a map to find our way.\n\nSpelling tip: M-A-P! Rhymes with cap and tap.",
+  "pen":"A pen is what you use to write. It has ink inside! \u270F\uFE0F\n\nExample: I write with my pen.\n\nSpelling tip: P-E-N! Rhymes with ten and hen.",
+  "top":"Top means the highest part of something! \u{1F51D}\n\nExample: The bird is on top of the tree.\n\nSpelling tip: T-O-P! Rhymes with hop and mop.",
+  "box":"A box is a container with four sides. You can put things inside! \u{1F4E6}\n\nExample: I keep my toys in a box.\n\nSpelling tip: B-O-X! Rhymes with fox.",
+  "fox":"A fox is a wild animal with orange fur and a bushy tail. Very clever! \u{1F98A}\n\nExample: The fox ran into the forest.\n\nSpelling tip: F-O-X! Rhymes with box.",
+  "pig":"A pig is a farm animal that says oink! Pigs love to roll in mud. \u{1F437}\n\nExample: The pig is fat and pink.\n\nSpelling tip: P-I-G! Rhymes with big and dig.",
+  "ant":"An ant is a tiny insect that is very strong! \u{1F41C}\n\nExample: The ant carries food to its home.\n\nSpelling tip: A-N-T! Rhymes with plant.",
+  "bat":"A bat is an animal that flies at night! Also a stick to hit a ball. \u{1F987}\n\nExample: The bat flies in the dark.\n\nSpelling tip: B-A-T! Rhymes with cat and hat.",
+  "mat":"A mat is a flat piece you put on the floor to stand on! \n\nExample: Wipe your feet on the mat.\n\nSpelling tip: M-A-T! Rhymes with cat and bat.",
+  "net":"A net has holes in it like a spider web. Used to catch fish! \u{1F578}\uFE0F\n\nExample: We caught fish with a net.\n\nSpelling tip: N-E-T! Rhymes with pet and set.",
+  "pot":"A pot is used for cooking food on a stove! \u{1F372}\n\nExample: Mum cooks rice in a pot.\n\nSpelling tip: P-O-T! Rhymes with hot and dot.",
+  "mud":"Mud is wet, sticky dirt from the ground. \u{1F7E4}\n\nExample: My shoes got dirty from the mud.\n\nSpelling tip: M-U-D! Rhymes with bud.",
+  "bun":"A bun is a soft, round bread roll! \u{1F9C1}\n\nExample: I ate a bun for breakfast.\n\nSpelling tip: B-U-N! Rhymes with sun and fun.",
+  "tap":"A tap is what you turn to get water. You wash your hands from a tap! \u{1F6BF}\n\nExample: Turn off the tap after washing.\n\nSpelling tip: T-A-P! Rhymes with map and cap.",
+  "jam":"Jam is a sweet spread made from fruit. Yummy on bread! \u{1F353}\n\nExample: I like strawberry jam on my bread.\n\nSpelling tip: J-A-M! Rhymes with ham.",
+  "fun":"Fun means something that makes you happy and laugh! \u{1F389}\n\nExample: Playing at the park is fun.\n\nSpelling tip: F-U-N! Rhymes with run and sun.",
+  "hug":"A hug is when you wrap your arms around someone you love! \u{1F917}\n\nExample: I give mum a big hug.\n\nSpelling tip: H-U-G! Rhymes with bug and mug.",
+  "and":"And is used to join two things together!\n\nExample: I have a cat and a dog.\n\nSpelling tip: A-N-D! Short and easy!",
+  "the":"The is one of the most common words in English! It points to a specific thing.\n\nExample: The cat is on the mat.\n\nSpelling tip: T-H-E! Just three letters!",
+  "go":"Go means to move from one place to another!\n\nExample: Let us go to the park!\n\nSpelling tip: G-O! Only two letters!",
+  "up":"Up means moving to a higher place!\n\nExample: The bird flies up into the sky.\n\nSpelling tip: U-P! Only two letters!",
+  "\u6211":"wǒ - I / Me\n\nExample: \u6211\u662f\u5b66\u751f (Wǒ shì xuésheng) - I am a student.\n\nTip: \u6211 has 7 strokes. Tap the character below to see how to write it!",
+  "\u4f60":"nǐ - You\n\nExample: \u4f60\u597d! (Nǐ hǎo) - Hello!\n\nTip: \u4f60 has 7 strokes. Tap to see how to write it!",
+  "\u4ed6":"tā - He / Him\n\nExample: \u4ed6\u662f\u6211\u7684\u670b\u53cb (Tā shì wǒ de péngyǒu) - He is my friend.\n\nTip: \u4ed6 has 5 strokes!",
+  "\u5979":"tā - She / Her\n\nExample: \u5979\u5f88\u597d (Tā hěn hǎo) - She is very good.\n\nTip: \u5979 has 6 strokes!",
+  "\u597d":"hǎo - Good\n\nExample: \u4f60\u597d! (Nǐ hǎo) - Hello! (literally: You good!)\n\nFun fact: \u597d = woman + child = good!",
+  "\u5927":"dà - Big\n\nExample: \u5927\u8c61\u5f88\u5927 (Dà xiàng hěn dà) - The elephant is very big.\n\nTip: \u5927 looks like a person stretching arms wide - BIG!",
+  "\u5c0f":"xiǎo - Small\n\nExample: \u5c0f\u732b\u5f88\u53ef\u7231 (Xiǎo māo hěn kě\u4e2d\u6587) - The small cat is very cute.\n\nTip: \u5c0f has 3 strokes!",
+  "\u4e0a":"shàng - Up / Above\n\nExample: \u732b\u5728\u6905\u5b50\u4e0a (Māo zài yǐzi shàng) - The cat is on the chair.\n\nTip: The line on TOP of \u4e0a shows it means UP!",
+  "\u4e0b":"xià - Down / Below\n\nExample: \u4e66\u5728\u684c\u5b50\u4e0b (Shū zài zhuōzi xià) - The book is under the table.\n\nTip: The line at BOTTOM of \u4e0b shows it means DOWN!",
+  "\u4eba":"rén - Person\n\nExample: \u90a3\u4e2a\u4eba\u5f88\u9ad8 (Nàge rén hěn gāo) - That person is very tall.\n\nFun fact: \u4eba looks like a person walking - two legs!",
+  "\u6c34":"shuǐ - Water\n\nExample: \u6211\u8981\u559d\u6c34 (Wǒ yào hē shuǐ) - I want to drink water.\n\nFun fact: \u6c34 looks like flowing water with ripples!",
+  "\u706b":"huǒ - Fire\n\nExample: \u706b\u5f88\u70ed (Huǒ hěn rè) - Fire is very hot.\n\nFun fact: \u706b looks like flames going up!",
+  "\u5c71":"shān - Mountain\n\nExample: \u90a3\u5ea7\u5c71\u5f88\u9ad8 (Nà zuò shān hěn gāo) - That mountain is very tall.\n\nFun fact: \u5c71 looks like three mountain peaks!",
+  "\u65e5":"rì - Sun / Day\n\nExample: \u4eca\u65e5\u5929\u6c14\u5f88\u597d (Jīnrì tiānqì hěn hǎo) - The weather is nice today.\n\nFun fact: \u65e5 looks like the sun - a box with a line!",
+  "\u6708":"yuè - Moon / Month\n\nExample: \u6708\u4eae\u5f88\u4eae (Yuèliàng hěn liàng) - The moon is very bright.\n\nFun fact: \u6708 looks like a crescent moon!",
+  "\u6728":"mù - Wood / Tree\n\nExample: \u8fd9\u5f35\u684c\u5b50\u662f\u6728\u505a\u7684 - This table is made of wood.\n\nFun fact: \u6728 looks like a tree with roots and branches!"
+};
+
+async function callAI(content, maxTokens){
+  maxTokens = maxTokens || 800;
+  // Check if we are on file:// (local) — API won't work there
+  if(window.location.protocol === 'file:'){
+    throw new Error('Running as local file — please open via your GitHub Pages link (https://...) for AI features');
+  }
+  var r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-6',
+      max_tokens:maxTokens,
+      messages:[{role:'user',content:content}]
+    })
+  });
+  if(!r.ok){
+    var errText=await r.text();
+    throw new Error('API error '+r.status+': '+errText.slice(0,120));
+  }
   var d=await r.json();
-  if(d.error)throw new Error(d.error.message);
+  if(d.error)throw new Error(d.error.message||JSON.stringify(d.error));
   var b=d.content&&d.content.find(function(b){return b.type==='text';});
-  if(!b)throw new Error('No response');
+  if(!b)throw new Error('No response from AI');
   return b.text;
 }
 
 // Preload voices
-if('speechSynthesis' in window){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=function(){window.speechSynthesis.getVoices();};}
+if(window.speechSynthesis){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=function(){window.speechSynthesis.getVoices();};}
 </script>
 </body>
 </html>

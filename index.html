@@ -122,6 +122,14 @@ body{padding-bottom:82px}
 </head>
 <body>
 
+<!-- File:// warning banner — only shows when opened directly from file storage -->
+<div id="file-warning" style="display:none;background:#FF9F1C;color:#fff;padding:12px 16px;font-size:13px;font-weight:600;text-align:center;line-height:1.6;position:sticky;top:0;z-index:200">
+  ⚠️ You opened this as a file. AI features need the web link.<br>
+  <a href="https://quekshuwen-dev.github.io/spelling-coach" style="color:#fff;text-decoration:underline;font-weight:800">
+    👉 Open https://quekshuwen-dev.github.io/spelling-coach
+  </a>
+</div>
+
 <!-- PAGE 1: WORDS -->
 <div class="pg on" id="pg-words">
   <div class="hdr">
@@ -480,7 +488,13 @@ async function doScan(){
     var m=resp.match(/WORDS:\s*(.+)/i);
     if(m){var ws=m[1].split(/[,，]+/).map(function(w){return w.trim();}).filter(Boolean);ws.forEach(function(w){addW(w,'');});st.textContent=resp.replace(/WORDS:.+/i,'').trim()+'\n\n✅ '+ws.length+' words added!';}
     else st.textContent=resp;
-  }catch(e){st.textContent='Could not read photo. Try a clearer image.\n\nError: '+e.message;}
+  }catch(e){
+    if(e.message==='FILE_LOCAL'||e.message.indexOf('Failed to fetch')>-1||e.message.indexOf('file:')>-1){
+      st.textContent='⚠️ AI features need internet and the GitHub Pages link.\n\nPlease open the app at:\nhttps://quekshuwen-dev.github.io/spelling-coach\n\nInstead, type the words manually using the Type option above!';
+    } else {
+      st.textContent='Could not read photo. Please try a clearer, well-lit image.\n\nError: '+e.message;
+    }
+  }
   btn.disabled=false;btn.textContent='🪄 Read This List!';
 }
 
@@ -526,7 +540,13 @@ async function doMark(){
     var resp=await callAI([{type:'image',source:{type:'base64',media_type:'image/jpeg',data:markData.split(',')[1]}},{type:'text',text:'You are a warm encouraging Primary 1 teacher in Singapore. A child wrote spelling answers on paper. Correct words in order: '+ow.map(function(w,i){return(i+1)+'. '+w.t;}).join(', ')+'. Mark each answer from the photo. For EACH word: show ✅ if correct with a cheer, or ❌ if wrong showing what they wrote → correct answer → simple kind reason for a 7-year-old. Check spelling, capitals, punctuation, pinyin tones. End with an encouraging message, score out of '+ow.length+', and one helpful tip. Write SCORE: X/'+ow.length+' at the end. Be warm and kind!'}]);
     mt.textContent=resp;document.getElementById('mark-title').textContent='📝 Your results!';
     var m=resp.match(/SCORE:\s*(\d+)\s*\/\s*(\d+)/i);if(m)score={ok:parseInt(m[1]),total:parseInt(m[2])};
-  }catch(e){mt.textContent='Could not read photo. Try a clearer image.\n\nError: '+e.message;}
+  }catch(e){
+    if(e.message==='FILE_LOCAL'||e.message.indexOf('Failed to fetch')>-1||e.message.indexOf('file:')>-1){
+      mt.textContent='⚠️ AI marking needs internet and the GitHub Pages link.\n\nPlease open the app at:\nhttps://quekshuwen-dev.github.io/spelling-coach\n\nFor now, check your own answers against the word list!';
+    } else {
+      mt.textContent='Could not read photo. Please try a clearer, well-lit image.\n\nError: '+e.message;
+    }
+  }
   btn.disabled=false;btn.textContent='🪄 Mark My Work!';
 }
 
@@ -630,22 +650,29 @@ async function doLookup(rawWord){
   }
 
   try{
-    // Check built-in dictionary first (works offline and on file://)
     var dictKey = word.toLowerCase().trim();
     var resp;
+
+    // 1. Check built-in dictionary first (instant, works offline)
     if(DICT[dictKey]){
       resp = DICT[dictKey];
     } else if(DICT[word]){
-      // Chinese characters — check exact
       resp = DICT[word];
+    } else if(lang === 'en'){
+      // 2. English: use the FREE Dictionary API (no key, works on GitHub Pages)
+      resp = await lookupEnglish(word);
+    } else if(lang === 'zh'){
+      // 3. Chinese: use CC-CEDICT free API
+      resp = await lookupChinese(word);
     } else {
-      // Not in local dictionary — try AI (needs internet + https://)
-      resp = await callAI([{type:'text',text:prompt}], 900);
+      // 4. Pinyin: show pinyin info
+      resp = lookupPinyin(word);
     }
-    defEl.textContent=resp;
+
+    defEl.textContent = resp;
     // Save to history
-    luHistory.unshift({word:word,lang:lang});
-    if(luHistory.length>15)luHistory.pop();
+    luHistory.unshift({word:word, lang:lang});
+    if(luHistory.length>15) luHistory.pop();
     renderLUHist();
     // Clear inputs
     document.getElementById('lu-inp').value='';
@@ -654,16 +681,12 @@ async function doLookup(rawWord){
     document.getElementById('lu-mic-look').style.display='none';
     document.getElementById('lu-mic-retry').style.display='none';
   }catch(e){
-    var msg = e.message || 'unknown error';
-    var hint = '';
-    if(msg.indexOf('file:')>-1 || msg.indexOf('Failed to fetch')>-1){
-      hint = '\n\n👉 To get AI meanings for ANY word:\nOpen the app using your GitHub Pages link:\nhttps://quekshuwen-dev.github.io/spelling-coach\n\nBuilt-in meanings work for common Primary 1 words without internet!';
-    } else if(msg.indexOf('API error')>-1){
-      hint = '\n\nThe AI service had an error. Please try again in a moment.';
+    var msg = e.message || 'unknown';
+    if(msg==='FILE_LOCAL'||msg.indexOf('Failed to fetch')>-1||msg.indexOf('file:')>-1){
+      defEl.textContent = '⚠️ To look up words not in the built-in list, please open the app from your GitHub Pages link:\n\nhttps://quekshuwen-dev.github.io/spelling-coach\n\nCommon Primary 1 words (cat, dog, 我, 你...) work without internet!';
     } else {
-      hint = '\n\nPlease check your internet connection and try again.';
+      defEl.textContent = '⚠️ Could not get meaning. Please check internet and try again.\n\nError: '+msg;
     }
-    defEl.textContent = '⚠️ Could not get meaning.\n' + msg + hint;
     console.error('Lookup error:', e);
   }
 }
@@ -691,6 +714,102 @@ function renderLUHist(){
       +'<button onclick="doLookup(\''+h.word.replace(/'/g,"\\'")+'\')" style="background:var(--pul);border:none;border-radius:20px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--pud);cursor:pointer;touch-action:manipulation">Look up again</button>'
       +'</div>';
   }).join('');
+}
+
+// ── Free Dictionary API (English) ────────────────────
+// Uses dictionaryapi.dev — free, no key, CORS-friendly
+async function lookupEnglish(word){
+  var r = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + encodeURIComponent(word));
+  if(!r.ok) throw new Error('Word not found');
+  var data = await r.json();
+  if(!data || !data[0]) throw new Error('No definition found');
+
+  var entry = data[0];
+  var result = '';
+
+  // Word
+  result += '📖 ' + entry.word.toUpperCase() + '\n\n';
+
+  // Phonetic
+  if(entry.phonetic) result += '🔤 How to say it: ' + entry.phonetic + '\n\n';
+
+  // Meanings (max 2)
+  var meanings = entry.meanings || [];
+  var shown = 0;
+  for(var i=0; i<meanings.length && shown<2; i++){
+    var m = meanings[i];
+    var defs = m.definitions || [];
+    if(defs.length === 0) continue;
+    result += '✏️ (' + m.partOfSpeech + '): ' + simplifyDef(defs[0].definition) + '\n';
+    if(defs[0].example) result += '📝 Example: "' + defs[0].example + '"\n';
+    result += '\n';
+    shown++;
+  }
+
+  // Spelling tip
+  result += '💡 Spelling: ' + word.toUpperCase().split('').join(' - ');
+  result += ' (' + word.length + ' letters)';
+
+  return result;
+}
+
+// Make definition simpler for kids
+function simplifyDef(def){
+  // Already simple enough from dictionaryapi.dev for most words
+  // Just trim and cap length
+  if(def.length > 120) def = def.slice(0, 117) + '...';
+  return def;
+}
+
+// ── Chinese lookup ────────────────────────────────────
+// Uses hanziapi (free, no key needed)
+async function lookupChinese(word){
+  // Try each character and combine meanings
+  var chars = word.split('').filter(function(ch){ return /[一-鿿]/.test(ch); });
+  if(chars.length === 0) throw new Error('No Chinese characters found');
+
+  var result = '📖 ' + word + '\n\n';
+
+  // Use multiple free sources
+  // Try MDBG / CC-CEDICT via a free proxy
+  try{
+    var r = await fetch('https://ccdb.hemiola.com/characters/string/' + encodeURIComponent(word) + '?fields=kMandarin,kDefinition', {mode:'cors'});
+    if(r.ok){
+      var data = await r.json();
+      if(data && data.length > 0 && data[0].kDefinition){
+        result += '🇨🇳 Meaning: ' + data[0].kDefinition.split('/').slice(0,3).join(', ') + '\n\n';
+        if(data[0].kMandarin) result += '🔤 Pinyin: ' + data[0].kMandarin + '\n\n';
+      }
+    }
+  }catch(ex){}
+
+  // Character by character breakdown
+  result += '✏️ Characters:\n';
+  for(var i=0; i<chars.length; i++){
+    var ch = chars[i];
+    if(DICT[ch]){
+      // Use our built-in dictionary for individual chars
+      var dictEntry = DICT[ch].split('\n')[0]; // first line only
+      result += '• ' + ch + ' — ' + dictEntry + '\n';
+    } else {
+      result += '• ' + ch + ' (tap stroke guide below to learn how to write)\n';
+    }
+  }
+
+  result += '\n💡 Tap each character in the stroke guide below to see how to write it step by step!';
+  return result;
+}
+
+// ── Pinyin lookup ─────────────────────────────────────
+function lookupPinyin(word){
+  return '🔤 Pinyin: ' + word + '\n\n'
+    + '📖 Pinyin is how we write the sounds of Chinese using letters.\n\n'
+    + '🎵 The marks above the letters show the tone (how your voice goes up or down):\n'
+    + '  ā / ō / ē / ī / ū  (1st tone — flat and steady)\n'
+    + '  á / ó / é / í / ú  (2nd tone — going UP)\n'
+    + '  ǎ / ǒ / ě / ǐ / ǔ  (3rd tone — goes down then UP)\n'
+    + '  à / ò / è / ì / ù  (4th tone — going DOWN fast)\n\n'
+    + '💡 Say the word out loud and listen to the recording above!';
 }
 
 // ── Parent lookup (types for child) ──────────────────
@@ -789,7 +908,7 @@ async function callAI(content, maxTokens){
   maxTokens = maxTokens || 800;
   // Check if we are on file:// (local) — API won't work there
   if(window.location.protocol === 'file:'){
-    throw new Error('Running as local file — please open via your GitHub Pages link (https://...) for AI features');
+    throw new Error('FILE_LOCAL');
   }
   var r=await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
@@ -809,6 +928,11 @@ async function callAI(content, maxTokens){
   var b=d.content&&d.content.find(function(b){return b.type==='text';});
   if(!b)throw new Error('No response from AI');
   return b.text;
+}
+
+// Show file:// warning banner
+if(window.location.protocol === 'file:'){
+  document.getElementById('file-warning').style.display = 'block';
 }
 
 // Preload voices

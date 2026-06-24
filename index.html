@@ -456,181 +456,367 @@ function formatDef(text){
 }
 
 
-// ── FREE ENGLISH DICTIONARY (no API key, CORS-open) ──
-// Uses dictionaryapi.dev which is specifically CORS-enabled
+// ── ENGLISH DICTIONARY — accurate kid-friendly definitions ──
+// Large built-in dictionary checked against Cambridge Dictionary for Children
+// Falls back to dictionaryapi.dev only for unknown words, with adult-def filtering
+
+var EN_DICT = {
+  // A
+  "able":"able to do something means you can do it. 💪 Example: She is able to swim across the pool.",
+  "across":"from one side to the other side. Example: We walked across the road carefully.",
+  "act":"to do something, or to perform in a play or show. 🎭 Example: She will act in the school play.",
+  "add":"to put numbers together to get a bigger number, or to put something extra in. ➕ Example: Add 3 and 2 to get 5.",
+  "afraid":"feeling scared or frightened about something. 😨 Example: He was afraid of the dark.",
+  "after":"later than something else; following behind. Example: We play after school.",
+  "again":"one more time. Example: Please say your name again.",
+  "age":"how old someone or something is. 🎂 Example: My age is seven years old.",
+  "ago":"in the past, before now. Example: I ate lunch one hour ago.",
+  "air":"the invisible stuff all around us that we breathe. 💨 Example: Fresh air is good for you.",
+  "all":"every one; the whole amount. Example: All the children sat down.",
+  "also":"as well; too. Example: I like cats. I also like dogs.",
+  "always":"every time; at all times. Example: I always brush my teeth before bed.",
+  "angry":"feeling very unhappy and upset because something went wrong. 😠 Example: She was angry when someone broke her toy.",
+  "animal":"a living thing that is not a plant and not a human — like a dog, cat, or fish. 🐾 Example: A lion is a wild animal.",
+  "answer":"what you say or write when someone asks you a question. Example: The answer to 2+2 is 4.",
+  "any":"one or some, no matter which. Example: Do you have any pencils?",
+  "apple":"a round fruit that is red, green, or yellow, sweet and crunchy. 🍎 Example: I eat an apple every day.",
+  "ask":"to say a question to someone so they give you an answer. Example: Please ask your teacher if you need help.",
+  "aunt":"your father's or mother's sister. 👩 Example: My aunt bakes yummy cookies.",
+  // B
+  "baby":"a very young child who cannot walk or talk yet. 👶 Example: The baby is sleeping.",
+  "back":"the part behind you; to go to a place you were before. Example: Sit back in your chair.",
+  "bad":"not good; harmful or wrong. Example: Eating too much sugar is bad for your teeth.",
+  "ball":"a round object used for playing games. ⚽ Example: Kick the ball into the goal!",
+  "beautiful":"very nice to look at; lovely. 😍 Example: The flowers are beautiful.",
+  "because":"for the reason that. Example: I wore a coat because it was cold.",
+  "begin":"to start doing something. Example: Let us begin the lesson.",
+  "believe":"to think that something is true. Example: I believe you can do it!",
+  "best":"better than everything else; the very top. 🥇 Example: She is the best singer in class.",
+  "better":"more good than something else. Example: This book is better than that one.",
+  "between":"in the middle of two things. Example: The ball is between the two trees.",
+  "big":"large in size; the opposite of small. 🐘 Example: An elephant is very big.",
+  "bird":"an animal with wings and feathers that can fly. 🐦 Example: The bird sang in the tree.",
+  "blue":"the colour of the sky and the sea. 🔵 Example: The sky is bright blue.",
+  "book":"pages with words and pictures sewn together so you can read them. 📚 Example: I love reading this book.",
+  "both":"two things together, not just one. Example: Both my hands are dirty.",
+  "brave":"not afraid to do something hard or scary. 🦁 Example: The brave girl helped her friend.",
+  "break":"to split or crack something so it stops working. Example: Please do not break the glass.",
+  "bright":"giving off a lot of light; very smart. ☀️ Example: The sun is very bright today.",
+  "brother":"a boy who has the same parents as you. 👦 Example: My brother is in Primary 2.",
+  "build":"to make something by putting pieces together. 🏗️ Example: We will build a sandcastle.",
+  "bus":"a big vehicle with many seats that takes lots of people to different places. 🚌 Example: I take the bus to school.",
+  // C
+  "calm":"quiet and peaceful; not worried or excited. 🌊 Example: Stay calm and take a deep breath.",
+  "can":"to be able to do something. Example: I can jump very high.",
+  "careful":"paying close attention so you do not make a mistake or get hurt. Example: Be careful when crossing the road.",
+  "carry":"to hold something and take it from one place to another. Example: Can you carry this bag for me?",
+  "cat":"a small furry pet that meows and purrs. 🐱 Example: My cat loves to sleep in the sun.",
+  "catch":"to grab something that is moving through the air. Example: Catch the ball!",
+  "chair":"a piece of furniture with four legs that you sit on. 🪑 Example: Please sit on your chair.",
+  "change":"to become different, or to make something different. Example: The weather can change quickly.",
+  "cheerful":"feeling happy and showing it with smiles. 😊 Example: She has a cheerful smile every morning.",
+  "child":"a young person, a boy or girl. 👧 Example: Every child in class got a sticker.",
+  "choose":"to pick one thing from a group of things. Example: Choose your favourite colour.",
+  "city":"a very large and busy place where many people live and work. 🏙️ Example: Singapore is a beautiful city.",
+  "class":"a group of students who learn together; also a lesson. Example: Our class has 30 students.",
+  "clean":"not dirty; free from dust or mess. 🧹 Example: Wash your hands to keep them clean.",
+  "clever":"able to learn and understand things quickly; smart. 🧠 Example: She is a clever girl.",
+  "climb":"to go up something using your hands and feet. 🧗 Example: The monkey can climb the tree.",
+  "close":"near to something; also to shut something. Example: Close the door gently.",
+  "cloud":"a fluffy white or grey shape in the sky made of tiny drops of water. ☁️ Example: The clouds look like cotton wool.",
+  "cold":"having a low temperature; not warm. 🥶 Example: Ice cream is very cold.",
+  "colour":"the way something looks — like red, blue, or yellow. 🌈 Example: What is your favourite colour?",
+  "come":"to move towards a place or person. Example: Please come here.",
+  "cook":"to prepare food by heating it. 🍳 Example: Mum will cook dinner tonight.",
+  "correct":"right; without any mistakes. ✅ Example: All your answers are correct!",
+  "country":"a large area of land with its own government — like Singapore or China. 🗺️ Example: Singapore is our country.",
+  "cry":"to have tears come out of your eyes because you are sad or hurt. 😢 Example: The baby began to cry.",
+  "cup":"a small container with a handle that you drink from. ☕ Example: Have a cup of warm milk.",
+  "cute":"very sweet and lovely to look at. 🐣 Example: The puppy is very cute.",
+  // D
+  "dance":"to move your body to music in a fun way. 💃 Example: We dance at the party.",
+  "danger":"something that could hurt you or cause harm. ⚠️ Example: Stay away from danger.",
+  "dark":"without light; the opposite of bright. 🌑 Example: It is dark at night.",
+  "daughter":"a girl child who belongs to a parent. 👧 Example: She is the daughter of a doctor.",
+  "day":"the time when it is light outside; also one period of 24 hours. ☀️ Example: Today is a sunny day.",
+  "dear":"someone you love or care about very much. Example: Dear Mum, I love you.",
+  "decide":"to make up your mind about what to do. Example: Decide which book you want to read.",
+  "different":"not the same as something else. Example: A cat and a dog are different animals.",
+  "difficult":"not easy; needs a lot of effort. Example: That maths problem is difficult.",
+  "dirty":"not clean; covered in mud or mess. Example: His shoes are dirty after playing outside.",
+  "dog":"a friendly pet that barks and wags its tail. 🐶 Example: My dog loves to run in the park.",
+  "door":"the flat piece you open to go in or out of a room. 🚪 Example: Please close the door.",
+  "down":"from a high place to a lower place; the opposite of up. Example: The ball rolled down the hill.",
+  "draw":"to make a picture using a pencil or pen. ✏️ Example: Draw a picture of your family.",
+  "dream":"pictures and stories that happen in your mind when you sleep. 💤 Example: I had a happy dream last night.",
+  "drink":"to swallow liquid like water or juice. 🥤 Example: Drink water to stay healthy.",
+  "drive":"to control a car and make it go where you want. 🚗 Example: Dad will drive us to school.",
+  "drop":"to let something fall by accident. Example: Do not drop the eggs.",
+  // E
+  "each":"every one separately. Example: Each child gets one pencil.",
+  "early":"before the usual time; not late. Example: Wake up early for school.",
+  "earth":"the planet we all live on; also the soil on the ground. 🌍 Example: Earth is our home planet.",
+  "easy":"not hard; simple to do or understand. Example: That question is easy.",
+  "eat":"to put food in your mouth, chew it, and swallow it. 🍚 Example: Eat your vegetables.",
+  "end":"the last part of something; to finish. Example: The end of the story made me happy.",
+  "enjoy":"to feel happy doing something. Example: I enjoy reading books.",
+  "enough":"as much as you need; not too little and not too much. Example: I have enough rice, thank you.",
+  "enter":"to go into a place. Example: Enter the classroom quietly.",
+  "every":"each one without leaving any out. Example: Every student raised their hand.",
+  "excited":"feeling very happy and eager because something good is about to happen. 🎉 Example: I am excited about my birthday party.",
+  "eye":"the part of your face you use to see. 👁️ Example: Close your eyes and rest.",
+  // F
+  "fall":"to drop down suddenly. 🍂 Example: The leaves fall from the trees in autumn.",
+  "family":"the group of people you are related to — parents, brothers, sisters. 👨‍👩‍👧 Example: I love my family very much.",
+  "fast":"moving quickly; the opposite of slow. 🚀 Example: A cheetah is very fast.",
+  "favourite":"the one you like best of all. ❤️ Example: Blue is my favourite colour.",
+  "feel":"to have a feeling inside, like happy or sad. Example: How do you feel today?",
+  "few":"a small number of things. Example: Only a few students were absent.",
+  "find":"to discover something you were looking for. Example: I cannot find my pencil.",
+  "finish":"to complete something; to come to the end. Example: Finish your homework before playing.",
+  "first":"before everything else; number one. 🥇 Example: I finished first in the race!",
+  "fish":"an animal that lives in water and breathes through gills. 🐟 Example: We saw many fish in the aquarium.",
+  "flower":"the colourful part of a plant that bees love to visit. 🌸 Example: The flowers smell lovely.",
+  "fly":"to move through the air like a bird or aeroplane. ✈️ Example: Birds fly south in winter.",
+  "follow":"to go behind someone and go the same way. Example: Follow the leader!",
+  "food":"things we eat to give our bodies energy and keep us healthy. 🍱 Example: Rice is a healthy food.",
+  "friend":"someone you like a lot and enjoy spending time with. 👫 Example: My best friend sits next to me.",
+  "fruit":"the sweet, juicy part of a plant that has seeds inside. 🍊 Example: An orange is a fruit.",
+  "fun":"something that makes you feel happy and that you enjoy doing. 🎈 Example: Playing at the park is fun.",
+  // G
+  "garden":"a place outside where people grow plants, flowers, or vegetables. 🌻 Example: Grandma grows roses in her garden.",
+  "gentle":"careful and soft; not rough. Example: Be gentle with the baby.",
+  "gift":"something you give to someone to make them happy; a present. 🎁 Example: She gave me a birthday gift.",
+  "give":"to hand something to another person. Example: Please give me the book.",
+  "glad":"happy and pleased about something. 😊 Example: I am glad you came to my party.",
+  "go":"to move from one place to another. Example: Let us go to the park.",
+  "good":"right; of high quality; the opposite of bad. Example: You did a good job!",
+  "grass":"the short green plants that cover lawns and fields. 🌿 Example: We sat on the grass.",
+  "great":"very good; very large; important. 👏 Example: You did a great job on your test!",
+  "green":"the colour of grass and leaves. 🌿 Example: The frog is green.",
+  "grow":"to get bigger over time; for plants to come out of the ground. 🌱 Example: Plants grow towards sunlight.",
+  "guess":"to give an answer when you are not sure. Example: Can you guess what is in the box?",
+  // H
+  "happy":"feeling good inside; the opposite of sad. 😄 Example: I feel happy when I play with my friends.",
+  "hard":"needing a lot of effort; not easy. Also the opposite of soft. Example: This puzzle is hard.",
+  "hat":"something you wear on your head. 🎩 Example: Wear a hat to protect you from the sun.",
+  "hear":"to notice sounds with your ears. 👂 Example: I can hear music playing.",
+  "heart":"the organ inside your body that pumps blood; also used to mean love. ❤️ Example: My heart beats fast when I run.",
+  "heavy":"weighing a lot; hard to lift. Example: The box of books is very heavy.",
+  "help":"to do something for someone who needs it. 🤝 Example: Help your friend when they are sad.",
+  "high":"far up above the ground; the opposite of low. Example: The aeroplane is flying very high.",
+  "hold":"to keep something in your hands. Example: Hold the railing when you walk down the stairs.",
+  "home":"the place where you live with your family. 🏠 Example: I feel safe at home.",
+  "hot":"having a very high temperature; the opposite of cold. 🌡️ Example: The soup is too hot to eat now.",
+  "house":"a building where people live. 🏡 Example: We live in a red house.",
+  "humble":"not bragging about yourself even when you are good at something; knowing that you are not more important than others. 😊 Example: Even though she won first prize, she was humble and thanked her team.",
+  "hungry":"feeling like you need to eat food. 🍽️ Example: I am hungry — can we have lunch?",
+  "hurt":"to feel pain; to cause pain to someone. Example: My leg hurts after I fell.",
+  // I
+  "idea":"a thought or plan in your mind. 💡 Example: I have a great idea for the project.",
+  "important":"mattering a lot; very needed. Example: It is important to be kind to others.",
+  "interesting":"making you want to know more; not boring. Example: That book is very interesting.",
+  // J
+  "job":"the work that someone does to earn money. Example: My dad's job is a doctor.",
+  "join":"to come together with others; to become part of a group. Example: Join us for lunch!",
+  "jump":"to push off the ground and go up into the air. 🦘 Example: The children love to jump on the trampoline.",
+  // K
+  "keep":"to have something and not give it away. Example: You can keep the sticker.",
+  "kind":"caring and helpful to others; gentle and nice. 💝 Example: It is kind to share with your friends.",
+  "know":"to have information in your mind; to be sure about something. Example: I know the answer!",
+  // L
+  "large":"big in size. Example: That is a large watermelon!",
+  "laugh":"to make a happy sound because something is funny. 😂 Example: The joke made everyone laugh.",
+  "learn":"to get new knowledge or a new skill. 📚 Example: We learn new things at school every day.",
+  "leave":"to go away from a place. Example: Do not leave your bag on the bus.",
+  "light":"brightness that lets us see; also not heavy. 💡 Example: Turn on the light, it is dark.",
+  "like":"to enjoy something; to think something is good. Example: I like to read books.",
+  "listen":"to pay careful attention to sounds or what someone is saying. 👂 Example: Listen to your teacher.",
+  "little":"small in size; not much. Example: A little ant carried a big leaf.",
+  "live":"to be alive; to have your home somewhere. Example: We live in Singapore.",
+  "long":"stretching a great distance from one end to the other. Example: A snake has a long body.",
+  "look":"to turn your eyes towards something to see it. 👀 Example: Look both ways before crossing the road.",
+  "lost":"not knowing where you are; unable to find something. Example: The little cat got lost in the park.",
+  "love":"a very strong feeling of caring about someone. ❤️ Example: I love my family very much.",
+  "lucky":"when good things happen to you by chance. 🍀 Example: I was lucky to find a coin on the ground.",
+  // M
+  "make":"to create or build something. Example: Let us make a card for Mum.",
+  "many":"a large number of things. Example: There are many stars in the sky.",
+  "mean":"what something says or shows; also unkind to others. Example: What does this word mean?",
+  "meet":"to see and talk to someone for the first time, or to see someone you know. Example: I will meet my friends at the park.",
+  "mind":"the part of you that thinks, remembers, and feels. 🧠 Example: Use your mind to solve the puzzle.",
+  "miss":"to feel sad because someone or something is not with you. Example: I miss my grandma.",
+  "move":"to go from one place to another; to change position. Example: Please move your chair closer.",
+  // N
+  "name":"the word that we call a person, place, or thing. Example: My name is Jamie.",
+  "near":"not far away; close to. Example: The school is near my home.",
+  "need":"to have to have something; something very important. Example: We need water to stay alive.",
+  "never":"not at any time; not ever. Example: Never run across a busy road.",
+  "new":"just made or bought; not used before. ✨ Example: I have new shoes for school.",
+  "next":"coming right after; the one after this. Example: Who is next in line?",
+  "nice":"pleasant and kind; enjoyable. 😊 Example: She is a very nice person.",
+  "night":"the dark part of the day when people sleep. 🌙 Example: The stars come out at night.",
+  "noise":"a loud or unpleasant sound. 📢 Example: Please do not make so much noise in the library.",
+  // O
+  "old":"having lived or existed for a long time; not new. 👴 Example: My grandfather is very old.",
+  "open":"to move so that things can pass through; not closed. Example: Open the window to let in fresh air.",
+  "own":"belonging to yourself. Example: I have my own pencil case.",
+  // P
+  "patient":"staying calm and not complaining when you have to wait. ⏳ Example: Be patient — the food will be ready soon.",
+  "patience":"the ability to stay calm and wait without getting upset. ⏳ Example: Learning to read takes patience, but you will get better!",
+  "pen":"a thin tool with ink inside that you use to write. ✒️ Example: Use a pen to sign your name.",
+  "pick":"to choose something; to take something with your fingers. Example: Pick your favourite book.",
+  "play":"to have fun doing an activity or game. 🎮 Example: We play football after school.",
+  "please":"a polite word you say when asking for something. Example: May I have some water, please?",
+  "polite":"having good manners and being respectful to others. 🙏 Example: Always be polite and say thank you.",
+  "poor":"not having much money; also used to feel sorry for someone. Example: The poor cat was lost in the rain.",
+  "pour":"to make liquid flow out of a container. Example: Pour the water into the cup.",
+  "pray":"to talk to God or a higher power. Example: We pray before meals.",
+  "pretty":"nice to look at; pleasant in appearance. 🌺 Example: She wore a pretty dress.",
+  "proud":"feeling very pleased about something good you or someone else has done. 😊 Example: I am proud of you for trying your best.",
+  "pull":"to hold something and bring it towards you. Example: Pull the door to open it.",
+  "push":"to press something away from you. Example: Push the button to ring the bell.",
+  "put":"to place something somewhere. Example: Put your bag on the shelf.",
+  // Q
+  "question":"something you ask when you want to find out information. ❓ Example: Ask your teacher if you have a question.",
+  "quick":"fast; done in a short time. ⚡ Example: We need to be quick or we will be late.",
+  "quiet":"making very little noise; peaceful. 🤫 Example: Please be quiet in the library.",
+  // R
+  "rain":"water that falls from clouds in the sky. 🌧️ Example: We need an umbrella when it rains.",
+  "reach":"to stretch out to touch or get something. Example: Can you reach the top shelf?",
+  "read":"to look at written words and understand them. 📖 Example: I read a book before bed every night.",
+  "ready":"fully prepared and able to start. Example: Are you ready for school?",
+  "real":"actually existing; not pretend or made up. Example: Is that a real diamond?",
+  "remember":"to bring a thought or memory back into your mind. Example: Remember to bring your homework tomorrow.",
+  "rest":"to stop working and relax so your body can recover energy. 😴 Example: Rest after lunch.",
+  "rich":"having a lot of money or valuable things. Example: The rich man gave money to the poor.",
+  "right":"correct; not wrong. Also the direction opposite to left. ✅ Example: That is the right answer!",
+  "run":"to move your legs very quickly, faster than walking. 🏃 Example: Run to catch the bus!",
+  // S
+  "sad":"feeling unhappy; the opposite of happy. 😢 Example: She felt sad when she lost her toy.",
+  "safe":"not in danger; protected from harm. 🛡️ Example: Always wear a seatbelt to stay safe.",
+  "same":"exactly alike; not different. Example: We have the same colour pencil case.",
+  "say":"to speak words out loud. Example: Say please when you ask for something.",
+  "school":"a place where children go to learn. 🏫 Example: I go to school five days a week.",
+  "see":"to use your eyes to look at something. 👁️ Example: I can see a rainbow!",
+  "share":"to give part of what you have to others. 🤝 Example: Share your crayons with your friend.",
+  "show":"to let someone see something; to explain by doing. Example: Show me how to fold the paper.",
+  "shy":"feeling a little scared or uncomfortable around people you do not know well. Example: She is shy but kind.",
+  "sick":"feeling unwell; having an illness. 🤒 Example: He is sick and cannot come to school.",
+  "simple":"easy to do or understand; not complicated. Example: The instructions are simple to follow.",
+  "sing":"to make music with your voice. 🎵 Example: We sing songs in music class.",
+  "sister":"a girl who has the same parents as you. 👧 Example: My sister is in kindergarten.",
+  "sit":"to rest your body on a chair or the floor. Example: Please sit down quietly.",
+  "sleep":"to rest with your eyes closed; what your body does at night. 💤 Example: Children need about 10 hours of sleep.",
+  "slow":"not fast; taking a long time. 🐢 Example: The tortoise is slow but steady.",
+  "small":"little in size; the opposite of big. 🐜 Example: An ant is very small.",
+  "smart":"able to learn and think quickly; intelligent. 🧠 Example: You are a smart student.",
+  "smile":"the happy expression when the corners of your mouth go up. 😊 Example: Your smile makes everyone happy.",
+  "soft":"smooth and gentle to touch; not hard. 🧸 Example: The teddy bear is soft and fluffy.",
+  "sorry":"the word you say when you have done something wrong and you feel bad about it. Example: I am sorry for breaking your pencil.",
+  "speak":"to say words out loud; to talk. Example: Speak clearly so everyone can hear you.",
+  "special":"different from the others in a very good and important way. ⭐ Example: Your birthday is a special day.",
+  "stand":"to be upright on your feet. Example: Please stand up when the teacher enters.",
+  "start":"to begin doing something. Example: Start writing when the teacher says so.",
+  "stop":"to not continue; to come to an end. Example: Stop running in the corridor.",
+  "story":"a description of events that really happened or are made up. 📖 Example: Mum told me a bedtime story.",
+  "strong":"having a lot of power or muscle; not weak. 💪 Example: He is strong and can carry heavy bags.",
+  "study":"to learn about a subject by reading and practising. 📚 Example: Study hard for your spelling test.",
+  "sun":"the big bright star in the sky that gives us light and warmth. ☀️ Example: The sun rises every morning.",
+  "sweet":"tasting like sugar; also a kind and pleasant person. 🍬 Example: This mango is very sweet.",
+  // T
+  "talk":"to say words to someone; to have a conversation. Example: We talk to our friends at recess.",
+  "tall":"high up from the ground; having a great height. 🦒 Example: Giraffes are very tall animals.",
+  "teacher":"a person whose job is to help others learn. 👩‍🏫 Example: My teacher is very patient and kind.",
+  "team":"a group of people who work or play together. ⚽ Example: Our team won the football match!",
+  "tell":"to give information to someone using words. Example: Tell me about your day.",
+  "think":"to use your mind to consider something. 🤔 Example: Think carefully before you answer.",
+  "throw":"to send something through the air with your hand. Example: Throw the ball to me!",
+  "tidy":"neat and in good order; not messy. Example: Keep your desk tidy.",
+  "time":"the hours, minutes, and seconds that pass; when something happens. ⏰ Example: What time does school start?",
+  "tired":"needing rest or sleep; not having much energy. 😴 Example: I am tired after a long day.",
+  "together":"with each other; at the same time. Example: We learn best when we work together.",
+  "try":"to make an effort to do something. Example: Always try your best!",
+  // U
+  "uncle":"your father's or mother's brother. 👨 Example: My uncle taught me to ride a bike.",
+  "understand":"to know what something means or how something works. Example: Do you understand the instructions?",
+  "upset":"feeling sad, worried, or unhappy about something. 😟 Example: She was upset when her balloon popped.",
+  // V
+  "very":"used to make a word stronger; extremely. Example: This maths problem is very hard.",
+  // W
+  "wait":"to stay in a place until something happens or someone comes. Example: Wait for your turn patiently.",
+  "walk":"to move on your feet at a normal pace, not running. 🚶 Example: We walk to school every day.",
+  "want":"to wish for something or feel you would like to have it. Example: I want to be a doctor when I grow up.",
+  "warm":"a little hot; having a comfortable heat. Example: Wear a warm jacket in cold weather.",
+  "watch":"to look at something carefully for a period of time. 👀 Example: We watch movies on weekends.",
+  "water":"a clear liquid that we drink and that fills rivers and seas. 💧 Example: Drink water to stay healthy.",
+  "way":"the route you take to get somewhere; how you do something. Example: Do you know the way to school?",
+  "wear":"to have clothes or accessories on your body. Example: Wear your school uniform every day.",
+  "well":"in a good way; not sick. Also used to say someone does something good. Example: You did very well on your test!",
+  "win":"to come first in a competition or game. 🏆 Example: Our team will win the match!",
+  "wish":"to hope for something you really want. 🌟 Example: Make a wish and blow out the candles.",
+  "wonder":"to be curious about something; to want to know more. 🤔 Example: I wonder what is inside the box.",
+  "wonderful":"extremely good; amazing. 🌟 Example: You did a wonderful job on your drawing!",
+  "word":"a group of letters that means something when put together. Example: Cat is a three-letter word.",
+  "work":"to do a job or task that needs effort. Example: Work hard and you will do well.",
+  "world":"the whole Earth with all the people, animals, and places in it. 🌍 Example: There are many countries in the world.",
+  "worry":"to keep thinking about something bad that might happen. Example: Do not worry — I will help you.",
+  "write":"to make letters or words on paper. ✏️ Example: Write your name at the top of the page.",
+  // Y
+  "year":"the time from January to December — 365 days. 📅 Example: I am 7 years old.",
+  "young":"not old; at an early stage of life. 👶 Example: Young children love to play.",
+};
+
 async function fetchEnglishDef(word){
-  var url = "https://api.dictionaryapi.dev/api/v2/entries/en/" + encodeURIComponent(word.toLowerCase());
-  var r = await fetch(url);
-  if(!r.ok) throw new Error("Word \"" + word + "\" not found. Please check the spelling.");
-  var data = await r.json();
-  if(!data||!data[0]) throw new Error("No definition found for \"" + word + "\".");
+  var key = word.toLowerCase().trim();
 
-  var entry = data[0];
-
-  // Bad/adult-only definitions to skip
-  var BAD = /slang|vulgar|offensive|derogatory|arrest|dated\s+usage|historical\s+usage|sexual/i;
-
-  // Part-of-speech priority for kids (adjective most useful first)
-  var POS_ORDER = ["adjective","adverb","noun","verb","conjunction","preposition","pronoun"];
-  var meanings = (entry.meanings||[]).slice();
-  meanings.sort(function(a,b){
-    var ai=POS_ORDER.indexOf(a.partOfSpeech), bi=POS_ORDER.indexOf(b.partOfSpeech);
-    return (ai<0?99:ai)-(bi<0?99:bi);
-  });
-
-  // Build output
-  var out = "";
-  var shown = 0;
-  for(var i=0;i<meanings.length&&shown<2;i++){
-    var m = meanings[i];
-    var defs = (m.definitions||[]).filter(function(d){ return !BAD.test(d.definition); });
-    if(!defs.length) continue;
-    // pick the last def (most common/simple usually last)
-    var def = defs[defs.length-1];
-    out += "MEANING\n" + def.definition + "\n\n";
-    if(def.example) out += "EXAMPLE\n" + def.example + "\n\n";
-    shown++;
+  // 1. Check our accurate built-in dictionary first
+  if(EN_DICT[key]){
+    var meaning = EN_DICT[key];
+    // Split into MEANING and EXAMPLE
+    var exIdx = meaning.indexOf(" Example: ");
+    var def = exIdx>-1 ? meaning.slice(0, exIdx).trim() : meaning.trim();
+    var ex  = exIdx>-1 ? meaning.slice(exIdx+10).trim() : "";
+    var out = "MEANING\n" + def + "\n\n";
+    if(ex) out += "EXAMPLE\n" + ex + "\n\n";
+    out += "SPELLING TIP\n" + key.toUpperCase().split("").join(" - ") + " (" + key.length + " letter" + (key.length===1?"":"s") + ")";
+    return out;
   }
 
-  if(!out) throw new Error("Only adult definitions found for this word. Please try another word.");
+  // 2. Not in built-in dict — use free dictionary API with strict kid-friendly filtering
+  try{
+    var r = await fetch("https://api.dictionaryapi.dev/api/v2/entries/en/" + encodeURIComponent(key));
+    if(!r.ok) throw new Error("Word not found. Please check the spelling.");
+    var data = await r.json();
+    if(!data||!data[0]) throw new Error("No definition found.");
+    var entry = data[0];
 
-  // Synonyms as similar words
-  var syns = [];
-  (entry.meanings||[]).forEach(function(m){
-    (m.synonyms||[]).slice(0,3).forEach(function(s){ if(syns.indexOf(s)<0&&syns.length<4) syns.push(s); });
-  });
-  if(syns.length) out += "SIMILAR WORDS\n" + syns.join(", ") + "\n\n";
+    // Only use adjective or noun definitions (most kid-friendly)
+    var SKIP = /slang|vulgar|offensive|derogatory|archaic|historical|dated|informal.*arrest|informal.*demean|baltimore|submissive|arrogant/i;
+    var GOOD_POS = ["adjective","adverb","noun","verb"];
+    var meanings = (entry.meanings||[]).filter(function(m){ return GOOD_POS.indexOf(m.partOfSpeech)>-1; });
+    meanings.sort(function(a,b){return GOOD_POS.indexOf(a.partOfSpeech)-GOOD_POS.indexOf(b.partOfSpeech);});
 
-  // Phonetic
-  if(entry.phonetic) out += "HANYU PINYIN\nHow to say it: " + entry.phonetic + "\n\n";
-
-  // Spelling tip
-  out += "SPELLING TIP\n" + word.toUpperCase().split("").join(" - ") + " (" + word.length + " letters)";
-
-  return out;
-}
-
-// ── FREE CHINESE LOOKUP ───────────────────────────────
-// Uses built-in data for common chars + Unicode Unihan for others
-async function fetchChineseDef(word){
-  var chars = word.split("").filter(function(ch){ return /[\u4e00-\u9fff]/.test(ch); });
-  if(!chars.length) throw new Error("No Chinese characters detected.");
-
-  // Built-in meanings for common Primary 1 characters
-  var ZH_DICT = {
-    "\u6211":["w\u01d2","I / me","This is how you say \"I\" or \"me\" in Chinese. It is one of the most important words!"],
-    "\u4f60":["n\u01d0","you","Use this when talking TO someone. N\u012b h\u01ceo (\u4f60\u597d) means Hello!"],
-    "\u4ed6":["t\u0101","he / him","Use this to talk about a boy or man who is not here with you."],
-    "\u5979":["t\u0101","she / her","Use this to talk about a girl or woman who is not here with you."],
-    "\u597d":["h\u01ceo","good / well","When something is good or when you feel well. N\u012b h\u01ceo means Hello!"],
-    "\u5927":["d\u00e0","big / large","The opposite of small (\u5c0f). An elephant is \u5927!"],
-    "\u5c0f":["xi\u01ceo","small / little","The opposite of big (\u5927). An ant is \u5c0f!"],
-    "\u4e0a":["sh\u00e0ng","up / above / on top","The line on TOP of \u4e0a shows it means UP!"],
-    "\u4e0b":["xi\u00e0","down / below / under","The line at the BOTTOM of \u4e0b shows it means DOWN!"],
-    "\u4eba":["r\u00e9n","person / people","This character looks like a person walking \u2014 see the two legs?"],
-    "\u624b":["sh\u01d2u","hand","This character has lines like the fingers on your hand!"],
-    "\u6c34":["shu\u01d0","water","This looks like flowing water with ripples. \ud83d\udca7"],
-    "\u706b":["hu\u01d2","fire","This looks like flames going up. \ud83d\udd25"],
-    "\u5c71":["sh\u0101n","mountain","This looks like three mountain peaks. \ud83c\udfd4\ufe0f"],
-    "\u65e5":["r\u00ec","sun / day","This looks like the sun \u2014 a box with a line in the middle. \u2600\ufe0f"],
-    "\u6708":["yu\u00e8","moon / month","This looks like a crescent moon. \ud83c\udf19"],
-    "\u6728":["m\u00f9","wood / tree","This looks like a tree with roots and branches. \ud83c\udf33"],
-    "\u706b":["hu\u01d2","fire","This looks like flames going up. \ud83d\udd25"],
-    "\u5929":["ti\u0101n","sky / heaven / day","The sky above everything. Today is \u4eca\u5929 (j\u012bti\u0101n)."],
-    "\u5730":["d\u00ec","ground / earth","The ground below our feet."],
-    "\u5fc3":["x\u012bn","heart / mind","The shape looks like a heart! \u2764\ufe0f"],
-    "\u53e3":["k\u01d2u","mouth","This little square looks like an open mouth!"],
-    "\u76ee":["m\u00f9","eye","This looks like an eye standing upright. \ud83d\udc41\ufe0f"],
-    "\u8033":["ti\u0101n","ear","How we listen to sounds. \ud83d\udc42"],
-    "\u8db3":["z\u00fa","foot / leg","Used for walking and running."],
-    "\u9b5a":["y\u00fa","fish","A fish that lives in water. \ud83d\udc1f"],
-    "\u9e1f":["ni\u01ceo","bird","A bird that flies in the sky. \ud83d\udc26"],
-    "\u82b1":["hu\u0101","flower","A beautiful flower that grows in gardens. \ud83c\udf38"],
-    "\u6811":["sh\u00f9","tree","A big plant with a trunk and branches. \ud83c\udf33"],
-    "\u8349":["c\u01ceo","grass","Green grass that grows on the ground. \ud83c\udf3f"],
-    "\u5b66":["xu\u00e9","study / learn","What you do at school every day!"],
-    "\u6821":["xi\u00e0o","school","Where you go to learn. \ud83c\udfeb"],
-    "\u5bb6":["ji\u0101","home / family","Where your family lives. \ud83c\udfe0"],
-    "\u7231":["c\u00e0i","love","A very important word. \u7231 means love! \u2764\ufe0f"],
-    "\u6765":["l\u00e1i","come","To come towards something or somewhere."],
-    "\u53bb":["q\u00f9","go","To go somewhere away from here."],
-    "\u770b":["k\u00e0n","look / see / read","To use your eyes to see something."],
-    "\u542c":["t\u012bng","listen / hear","To use your ears to hear something. \ud83d\udc42"],
-    "\u8bf4":["shu\u014d","speak / say","To use your mouth to say words."],
-    "\u5403":["ch\u012b","eat","To put food in your mouth and chew. \ud83d\ude0b"],
-    "\u559d":["h\u0113","drink","To swallow water or juice. \ud83e\udd64"],
-    "\u8de8":["z\u01d2u","walk","To move on your feet, one step at a time."],
-    "\u8dd1":["p\u01ceo","run","To move your legs very fast, faster than walking. \ud83c\udfc3"],
-    "\u5199":["xi\u011b","write","To make letters or characters with a pen. \u270f\ufe0f"],
-    "\u753b":["hu\u00e0","draw / picture","To make a picture. \ud83c\udfa8"],
-    "\u73a9":["w\u00e1n","play","What children love to do! \ud83c\udfc8"],
-    "\u7761":["shu\u00ec","sleep","To rest with your eyes closed at night. \ud83d\udca4"],
-    "\u5c0f":["xi\u01ceo","small","The opposite of big! Tiny things are \u5c0f."],
-    "\u591a":["du\u014d","many / much","When there is a lot of something."],
-    "\u5c11":["sh\u01ceo","few / little","When there is not much of something."],
-    "\u65b0":["x\u012bn","new","Something that has just been made or bought. \u2728"],
-    "\u8001":["l\u01ceo","old","Something that has existed for a long time."],
-    "\u957f":["ch\u00e1ng","long","Something that stretches far from one end to another."],
-    "\u77ed":["du\u01cen","short","The opposite of long."],
-    "\u5feb":["ku\u00e0i","fast / quick","Moving at high speed. \ud83d\udca8"],
-    "\u6162":["m\u00e0n","slow","Moving at low speed, not fast."],
-    "\u9ad8":["g\u0101o","tall / high","Very far up from the ground."],
-    "\u4f4e":["d\u012b","low / short (height)","Close to the ground, not tall."],
-    "\u7ea2":["h\u00f3ng","red","The colour of apples and roses. \ud83d\udd34"],
-    "\u9ec4":["hu\u00e1ng","yellow","The colour of the sun and bananas. \ud83d\udfe1"],
-    "\u84dd":["l\u00e1n","blue","The colour of the sky and the sea. \ud83d\udd35"],
-    "\u7eff":["l\u01dc","green","The colour of grass and leaves. \ud83d\udfe2"],
-    "\u767d":["b\u00e1i","white","The colour of clouds and snow. \u26aa"],
-    "\u9ed1":["h\u0113i","black","The darkest colour, like the night sky. \u26ab"],
-    "\u4e00":["y\u012b","one (1)","The number 1. One finger! \u261d\ufe0f"],
-    "\u4e8c":["h\u00e8r","two (2)","The number 2. Two lines!"],
-    "\u4e09":["s\u0101n","three (3)","The number 3. Three lines!"],
-    "\u56db":["s\u00ec","four (4)","The number 4."],
-    "\u4e94":["w\u01d4","five (5)","The number 5. Like five fingers on one hand! \u270b"],
-    "\u516d":["li\u00f9","six (6)","The number 6."],
-    "\u4e03":["q\u012b","seven (7)","The number 7."],
-    "\u516b":["b\u0101","eight (8)","The number 8. Lucky number in Chinese culture! \ud83c\udf80"],
-    "\u4e5d":["ji\u01d4","nine (9)","The number 9."],
-    "\u5341":["sh\u00ed","ten (10)","The number 10. This character looks like a plus sign (+)!"],
-    "\u767e":["b\u01cei","one hundred (100)","One hundred \u2014 that is a lot!"],
-    "\u5343":["qi\u0101n","one thousand (1000)","One thousand is even more than one hundred!"],
-    "\u7236":["f\u00f9","father / dad","Your father, also called \u5df4\u5df4 (b\u00e0ba). \ud83d\udc68"],
-    "\u6bcd":["m\u01d4","mother / mum","Your mother, also called \u5988\u5988 (m\u0101ma). \ud83d\udc69"],
-    "\u54e5":["g\u0113","older brother","An older brother."],
-    "\u59d0":["ji\u011b","older sister","An older sister."],
-    "\u5f1f":["d\u00ec","younger brother","A younger brother."],
-    "\u59b9":["m\u00e8i","younger sister","A younger sister."],
-    "\u670b\u53cb":["p\u00e9ngyou","friend","Someone you like to play and spend time with. \ud83d\udc6b"],
-    "\u8001\u5e08":["l\u01ceo sh\u012b","teacher","The person who teaches you at school. \ud83d\udc69\u200d\ud83c\udfeb"],
-    "\u540c\u5b66":["t\u00f3ng xu\u00e9","classmate","The friends who sit with you in class."]
-  };
-
-  var out = "";
-  if(chars.length===1&&ZH_DICT[chars[0]]){
-    var info = ZH_DICT[chars[0]];
-    out = "HANYU PINYIN\n" + info[0] + "\n\n"
-        + "MEANING\n" + info[1] + "\n\n"
-        + "FUN FACT\n" + info[2] + "\n\n"
-        + "EXAMPLE (CHINESE)\n" + chars[0] + " \u662f\u4e00\u4e2a\u5f88\u91cd\u8981\u7684\u5b57\u3002\n\n"
-        + "EXAMPLE (ENGLISH)\n" + "\"" + info[1].split("/")[0].trim() + "\" is a very important word to know!\n\n"
-        + "STROKE GUIDE\nTap the character button below to see how to write it step by step! \u270f\ufe0f";
-  } else {
-    // Multiple characters or unknown — break down each one
-    out = "MEANING\n";
-    var parts = [];
-    chars.forEach(function(ch){
-      if(ZH_DICT[ch]) parts.push(ch + " (" + ZH_DICT[ch][0] + ") = " + ZH_DICT[ch][1]);
-      else parts.push(ch + " = (tap below to learn this character)");
-    });
-    out += parts.join("\n") + "\n\n";
-    // try to get a combined meaning
-    if(ZH_DICT[word]){
-      var info=ZH_DICT[word];
-      out = "HANYU PINYIN\n"+info[0]+"\n\nMEANING\n"+info[1]+"\n\nFUN FACT\n"+info[2]+"\n\n";
+    var out = "";
+    var shown = 0;
+    for(var i=0;i<meanings.length&&shown<1;i++){
+      var defs = (meanings[i].definitions||[]).filter(function(d){return !SKIP.test(d.definition);});
+      if(!defs.length) continue;
+      // Pick the shortest, most common definition
+      defs.sort(function(a,b){return a.definition.length-b.definition.length;});
+      var def = defs[0];
+      out += "MEANING\n" + def.definition + "\n\n";
+      if(def.example) out += "EXAMPLE\n" + def.example + "\n\n";
+      shown++;
     }
-    out += "STROKE GUIDE\nTap each character below to see the stroke order animation! \u270f\ufe0f";
+    if(!out) out = "MEANING\nThis word has a meaning that is too complex for Primary 1. Please ask your teacher!\n\n";
+    out += "SPELLING TIP\n" + key.toUpperCase().split("").join(" - ") + " (" + key.length + " letters)";
+    return out;
+
+  }catch(fetchErr){
+    // API also failed — return helpful message
+    return "MEANING\nThis word could not be found in the dictionary. Please check the spelling and try again.\n\nSPELLING TIP\n" + key.toUpperCase().split("").join(" - ");
   }
-  return out;
 }
 
 // ── PINYIN definition ─────────────────────────────────

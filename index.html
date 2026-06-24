@@ -456,155 +456,542 @@ function formatDef(text){
 }
 
 
-// ── DICTIONARY LOOKUP — Cambridge + MDBG ───────────────
-// English: Cambridge Dictionary API (free, CORS-open)
-// Chinese: CC-CEDICT via free MDBG API
+// ── WORD LOOKUP ─────────────────────────────────────────
+// Built-in dictionary with clear, accurate definitions for common words.
+// For unknown words, uses dictionaryapi.dev with strict filtering.
+
+// Format: "word": ["part of speech", "definition", "example sentence"]
+var WORDS = {
+  // A
+  "able":["adjective","having the power, skill, or means to do something","She is able to swim very well."],
+  "above":["preposition","in or to a higher position than something else","The bird flew above the trees."],
+  "across":["preposition","from one side to the other side of something","We walked across the bridge."],
+  "afraid":["adjective","feeling fear; frightened","He was afraid of the dark."],
+  "after":["preposition","following in time or place; later than","We play after school ends."],
+  "again":["adverb","one more time","Please say your name again."],
+  "angry":["adjective","having a strong feeling of being very annoyed","She was angry when someone broke her toy."],
+  "answer":["noun","something you say or write when someone asks a question","The answer to 2 + 2 is 4."],
+  "ask":["verb","to say a question to get information","Please ask your teacher if you need help."],
+  // B
+  "baby":["noun","a very young child who cannot yet walk or talk","The baby is sleeping in the cot."],
+  "bad":["adjective","not good; of poor quality; harmful","Eating too much sugar is bad for your teeth."],
+  "beautiful":["adjective","very attractive or pleasing to look at","The flowers in the garden are beautiful."],
+  "because":["conjunction","for the reason that","I wore a coat because it was cold."],
+  "begin":["verb","to start doing something","Let us begin the lesson now."],
+  "believe":["verb","to feel sure that something is true","I believe you can do it!"],
+  "best":["adjective","of the highest quality; better than all others","She is the best singer in the class."],
+  "better":["adjective","of a higher quality or more suitable than another","This book is better than that one."],
+  "big":["adjective","large in size","An elephant is a very big animal."],
+  "brave":["adjective","willing to do things that are difficult or dangerous; not afraid","The brave girl helped her injured friend."],
+  // C
+  "calm":["adjective","peaceful and quiet; not excited, worried, or angry","Stay calm and take a deep breath."],
+  "careful":["adjective","giving attention to what you are doing so you avoid mistakes or danger","Be careful when you cross the road."],
+  "cheerful":["adjective","feeling happy and showing it","She has a cheerful smile every morning."],
+  "clever":["adjective","able to learn and understand things quickly; intelligent","He is a very clever student."],
+  "correct":["adjective","right; having no mistakes","All your answers are correct — well done!"],
+  // D
+  "difficult":["adjective","not easy; needing a lot of skill or effort","That maths problem is very difficult."],
+  "dirty":["adjective","not clean; covered in mud, dust, or marks","His shoes are dirty after playing outside."],
+  // E
+  "early":["adjective","before the usual or expected time","We arrived early so we got good seats."],
+  "easy":["adjective","not difficult; simple to do or understand","This question is easy — I know the answer!"],
+  "enjoy":["verb","to get pleasure from something","I enjoy reading books before bed."],
+  "enough":["determiner","as much or as many as is needed","I have enough rice, thank you."],
+  "excited":["adjective","feeling very happy and enthusiastic because something good is happening","I am excited about my birthday party tomorrow!"],
+  // F
+  "famous":["adjective","known by many people","The Merlion is a famous statue in Singapore."],
+  "fast":["adjective","moving or happening quickly","A cheetah is the fastest land animal."],
+  "favourite":["noun","the person or thing you like best","Blue is my favourite colour."],
+  "find":["verb","to discover something you were looking for","I cannot find my pencil anywhere."],
+  "finish":["verb","to complete something; to come to an end","Finish your homework before you play."],
+  "friendly":["adjective","behaving in a kind and pleasant way towards others","My new classmate is very friendly."],
+  "funny":["adjective","making you laugh or smile; amusing","That joke was very funny!"],
+  // G
+  "gentle":["adjective","mild and kind; not rough or violent","Be gentle when you hold the baby bird."],
+  "glad":["adjective","feeling happy or pleased about something","I am glad you came to my birthday party."],
+  "great":["adjective","very good; of high quality","You did a great job on your test!"],
+  // H
+  "happy":["adjective","feeling pleasure and contentment; the opposite of sad","I feel happy when I play with my friends."],
+  "hard":["adjective","needing a lot of physical or mental effort; not easy","Learning to ride a bike is hard at first."],
+  "heavy":["adjective","weighing a lot; difficult to lift","The box of books is very heavy."],
+  "help":["verb","to make it easier for someone to do something","Please help me carry these bags."],
+  "honest":["adjective","telling the truth and not lying or cheating","An honest person always tells the truth."],
+  "humble":["adjective","not thinking that you are better or more important than other people","Even after winning the prize, she stayed humble and thanked her teammates."],
+  "hungry":["adjective","wanting or needing food","I am hungry — can we have lunch soon?"],
+  // I
+  "idea":["noun","a thought or plan that comes into your mind","I have a great idea for our science project!"],
+  "important":["adjective","having a lot of value or meaning; mattering greatly","It is important to be kind to others."],
+  "interesting":["adjective","making you want to know more; not boring","That book about dinosaurs is very interesting."],
+  // J
+  "junk":["noun","things that are considered useless or of low value; rubbish or waste items","He cleared out a lot of old junk from his room."],
+  "join":["verb","to come together with others; to become part of a group","Please join us for lunch!"],
+  "jump":["verb","to push your body up off the ground into the air","The children love to jump on the trampoline."],
+  // K
+  "kind":["adjective","caring about others and wanting to help them; generous and gentle","It is kind to share your food with a friend who forgot theirs."],
+  "know":["verb","to have information in your mind; to be certain about something","I know the answer to that question!"],
+  // L
+  "laugh":["verb","to make sounds that show you think something is funny","That story made the whole class laugh."],
+  "learn":["verb","to get new knowledge or a new skill through study or experience","We learn something new at school every day."],
+  "little":["adjective","small in size; not much","A little ant was carrying a huge crumb."],
+  "lonely":["adjective","unhappy because you are alone and have no friends nearby","She felt lonely on her first day at the new school."],
+  "long":["adjective","measuring a great distance from one end to the other","The Amazon River is very long."],
+  "lucky":["adjective","having or bringing good things happen to you by chance","I was lucky to find a coin on the ground."],
+  // M
+  "mean":["adjective","unkind and unpleasant to others","It is mean to make fun of someone."],
+  // N
+  "neat":["adjective","arranged in a tidy and organised way","Please keep your desk neat and clean."],
+  "new":["adjective","recently made, bought, or created; not used before","I have a new school bag this year."],
+  "nice":["adjective","pleasant and enjoyable; kind and friendly","She is a very nice person to talk to."],
+  "noisy":["adjective","making a lot of loud sound","The playground is very noisy during recess."],
+  // O
+  "old":["adjective","having existed or lived for a long time; not new or young","That old tree has been there for 100 years."],
+  // P
+  "patient":["adjective","able to wait calmly for a long time without complaining","Be patient — the food will be ready soon."],
+  "patience":["noun","the ability to wait calmly without getting upset or angry","Learning a new skill takes patience and practice."],
+  "polite":["adjective","behaving in a respectful and considerate way towards others","Always be polite and say please and thank you."],
+  "poor":["adjective","having very little money; also used to show sympathy for someone","The poor little cat was lost in the rain."],
+  "proud":["adjective","feeling very pleased about something good you or someone else has done","I am proud of you for trying your very best."],
+  // Q
+  "quick":["adjective","moving or doing things fast; done in a short time","We need to be quick or we will miss the bus."],
+  "quiet":["adjective","making very little or no noise; peaceful","Please be quiet in the library."],
+  // R
+  "ready":["adjective","fully prepared for something; able to start","Are you ready for school?"],
+  "real":["adjective","actually existing; not pretend or imaginary","Is that a real diamond or a fake one?"],
+  "remember":["verb","to bring something back into your mind that you knew before","Remember to bring your homework tomorrow."],
+  "responsible":["adjective","in charge of something and having to make sure it is done properly","A responsible student always completes their homework."],
+  // S
+  "sad":["adjective","feeling unhappy; the opposite of happy","She felt sad when she lost her favourite toy."],
+  "safe":["adjective","not in danger; protected from harm","Always wear your seatbelt to stay safe in the car."],
+  "shy":["adjective","nervous and uncomfortable with people you do not know well","He is shy at first but very kind once you know him."],
+  "silly":["adjective","not sensible; foolish or not serious","It is silly to run with scissors."],
+  "simple":["adjective","easy to understand or do; not complicated","The instructions are simple — just follow the pictures."],
+  "slow":["adjective","not moving or happening quickly; the opposite of fast","A tortoise is slow but it never gives up."],
+  "smart":["adjective","intelligent; quick to learn and understand","You are a very smart student."],
+  "sorry":["adjective","feeling regret or sadness about something wrong you have done","I am sorry for accidentally breaking your pencil."],
+  "special":["adjective","different from normal things in a way that makes it more important or better","Your birthday is a very special day."],
+  "strong":["adjective","having great physical power; able to lift heavy things; the opposite of weak","He is strong enough to carry both bags."],
+  // T
+  "tired":["adjective","needing rest or sleep; without much energy","I am tired after a long day at school."],
+  // U
+  "understand":["verb","to know what something means or how something works","Do you understand the instructions?"],
+  "upset":["adjective","feeling sad, worried, or unhappy about something","She was upset when her balloon popped."],
+  // W
+  "wonderful":["adjective","extremely good; causing great pleasure or admiration","You did a wonderful job on your art project!"],
+  "worry":["verb","to keep thinking that something bad might happen","Do not worry — I will help you with the problem."],
+  // Common sight words
+  "the":["article","used before a noun to refer to a specific thing","The cat sat on the mat."],
+  "a":["article","used before a noun to refer to one of something","I have a dog at home."],
+  "and":["conjunction","used to join two words, phrases, or sentences","I like cats and dogs."],
+  "is":["verb","the form of 'be' used with he, she, it","The sky is blue."],
+  "in":["preposition","inside something; enclosed by something","The pencil is in the box."],
+  "on":["preposition","touching and supported by the surface of something","Put the book on the table."],
+  "at":["preposition","used to show where someone or something is","I am at school right now."],
+  "to":["preposition","in the direction of; towards","We are going to the park."],
+  "of":["preposition","belonging to; relating to","The colour of the sky is blue."],
+  "it":["pronoun","used to refer to a thing, animal, or idea already mentioned","I found a book. It is very interesting."],
+  "my":["pronoun","belonging to me","This is my school bag."],
+  "we":["pronoun","I and other people together","We are going to learn something new today."],
+  "he":["pronoun","used to refer to a male person or animal","He is my best friend."],
+  "she":["pronoun","used to refer to a female person or animal","She is a kind teacher."],
+  "they":["pronoun","used to refer to more than one person or thing","They are playing football."],
+  "was":["verb","the past form of 'be' used with I, he, she, it","Yesterday was a sunny day."],
+  "for":["preposition","intended to belong to or be used by someone","This gift is for you."],
+  "not":["adverb","used to make a word or statement negative","I do not like spicy food."],
+  "are":["verb","the form of 'be' used with you, we, they","We are students at this school."],
+  "but":["conjunction","used to introduce something different from what was said before","I like cats but my brother likes dogs."],
+  "do":["verb","to perform or complete an action","Do your best in the test."],
+  "can":["verb","to be able to do something","I can ride a bicycle."],
+  "go":["verb","to move from one place to another","Let us go to the library."],
+  "get":["verb","to obtain or receive something; to become","Go and get your school bag."],
+  "come":["verb","to move towards the speaker or a particular place","Please come here quickly."],
+  "see":["verb","to notice something using your eyes","Can you see the rainbow?"],
+  "look":["verb","to turn your eyes towards something in order to see it","Look both ways before crossing the road."],
+  "say":["verb","to speak words; to express something in words","Please say please when you ask for something."],
+  "make":["verb","to create or build something; to cause something to happen","Let us make a birthday card for Mum."],
+  "give":["verb","to hand something to another person","Please give me the pencil."],
+  "take":["verb","to reach out and hold something; to carry something","Take your umbrella — it might rain."],
+  "put":["verb","to move something to a particular place","Put your bag on the shelf."],
+  "think":["verb","to use your mind to consider something carefully","Think carefully before you answer."],
+  "want":["verb","to feel that you would like to have or do something","I want to be a doctor when I grow up."],
+  "use":["verb","to do something with an object for a purpose","Use a ruler to draw a straight line."],
+  "many":["adjective","a large number of things or people","There are many stars in the night sky."],
+  "some":["determiner","an amount or number of something, but not all","Have some water — you look thirsty."],
+  "with":["preposition","accompanied by; in the company of","I went to school with my friend."],
+  "all":["determiner","the whole number or amount of something","All the students finished their homework."],
+  "very":["adverb","used to emphasise an adjective or adverb; extremely","This maths problem is very hard."],
+  "here":["adverb","in, at, or to this place","Please come here at once."],
+  "when":["conjunction","at the time that something happens","I read a book when I have free time."],
+  "your":["pronoun","belonging to the person being spoken to","Is this your pencil?"],
+  "our":["pronoun","belonging to us","Our school has a beautiful garden."],
+  "then":["adverb","at that time; after that","Finish your work, then you may play."],
+  "so":["conjunction","therefore; with the result that","I was tired, so I went to sleep early."],
+  "if":["conjunction","used to say that one thing depends on another thing","If you study hard, you will do well."],
+  "up":["adverb","towards a higher position; the opposite of down","The balloon floated up into the sky."],
+  "out":["adverb","away from the inside of a place","Please go out to play during recess."],
+  "what":["pronoun","asking for information about something","What is your favourite animal?"],
+  "who":["pronoun","asking about or referring to a person","Who is your best friend?"],
+  "how":["adverb","in what way; to what degree","How do you spell your name?"],
+  "just":["adverb","only; very recently","I just finished my homework."],
+  "now":["adverb","at this moment; at the present time","Please sit down now."],
+  "also":["adverb","in addition to something else; too","I like cats. I also like dogs."],
+  "back":["adverb","to a place or position where someone or something was before","Please give the book back to the library."],
+  "down":["adverb","towards a lower position; the opposite of up","The ball rolled down the hill."],
+  "way":["noun","how something is done; the route to get somewhere","Do you know the way to school?"],
+  "even":["adverb","used to emphasise something surprising","Even the teacher laughed at that joke."],
+  "well":["adverb","in a good or satisfactory way; in good health","You have done very well on your spelling test."],
+  "too":["adverb","more than is needed; also; as well","This bag is too heavy for me to carry."],
+  "any":["determiner","used in questions and negatives; one or some","Do you have any pencils I can borrow?"],
+  "same":["adjective","exactly alike; not different or not another","We are wearing the same colour today."],
+  "off":["adverb","away from a place; not switched on","Please turn off the lights when you leave."],
+  "much":["adverb","to a great degree; a large amount","Thank you very much for your help."],
+  "right":["adjective","correct; morally good; the direction opposite to left","That is the right answer — well done!"],
+  "left":["adjective","on the side opposite to the right","Turn left at the traffic light."],
+  "move":["verb","to change position; to go from one place to another","Please move your chair closer to the desk."],
+  "still":["adverb","continuing to happen or existing; not moving","Please sit still while I take your photo."],
+  "own":["adjective","belonging to a particular person and no one else","I have my own pencil case."],
+  "each":["determiner","every one of two or more people or things separately","Each child in the class got one sticker."],
+  "both":["determiner","the two of them together; not just one","Both my hands are clean."],
+  "between":["preposition","in the space or period separating two things","The library is between the canteen and the hall."],
+  "never":["adverb","not at any time; not ever","Never run across a busy road without looking."],
+  "always":["adverb","at all times; on every occasion","I always brush my teeth before bed."],
+  "every":["determiner","each one of a group without exception","Every student must bring their homework tomorrow."],
+  "next":["adjective","coming immediately after in time, order, or space","Who is next in line please?"],
+  "first":["adjective","coming before all others in position or time","She was the first student to finish the test."],
+  "last":["adjective","coming after all others; the one at the end","He was the last person to arrive."],
+  "most":["determiner","the greatest amount or number of something","Most students enjoy recess."],
+  "more":["determiner","a greater amount or number","Can I have a little more water please?"],
+  "less":["determiner","a smaller amount of something","Try to eat less junk food and more fruit."],
+  "few":["determiner","a small number of things","Only a few students were absent today."],
+  "keep":["verb","to continue to have something; to not lose or give away","You can keep the sticker — it is yours."],
+  "start":["verb","to begin doing or happening","Let us start the lesson with a spelling warm-up."],
+  "stop":["verb","to no longer do something; to come to an end","Stop running in the corridor please."],
+  "let":["verb","to allow someone to do something","Let me help you carry that."],
+  "show":["verb","to allow someone to see something; to explain by demonstrating","Show me how you solve this maths problem."],
+  "try":["verb","to make an effort to do something","Always try your best — that is all that matters."],
+  "turn":["verb","to move in a circular direction; to change direction","Turn the page when you are ready."],
+  "walk":["verb","to move forward on your feet at a normal pace","We walk to school every morning."],
+  "run":["verb","to move on your feet at a fast pace, faster than walking","Run quickly or we will miss the bus!"],
+  "stand":["verb","to be upright on your feet; not sitting or lying","Please stand up when the teacher enters."],
+  "sit":["verb","to lower yourself onto a seat and rest your weight on it","Please sit down quietly."],
+  "eat":["verb","to put food in your mouth, chew it, and swallow it","Eat your vegetables — they are good for you!"],
+  "drink":["verb","to swallow a liquid such as water or juice","Drink plenty of water every day."],
+  "sleep":["verb","to rest with your eyes closed and your mind not active","Children should sleep for about 10 hours each night."],
+  "write":["verb","to make letters or words on paper using a pen or pencil","Write your name at the top of the page."],
+  "read":["verb","to look at and understand written words","I read a chapter of my book every night."],
+  "play":["verb","to do activities for fun and enjoyment","We play in the park after school."],
+  "sing":["verb","to make musical sounds with your voice","We sing our national anthem every morning."],
+  "draw":["verb","to make a picture using a pencil, pen, or other tool","Draw a picture of your favourite animal."],
+  "swim":["verb","to move through water using your arms and legs","She can swim across the whole pool."],
+  "jump":["verb","to push yourself up from the ground into the air","He can jump very high."],
+  "catch":["verb","to stop and hold something that is moving through the air","Catch the ball with both hands."],
+  "throw":["verb","to send something through the air using your hand","Throw the ball to your partner."],
+  "bring":["verb","to carry something or someone with you to a place","Please bring your textbook tomorrow."],
+  "buy":["verb","to get something by paying money for it","Mum will buy groceries at the supermarket."],
+  "sell":["verb","to give something to someone in exchange for money","The shop sells stationery and books."],
+  "open":["verb","to move something so that it is no longer closed","Open the door gently please."],
+  "close":["verb","to move something so it covers an opening; to shut","Please close your books and listen."],
+  "clean":["verb","to remove dirt from something; adjective: free from dirt","Please clean your desk before you go home."],
+  "wash":["verb","to clean something using water and soap","Wash your hands before eating."],
+  "cut":["verb","to divide something using scissors or a knife","Cut the paper along the dotted line."],
+  "break":["verb","to separate into pieces, especially by being hit or dropped","Be careful not to break the glass."],
+  "build":["verb","to make something by putting parts together","We will build a model aeroplane in class."],
+  "hold":["verb","to keep something in your hands or arms","Hold the railing when you walk down the stairs."],
+  "pull":["verb","to hold something and bring it towards you","Pull the door to open it — do not push!"],
+  "push":["verb","to press something away from you using force","Push the trolley to the checkout counter."],
+  "fall":["verb","to drop down from a higher position","Be careful not to fall off the chair."],
+  "miss":["verb","to feel sad because someone or something is not with you","I miss my grandma when she is overseas."],
+  "meet":["verb","to see and speak to someone for the first time; to come together","I will meet my friend at the library."],
+  "teach":["verb","to help someone learn something by explaining or showing them","My teacher teaches us new things every day."],
+  "wait":["verb","to stay in a place until something happens","Wait patiently for your turn."],
+  "carry":["verb","to hold something and take it to another place","Can you carry these books to the library?"],
+  "follow":["verb","to go behind someone and go the same way","Follow the instructions carefully."],
+  "reach":["verb","to stretch out your arm to touch or get something","Can you reach the top shelf?"],
+  "help":["verb","to do something useful for another person","Please help your friend if they are stuck."],
+  "love":["verb","to have a very strong feeling of affection for someone","I love my family very much."],
+  "like":["verb","to find something pleasant or enjoyable","I like to eat fruit for snacks."],
+  "hate":["verb","to dislike something very much","I hate it when it rains during recess!"],
+  "share":["verb","to give part of something you have to others","Please share the crayons with your friend."],
+  "care":["verb","to feel interest and concern for someone","Good friends care about each other."],
+  "tell":["verb","to give information to someone using words","Please tell me about your day."],
+  "ask":["verb","to say a question in order to get information","Always ask if you do not understand."],
+  "listen":["verb","to give attention to a sound; to pay attention to someone speaking","Listen carefully when your teacher is speaking."],
+  "talk":["verb","to say words; to have a conversation","We talk with our friends during recess."],
+  "call":["verb","to give a name to someone; to telephone someone; to shout to someone","Call your mum if you feel unwell."],
+  "choose":["verb","to decide which one you want from a group of things","Choose your favourite book from the shelf."],
+  "decide":["verb","to make a choice after thinking about it","Decide what you want to be when you grow up."],
+  "remember":["verb","to bring something back into your mind that you knew before","Remember to switch off the lights."],
+  "forget":["verb","to be unable to remember something you knew before","Do not forget to bring your water bottle."],
+  "need":["verb","to require something because it is very important or necessary","We need water to survive."],
+  "add":["verb","to put numbers together to get a larger total; to put something extra in","Add these two numbers together."],
+  "count":["verb","to say numbers in order; to find out how many there are","Count from one to twenty out loud."],
+  "number":["noun","a symbol or word that represents a quantity","The number 8 is a lucky number."],
+  "time":["noun","the progression of events from past to present to future; hours and minutes","What time does school start?"],
+  "day":["noun","the period from sunrise to sunset; a 24-hour period","Today is a wonderful day to learn."],
+  "night":["noun","the period of darkness between sunset and sunrise","Stars come out at night."],
+  "week":["noun","a period of seven days","There are five school days in a week."],
+  "month":["noun","one of the twelve periods that a year is divided into","My birthday is in the month of July."],
+  "year":["noun","the period of 365 days from January to December","I am seven years old this year."],
+  "morning":["noun","the early part of the day, from when you wake up until midday","We do spelling practice every morning."],
+  "afternoon":["noun","the part of the day between midday and evening","We have PE in the afternoon on Tuesdays."],
+  "evening":["noun","the later part of the day, from the end of the afternoon until night","We have family dinner every evening."],
+  "today":["noun","this present day","Today is Monday."],
+  "tomorrow":["noun","the day after today","Our spelling test is tomorrow — study tonight!"],
+  "yesterday":["noun","the day before today","Yesterday we went to the zoo."],
+  "home":["noun","the house or place where you live with your family","I feel safe and happy at home."],
+  "school":["noun","a place where children go to study and learn","I go to school five days a week."],
+  "class":["noun","a group of students who are taught together; a lesson","Our class has 30 students."],
+  "book":["noun","a set of printed pages joined together inside a cover","I love reading books."],
+  "pen":["noun","a long thin object with ink inside, used for writing","Use a blue or black pen to write your name."],
+  "pencil":["noun","a thin wooden stick with a dark centre, used for writing or drawing","Please sharpen your pencil."],
+  "bag":["noun","a container made of material, used for carrying things","I pack my school bag every night."],
+  "food":["noun","things that people and animals eat to get energy and stay healthy","Eat healthy food to grow strong."],
+  "water":["noun","the clear liquid that fills rivers, lakes, and oceans; what we drink","Drink water to stay hydrated."],
+  "house":["noun","a building where people, especially a family, live","We live in a red house near the park."],
+  "room":["noun","a separate area inside a building with its own walls, floor, and ceiling","My bedroom is on the second floor."],
+  "door":["noun","a flat panel that you open and close to enter or leave a room","Close the door quietly when you leave."],
+  "table":["noun","a piece of furniture with a flat top and legs, used to put things on","Put your books on the table."],
+  "chair":["noun","a piece of furniture with four legs and a back, designed for sitting on","Sit up straight on your chair."],
+  "family":["noun","a group of people who are related to each other, especially parents and children","I love spending time with my family."],
+  "friend":["noun","a person you know well and like to spend time with","My best friend sits next to me in class."],
+  "teacher":["noun","a person whose job is to teach others, especially in a school","My teacher is very patient and kind."],
+  "parent":["noun","a father or mother","My parents help me with my homework."],
+  "brother":["noun","a boy or man who has the same parents as you","My brother is two years younger than me."],
+  "sister":["noun","a girl or woman who has the same parents as you","My sister and I share a bedroom."],
+  "child":["noun","a young person; a boy or girl","Every child deserves a good education."],
+  "boy":["noun","a male child","The boy ran quickly across the field."],
+  "girl":["noun","a female child","The girl won first prize in the spelling competition."],
+  "man":["noun","an adult male person","The man helped the lost child find her mother."],
+  "woman":["noun","an adult female person","The woman is a kind doctor."],
+  "animal":["noun","a living creature that can move and is not a plant, such as a dog or fish","A cat is a common household animal."],
+  "cat":["noun","a small furry animal with four legs and a tail that is often kept as a pet","My cat loves to sleep in a sunny spot."],
+  "dog":["noun","a common animal with four legs that is often kept as a pet and makes a barking sound","My dog wags its tail when I come home."],
+  "bird":["noun","an animal with wings, feathers, and a beak that usually can fly","A bird was singing in the tree outside."],
+  "fish":["noun","an animal that lives in water and breathes through gills","We saw many colourful fish at the aquarium."],
+  "flower":["noun","the colourful part of a plant that produces seeds","Mum planted beautiful flowers in the garden."],
+  "tree":["noun","a tall plant with a thick wooden trunk, branches, and leaves","We sat in the shade under a big tree."],
+  "sun":["noun","the star at the centre of our solar system that gives us light and warmth","The sun rises in the east every morning."],
+  "rain":["noun","water that falls from clouds in the sky","We brought our umbrellas because of the rain."],
+  "colour":["noun","the way light appears to the eye, such as red, blue, or yellow","What is your favourite colour?"],
+  "red":["adjective","having the colour of blood or a ripe tomato","She wore a beautiful red dress."],
+  "blue":["adjective","having the colour of the clear sky on a sunny day","The sky is bright blue today."],
+  "green":["adjective","having the colour of grass and leaves","The grass in the park is very green."],
+  "yellow":["adjective","having the colour of the sun or a ripe banana","She drew a yellow sun in the corner of her picture."],
+  "white":["adjective","having the colour of milk or fresh snow","He wore a clean white shirt to school."],
+  "black":["adjective","having the darkest colour, like the night sky with no stars","The cat has shiny black fur."],
+  "big":["adjective","large in size","An elephant is a very big animal."],
+  "small":["adjective","little in size; not big","An ant is a very small insect."],
+  "tall":["adjective","having a great height; measuring a lot from bottom to top","Giraffes are the tallest animals on land."],
+  "short":["adjective","not measuring much from top to bottom; not tall","The short boy stood at the front of the class photo."],
+  "long":["adjective","measuring a great distance from one end to the other; not short","A snake has a long, flexible body."],
+  "hot":["adjective","having a high temperature; very warm","Be careful — the soup is very hot."],
+  "cold":["adjective","having a low temperature; the opposite of hot","It was so cold that we could see our breath."],
+  "wet":["adjective","covered with water or another liquid; not dry","My shoes got wet when I stepped in a puddle."],
+  "dry":["adjective","having no water or moisture; not wet","Dry your hands with a towel after washing them."],
+  "clean":["adjective","free from dirt or marks; not dirty","Wash your hands to keep them clean."],
+  "dirty":["adjective","covered in mud, dust, or marks; not clean","His shoes were dirty after playing in the garden."],
+  "light":["adjective","not heavy; easy to lift. Also: not dark; bright","This school bag is light and easy to carry."],
+  "dark":["adjective","with little or no light; the opposite of bright or light in colour","It gets dark early in winter."],
+  "fast":["adjective","moving or doing things quickly; the opposite of slow","A racing car is very fast."],
+  "slow":["adjective","not moving quickly; taking a long time; the opposite of fast","The tortoise is slow but it always reaches the finish line."],
+  "loud":["adjective","making a lot of noise; not quiet","The music at the party was very loud."],
+  "quiet":["adjective","making very little noise; peaceful; the opposite of loud","Please keep quiet during the exam."],
+  "kind":["adjective","friendly, generous, and caring towards others","It was very kind of you to help him."],
+  "smart":["adjective","having or showing intelligence; able to learn quickly","She is a very smart student who always asks good questions."],
+  "brave":["adjective","willing to do difficult or frightening things; not afraid","The brave firefighter ran into the burning building."],
+  "careful":["adjective","giving attention to what you do to avoid mistakes or accidents","Be careful when using scissors."],
+  "beautiful":["adjective","very attractive and pleasant to look at","What a beautiful painting you have made!"],
+  "funny":["adjective","making you laugh; amusing","That was such a funny story!"],
+  "strange":["adjective","unusual or surprising; not familiar","That is a very strange noise — what could it be?"],
+  "young":["adjective","having lived for only a short time; not old","Young children learn very quickly."],
+  "number":["noun","a symbol or word used to count or measure","Choose any number between one and ten."],
+  "answer":["noun","something said, written, or done in response to a question","Write your answer in the space provided."],
+  "question":["noun","a sentence or phrase that asks for information","Raise your hand if you have a question."],
+  "story":["noun","a description of events, whether real or imagined","Please write a story about your best day ever."],
+  "name":["noun","the word or words that a person or thing is known by","What is your full name?"],
+  "idea":["noun","a thought or suggestion about a possible course of action","I have an idea — let us make a surprise card for the teacher!"],
+  "world":["noun","the Earth and all the people, animals, and things on it","There are many countries in the world."],
+  "country":["noun","an area of land with its own government, laws, and people","Singapore is our beloved country."],
+  "place":["noun","a particular area or position","This is a good place to have a picnic."],
+  "thing":["noun","an object or item, especially one that you do not know the name of","What is that thing in your bag?"],
+  "part":["noun","a piece or section of something larger","Learning new words is part of being a good reader."],
+  "life":["noun","the state of being alive; the time between birth and death","Life is beautiful when we are kind to each other."],
+  "hand":["noun","the part at the end of your arm, including your fingers and thumb","Raise your hand if you know the answer."],
+  "eye":["noun","one of the two organs in your head that you use to see","Cover one eye and tell me how many fingers I am holding up."],
+  "face":["noun","the front part of your head, where your eyes, nose, and mouth are","She had a big smile on her face."],
+  "head":["noun","the part of your body above your neck, which contains your brain","Nod your head if you agree."],
+  "arm":["noun","one of the two long parts of your body attached to your shoulders","Stretch your arms up as high as you can."],
+  "leg":["noun","one of the limbs attached to the bottom of your body, used for walking","I hurt my leg when I fell off my bicycle."],
+  "mouth":["noun","the opening in your face that you use to eat and speak","Open your mouth wide at the dentist."],
+  "ear":["noun","one of the two organs on the sides of your head that you use to hear","I can hear music — it is so loud it hurts my ears!"],
+  "nose":["noun","the part of your face between your eyes and mouth, used for breathing and smelling","My nose tickles when I smell pepper."],
+  "heart":["noun","the organ in your chest that pumps blood around your body","Exercise makes your heart strong."],
+  "money":["noun","coins and notes that you use to buy things","Save your money so you can buy something special."],
+  "work":["noun/verb","effort put into doing something; a job or task; to do a job","Work hard and you will achieve your goals."],
+  "game":["noun","an activity done for fun, with rules","My favourite game is chess."],
+  "team":["noun","a group of people who play or work together","Our team won the football match!"],
+  "music":["noun","sounds arranged in a pleasant or interesting way to be sung or played","I love listening to music while I draw."],
+  "sport":["noun","a physical activity done for exercise or fun, often with rules and competition","Swimming is my favourite sport."],
+  "junk":["noun","things that are considered useless or of very poor quality; rubbish or waste material","Please do not eat too much junk food — eat fruit instead."],
+};
 
 async function fetchEnglishDef(word){
-  // Cambridge Dictionary API — real definitions, no keys needed
-  var url = "https://api.dictionaryapi.dev/api/v2/entries/en/" + encodeURIComponent(word.toLowerCase());
-  var r = await fetch(url);
-  if(!r.ok) throw new Error("\"" + word + "\" not found. Please check the spelling.");
-  var data = await r.json();
-  if(!data||!data[0]) throw new Error("No definition found for \"" + word + "\".");
+  var key = word.toLowerCase().trim();
 
-  var entry = data[0];
-
-  // Pick the best definition: use the Cambridge-sourced ones
-  // dictionaryapi.dev uses Cambridge data for most words
-  // We pick: first adjective def, else first noun def, else first verb def
-  var POS_ORDER = ["adjective","adverb","noun","verb","conjunction","preposition","pronoun"];
-  var SKIP = /\bBaltimore\b|\bslang\b|\bvulgar\b|\boffensive\b|\bderogatory\b|\barchaic\b|\bhistorical\b|\bdemean\b|\barrest\b/i;
-
-  var meanings = (entry.meanings||[]).slice();
-  meanings.sort(function(a,b){
-    var ai=POS_ORDER.indexOf(a.partOfSpeech),bi=POS_ORDER.indexOf(b.partOfSpeech);
-    return (ai<0?99:ai)-(bi<0?99:bi);
-  });
-
-  var out = "", shown = 0;
-  for(var i=0;i<meanings.length&&shown<2;i++){
-    var m = meanings[i];
-    var defs = (m.definitions||[]).filter(function(d){return !SKIP.test(d.definition);});
-    if(!defs.length) continue;
-    // Shortest clear definition first
-    defs.sort(function(a,b){return a.definition.length - b.definition.length;});
-    var def = defs[0];
-    out += "MEANING (" + m.partOfSpeech + ")\n" + def.definition + "\n\n";
-    if(def.example) out += "EXAMPLE\n" + def.example + "\n\n";
-    shown++;
+  // 1. Check built-in dictionary — always accurate for these words
+  if(WORDS[key]){
+    var entry = WORDS[key];
+    return "MEANING (" + entry[0] + ")\n" + entry[1] + "\n\nEXAMPLE\n" + entry[2] + "\n\nSPELLING\n" + key.toUpperCase().split("").join(" - ") + " (" + key.length + " letters)";
   }
-  if(!out) throw new Error("No suitable definition found. Try another word.");
 
-  // Phonetics
-  if(entry.phonetic) out += "PRONUNCIATION\n" + entry.phonetic + "\n\n";
-
-  // Spelling
-  out += "SPELLING\n" + word.toUpperCase().split("").join(" - ") + " (" + word.length + " letters)";
-  return out;
+  // 2. Unknown word — use dictionary API with strict filtering
+  try{
+    var r = await fetch("https://api.dictionaryapi.dev/api/v2/entries/en/" + encodeURIComponent(key));
+    if(!r.ok) throw new Error("\"" + word + "\" not found. Please check the spelling.");
+    var data = await r.json();
+    if(!data||!data[0]) throw new Error("No definition found.");
+    var entry = data[0];
+    // Skip obscure, slang, or overly technical definitions
+    var SKIP = /\bBaltimore\b|\bslang\b|\bvulgar\b|\boffensive\b|\bderogatory\b|\barchaic\b|\bdemean\b|\barrest\b|salt beef/i;
+    var POS_ORDER = ["adjective","adverb","noun","verb"];
+    var meanings = (entry.meanings||[]).slice();
+    meanings.sort(function(a,b){var ai=POS_ORDER.indexOf(a.partOfSpeech),bi=POS_ORDER.indexOf(b.partOfSpeech);return (ai<0?99:ai)-(bi<0?99:bi);});
+    var out="", shown=0;
+    for(var i=0;i<meanings.length&&shown<1;i++){
+      var defs=(meanings[i].definitions||[]).filter(function(d){return !SKIP.test(d.definition);});
+      if(!defs.length)continue;
+      defs.sort(function(a,b){return a.definition.length-b.definition.length;});
+      var def=defs[0];
+      out+="MEANING ("+meanings[i].partOfSpeech+")\n"+def.definition+"\n\n";
+      if(def.example)out+="EXAMPLE\n"+def.example+"\n\n";
+      shown++;
+    }
+    if(!out)throw new Error("No suitable definition found for this word.");
+    out+="SPELLING\n"+key.toUpperCase().split("").join(" - ")+" ("+key.length+" letters)";
+    return out;
+  }catch(e){
+    return "MEANING\nThis word is not in our dictionary yet. Please ask your teacher for the meaning!\n\nSPELLING\n"+key.toUpperCase().split("").join(" - ");
+  }
 }
 
 async function fetchChineseDef(word){
-  // Use the free CC-CEDICT dictionary via a public CORS-friendly endpoint
-  // mdbg.net is the standard reference for Chinese-English dictionary
   var chars = word.split("").filter(function(ch){return /[\u4e00-\u9fff]/.test(ch);});
   if(!chars.length) throw new Error("No Chinese characters found.");
-
-  var out = "";
-  var results = [];
-
-  // Try each character individually via the free hanzidb API
-  for(var i=0;i<chars.length;i++){
-    var ch = chars[i];
-    try{
-      var r = await fetch("https://api.hanzidb.org/v1/hanzi/"+encodeURIComponent(ch));
-      if(r.ok){
-        var d = await r.json();
-        if(d&&d.pinyin_numeric){
-          results.push({ch:ch, pinyin:d.pinyin_numeric, def:d.definition});
-        }
-      }
-    }catch(e){}
-  }
-
-  if(results.length>0){
-    // Build output from API results
-    var pinyins = results.map(function(r){return r.pinyin;}).join(" ");
-    out += "HANYU PINYIN\n" + pinyins + "\n\n";
-    out += "MEANING\n";
-    results.forEach(function(r){
-      out += "\u2022 " + r.ch + " \u2014 " + (r.def||"see stroke guide below") + "\n";
-    });
-    out += "\n";
-  } else {
-    // Fallback: use our local Chinese dictionary for common chars
-    out += buildLocalChineseDef(word, chars);
-  }
-  out += "STROKE GUIDE\nTap each character below to see the stroke order and practise writing! \u270f\ufe0f";
-  return out;
+  return buildLocalChineseDef(word, chars);
 }
 
 function buildLocalChineseDef(word, chars){
   var ZH = {
-    "\u6211":["w\u01d2","I, me"],"\u4f60":["n\u01d0","you"],"\u4ed6":["t\u0101","he, him"],"\u5979":["t\u0101","she, her"],
-    "\u597d":["h\u01ceo","good, well"],"\u5927":["d\u00e0","big, large"],"\u5c0f":["xi\u01ceo","small, little"],
-    "\u4e0a":["sh\u00e0ng","up, above, on"],"\u4e0b":["xi\u00e0","down, below, under"],"\u4eba":["r\u00e9n","person, people"],
-    "\u624b":["sh\u01d2u","hand"],"\u6c34":["shu\u01d0","water"],"\u706b":["hu\u01d2","fire"],"\u5c71":["sh\u0101n","mountain"],
-    "\u65e5":["r\u00ec","sun, day"],"\u6708":["yu\u00e8","moon, month"],"\u6728":["m\u00f9","wood, tree"],
-    "\u5929":["ti\u0101n","sky, day, heaven"],"\u5730":["d\u00ec","earth, ground"],"\u5fc3":["x\u012bn","heart, mind"],
-    "\u53e3":["k\u01d2u","mouth"],"\u76ee":["m\u00f9","eye"],"\u9b5a":["y\u00fa","fish"],"\u9e1f":["ni\u01ceo","bird"],
-    "\u82b1":["hu\u0101","flower"],"\u6811":["sh\u00f9","tree"],"\u5b66":["xu\u00e9","to study, to learn"],
-    "\u6821":["xi\u00e0o","school"],"\u5bb6":["ji\u0101","home, family"],
-    "\u7236":["f\u00f9","father"],"\u6bcd":["m\u01d4","mother"],"\u54e5":["g\u0113","older brother"],
-    "\u59d0":["ji\u011b","older sister"],"\u5f1f":["d\u00ec","younger brother"],"\u59b9":["m\u00e8i","younger sister"],
-    "\u5403":["ch\u012b","to eat"],"\u559d":["h\u0113","to drink"],"\u8def":["l\u00f9","road, path"],
-    "\u770b":["k\u00e0n","to look, to see, to read"],"\u542c":["t\u012bng","to listen, to hear"],
-    "\u8bf4":["shu\u014d","to speak, to say"],"\u5199":["xi\u011b","to write"],"\u73a9":["w\u00e1n","to play"],
-    "\u8de8":["z\u01d2u","to walk"],"\u8dd1":["p\u01ceo","to run"],"\u7761":["shu\u00ec","to sleep"],
-    "\u591a":["du\u014d","many, much"],"\u5c11":["sh\u01ceo","few, little"],"\u5feb":["ku\u00e0i","fast, quick"],
-    "\u6162":["m\u00e0n","slow"],"\u9ad8":["g\u0101o","tall, high"],"\u4f4e":["d\u012b","low, short"],
-    "\u7ea2":["h\u00f3ng","red"],"\u9ec4":["hu\u00e1ng","yellow"],"\u84dd":["l\u00e1n","blue"],
-    "\u7eff":["l\u01dc","green"],"\u767d":["b\u00e1i","white"],"\u9ed1":["h\u0113i","black"],
-    "\u4e00":["y\u012b","one (1)"],"\u4e8c":["h\u00e8r","two (2)"],"\u4e09":["s\u0101n","three (3)"],
-    "\u56db":["s\u00ec","four (4)"],"\u4e94":["w\u01d4","five (5)"],"\u516d":["li\u00f9","six (6)"],
-    "\u4e03":["q\u012b","seven (7)"],"\u516b":["b\u0101","eight (8)"],"\u4e5d":["ji\u01d4","nine (9)"],
-    "\u5341":["sh\u00ed","ten (10)"],"\u767e":["b\u01cei","hundred (100)"],"\u5343":["qi\u0101n","thousand (1000)"],
-    "\u670b\u53cb":["p\u00e9ngyou","friend"],"\u8001\u5e08":["l\u01ceo sh\u012b","teacher"],
-    "\u540c\u5b66":["t\u00f3ng xu\u00e9","classmate"],"\u4eca\u5929":["j\u012bti\u0101n","today"],
-    "\u660e\u5929":["m\u00edngti\u0101n","tomorrow"],"\u6628\u5929":["zu\u00f3ti\u0101n","yesterday"],
-    "\u5947\u4eba":["q\u00ed r\u00e9n","stranger, other person"],
-    "\u4f59\u4eba":["y\u00fa r\u00e9n","other people, remaining person"]
+    "\u6211":["w\u01d2","I, me"],
+    "\u4f60":["n\u01d0","you"],
+    "\u4ed6":["t\u0101","he, him"],
+    "\u5979":["t\u0101","she, her"],
+    "\u597d":["h\u01ceo","good, well"],
+    "\u5927":["d\u00e0","big, large"],
+    "\u5c0f":["xi\u01ceo","small, little"],
+    "\u4e0a":["sh\u00e0ng","up, above, on top of"],
+    "\u4e0b":["xi\u00e0","down, below, under"],
+    "\u4eba":["r\u00e9n","person, people"],
+    "\u624b":["sh\u01d2u","hand"],
+    "\u6c34":["shu\u01d0","water"],
+    "\u706b":["hu\u01d2","fire"],
+    "\u5c71":["sh\u0101n","mountain"],
+    "\u65e5":["r\u00ec","sun, day"],
+    "\u6708":["yu\u00e8","moon, month"],
+    "\u6728":["m\u00f9","wood, tree"],
+    "\u5929":["ti\u0101n","sky, day, heaven"],
+    "\u5730":["d\u00ec","earth, ground, soil"],
+    "\u5fc3":["x\u012bn","heart, mind, feelings"],
+    "\u53e3":["k\u01d2u","mouth"],
+    "\u76ee":["m\u00f9","eye"],
+    "\u9b5a":["y\u00fa","fish"],
+    "\u9e1f":["ni\u01ceo","bird"],
+    "\u82b1":["hu\u0101","flower"],
+    "\u6811":["sh\u00f9","tree"],
+    "\u5b66":["xu\u00e9","to study, to learn"],
+    "\u6821":["xi\u00e0o","school"],
+    "\u5bb6":["ji\u0101","home, family, house"],
+    "\u7236":["f\u00f9","father"],
+    "\u6bcd":["m\u01d4","mother"],
+    "\u54e5":["g\u0113","older brother"],
+    "\u59d0":["ji\u011b","older sister"],
+    "\u5f1f":["d\u00ec","younger brother"],
+    "\u59b9":["m\u00e8i","younger sister"],
+    "\u5403":["ch\u012b","to eat"],
+    "\u559d":["h\u0113","to drink"],
+    "\u770b":["k\u00e0n","to look, to see, to read"],
+    "\u542c":["t\u012bng","to listen, to hear"],
+    "\u8bf4":["shu\u014d","to speak, to say"],
+    "\u5199":["xi\u011b","to write"],
+    "\u73a9":["w\u00e1n","to play"],
+    "\u8de8":["z\u01d2u","to walk"],
+    "\u8dd1":["p\u01ceo","to run"],
+    "\u7761":["shu\u00ec","to sleep"],
+    "\u591a":["du\u014d","many, much, a lot"],
+    "\u5c11":["sh\u01ceo","few, little, not much"],
+    "\u5feb":["ku\u00e0i","fast, quick, soon"],
+    "\u6162":["m\u00e0n","slow"],
+    "\u9ad8":["g\u0101o","tall, high"],
+    "\u4f4e":["d\u012b","low, short (height)"],
+    "\u7ea2":["h\u00f3ng","red"],
+    "\u9ec4":["hu\u00e1ng","yellow"],
+    "\u84dd":["l\u00e1n","blue"],
+    "\u7eff":["l\u01dc","green"],
+    "\u767d":["b\u00e1i","white"],
+    "\u9ed1":["h\u0113i","black"],
+    "\u4e00":["y\u012b","one (1)"],
+    "\u4e8c":["h\u00e8r","two (2)"],
+    "\u4e09":["s\u0101n","three (3)"],
+    "\u56db":["s\u00ec","four (4)"],
+    "\u4e94":["w\u01d4","five (5)"],
+    "\u516d":["li\u00f9","six (6)"],
+    "\u4e03":["q\u012b","seven (7)"],
+    "\u516b":["b\u0101","eight (8)"],
+    "\u4e5d":["ji\u01d4","nine (9)"],
+    "\u5341":["sh\u00ed","ten (10)"],
+    "\u767e":["b\u01cei","hundred (100)"],
+    "\u5343":["qi\u0101n","thousand (1000)"],
+    "\u4eca\u5929":["j\u012bti\u0101n","today"],
+    "\u660e\u5929":["m\u00edngti\u0101n","tomorrow"],
+    "\u6628\u5929":["zu\u00f3ti\u0101n","yesterday"],
+    "\u670b\u53cb":["p\u00e9ngyou","friend"],
+    "\u8001\u5e08":["l\u01ceo sh\u012b","teacher"],
+    "\u540c\u5b66":["t\u00f3ng xu\u00e9","classmate"],
+    "\u4f59\u4eba":["y\u00fa r\u00e9n","other people, the rest of the people"]
   };
 
-  var out = "MEANING\n";
+  var out = "";
   // Check full word first
   if(ZH[word]){
     var info=ZH[word];
-    return "HANYU PINYIN\n"+info[0]+"\n\nMEANING\n"+info[1]+"\n\n";
+    out += "HANYU PINYIN\n" + info[0] + "\n\n";
+    out += "MEANING\n" + info[1] + "\n\n";
+    out += "STROKE GUIDE\nTap the character button below to see the stroke order! \u270f\ufe0f";
+    return out;
   }
-  // Break down by character
+  // Break down character by character
   var parts=[], pinyins=[];
   chars.forEach(function(ch){
     if(ZH[ch]){
-      parts.push("\u2022 "+ch+" ("+ZH[ch][0]+") = "+ZH[ch][1]);
+      parts.push("\u2022 " + ch + " (" + ZH[ch][0] + ") = " + ZH[ch][1]);
       pinyins.push(ZH[ch][0]);
     } else {
-      parts.push("\u2022 "+ch+" = see stroke guide below");
+      parts.push("\u2022 " + ch + " = not yet in our dictionary");
       pinyins.push("?");
     }
   });
-  out += parts.join("\n")+"\n\n";
   if(pinyins.some(function(p){return p!=="?";})){
-    out += "HANYU PINYIN\n"+pinyins.join(" ")+"\n\n";
+    out += "HANYU PINYIN\n" + pinyins.join(" ") + "\n\n";
   }
+  out += "MEANING\n" + parts.join("\n") + "\n\n";
+  out += "STROKE GUIDE\nTap each character below to see the stroke order and practise writing! \u270f\ufe0f";
   return out;
 }
 
 function buildPinyinDef(word){
   var tones={"\u0101":1,"\u00e1":2,"\u01ce":3,"\u00e0":4,"\u0113":1,"\u00e9":2,"\u011b":3,"\u00e8":4,"\u012b":1,"\u00ed":2,"\u01d0":3,"\u00ec":4,"\u014d":1,"\u00f3":2,"\u01d2":3,"\u00f2":4,"\u016b":1,"\u00fa":2,"\u01d4":3,"\u00f9":4};
-  var toneNum=5,toneNames={1:"1st tone (flat \u2014)",2:"2nd tone (rising \u2197)",3:"3rd tone (dip then rise \u2198\u2197)",4:"4th tone (falling \u2198)",5:"neutral tone"};
+  var toneNum=5,toneNames={1:"1st tone (flat)",2:"2nd tone (rising)",3:"3rd tone (dip then rise)",4:"4th tone (falling)",5:"neutral tone"};
   for(var ch in tones){if(word.indexOf(ch)>-1){toneNum=tones[ch];break;}}
-  return "HANYU PINYIN\n"+word+"\n\nMEANING\nThis is Hanyu Pinyin \u2014 the romanised spelling that shows how to pronounce Chinese characters.\n\nTONE GUIDE\nThis uses the "+toneNames[toneNum]+".\n\nSPELLING\n"+word.toUpperCase().split("").join(" - ");
+  return "HANYU PINYIN\n"+word+"\n\nMEANING\nThis is Hanyu Pinyin, which shows how to pronounce a Chinese character using letters.\n\nTONE GUIDE\nThis pinyin uses the "+toneNames[toneNum]+".\n\nSPELLING\n"+word.toUpperCase().split("").join(" - ");
 }
 
 

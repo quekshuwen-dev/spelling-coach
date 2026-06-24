@@ -836,156 +836,86 @@ var WORDS = {
 
 async function fetchEnglishDef(word){
   var key = word.toLowerCase().trim();
-
-  // 1. Check built-in dictionary — always accurate for these words
-  if(WORDS[key]){
-    var entry = WORDS[key];
-    return "MEANING (" + entry[0] + ")\n" + entry[1] + "\n\nEXAMPLE\n" + entry[2] + "\n\nSPELLING\n" + key.toUpperCase().split("").join(" - ") + " (" + key.length + " letters)";
-  }
-
-  // 2. Unknown word — use dictionary API with strict filtering
   try{
     var r = await fetch("https://api.dictionaryapi.dev/api/v2/entries/en/" + encodeURIComponent(key));
-    if(!r.ok) throw new Error("\"" + word + "\" not found. Please check the spelling.");
+    if(!r.ok) throw new Error("The word \"" + word + "\" was not found. Please check the spelling.");
     var data = await r.json();
-    if(!data||!data[0]) throw new Error("No definition found.");
+    if(!data||!data[0]) throw new Error("No definition found for \"" + word + "\".");
     var entry = data[0];
-    // Skip obscure, slang, or overly technical definitions
-    var SKIP = /\bBaltimore\b|\bslang\b|\bvulgar\b|\boffensive\b|\bderogatory\b|\barchaic\b|\bdemean\b|\barrest\b|salt beef/i;
-    var POS_ORDER = ["adjective","adverb","noun","verb"];
-    var meanings = (entry.meanings||[]).slice();
-    meanings.sort(function(a,b){var ai=POS_ORDER.indexOf(a.partOfSpeech),bi=POS_ORDER.indexOf(b.partOfSpeech);return (ai<0?99:ai)-(bi<0?99:bi);});
-    var out="", shown=0;
-    for(var i=0;i<meanings.length&&shown<1;i++){
-      var defs=(meanings[i].definitions||[]).filter(function(d){return !SKIP.test(d.definition);});
-      if(!defs.length)continue;
-      defs.sort(function(a,b){return a.definition.length-b.definition.length;});
-      var def=defs[0];
-      out+="MEANING ("+meanings[i].partOfSpeech+")\n"+def.definition+"\n\n";
-      if(def.example)out+="EXAMPLE\n"+def.example+"\n\n";
-      shown++;
+    var out = "";
+    // Show all meanings — unfiltered, exactly as the dictionary says
+    var meanings = entry.meanings || [];
+    for(var i=0;i<meanings.length;i++){
+      var m = meanings[i];
+      var defs = m.definitions || [];
+      for(var j=0;j<defs.length;j++){
+        out += "MEANING (" + m.partOfSpeech + ")\n" + defs[j].definition + "\n\n";
+        if(defs[j].example) out += "EXAMPLE\n" + defs[j].example + "\n\n";
+      }
     }
-    if(!out)throw new Error("No suitable definition found for this word.");
-    out+="SPELLING\n"+key.toUpperCase().split("").join(" - ")+" ("+key.length+" letters)";
+    if(!out) throw new Error("No definitions available for this word.");
+    if(entry.phonetic) out += "PRONUNCIATION\n" + entry.phonetic + "\n\n";
+    out += "SPELLING\n" + key.toUpperCase().split("").join(" - ") + " (" + key.length + " letters)";
     return out;
-  }catch(e){
-    return "MEANING\nThis word is not in our dictionary yet. Please ask your teacher for the meaning!\n\nSPELLING\n"+key.toUpperCase().split("").join(" - ");
+  }catch(err){
+    if(err.message.indexOf("Failed to fetch")>-1 || err.message.indexOf("NetworkError")>-1){
+      return "MEANING\nCould not connect to the dictionary. Please check your internet and try again.\n\nSPELLING\n" + key.toUpperCase().split("").join(" - ");
+    }
+    return "MEANING\n" + err.message + "\n\nSPELLING\n" + key.toUpperCase().split("").join(" - ");
   }
 }
+
 
 async function fetchChineseDef(word){
-  var chars = word.split("").filter(function(ch){return /[\u4e00-\u9fff]/.test(ch);});
+  var chars = word.split("").filter(function(ch){ return /[一-鿿]/.test(ch); });
   if(!chars.length) throw new Error("No Chinese characters found.");
-  return buildLocalChineseDef(word, chars);
-}
-
-function buildLocalChineseDef(word, chars){
-  var ZH = {
-    "\u6211":["w\u01d2","I, me"],
-    "\u4f60":["n\u01d0","you"],
-    "\u4ed6":["t\u0101","he, him"],
-    "\u5979":["t\u0101","she, her"],
-    "\u597d":["h\u01ceo","good, well"],
-    "\u5927":["d\u00e0","big, large"],
-    "\u5c0f":["xi\u01ceo","small, little"],
-    "\u4e0a":["sh\u00e0ng","up, above, on top of"],
-    "\u4e0b":["xi\u00e0","down, below, under"],
-    "\u4eba":["r\u00e9n","person, people"],
-    "\u624b":["sh\u01d2u","hand"],
-    "\u6c34":["shu\u01d0","water"],
-    "\u706b":["hu\u01d2","fire"],
-    "\u5c71":["sh\u0101n","mountain"],
-    "\u65e5":["r\u00ec","sun, day"],
-    "\u6708":["yu\u00e8","moon, month"],
-    "\u6728":["m\u00f9","wood, tree"],
-    "\u5929":["ti\u0101n","sky, day, heaven"],
-    "\u5730":["d\u00ec","earth, ground, soil"],
-    "\u5fc3":["x\u012bn","heart, mind, feelings"],
-    "\u53e3":["k\u01d2u","mouth"],
-    "\u76ee":["m\u00f9","eye"],
-    "\u9b5a":["y\u00fa","fish"],
-    "\u9e1f":["ni\u01ceo","bird"],
-    "\u82b1":["hu\u0101","flower"],
-    "\u6811":["sh\u00f9","tree"],
-    "\u5b66":["xu\u00e9","to study, to learn"],
-    "\u6821":["xi\u00e0o","school"],
-    "\u5bb6":["ji\u0101","home, family, house"],
-    "\u7236":["f\u00f9","father"],
-    "\u6bcd":["m\u01d4","mother"],
-    "\u54e5":["g\u0113","older brother"],
-    "\u59d0":["ji\u011b","older sister"],
-    "\u5f1f":["d\u00ec","younger brother"],
-    "\u59b9":["m\u00e8i","younger sister"],
-    "\u5403":["ch\u012b","to eat"],
-    "\u559d":["h\u0113","to drink"],
-    "\u770b":["k\u00e0n","to look, to see, to read"],
-    "\u542c":["t\u012bng","to listen, to hear"],
-    "\u8bf4":["shu\u014d","to speak, to say"],
-    "\u5199":["xi\u011b","to write"],
-    "\u73a9":["w\u00e1n","to play"],
-    "\u8de8":["z\u01d2u","to walk"],
-    "\u8dd1":["p\u01ceo","to run"],
-    "\u7761":["shu\u00ec","to sleep"],
-    "\u591a":["du\u014d","many, much, a lot"],
-    "\u5c11":["sh\u01ceo","few, little, not much"],
-    "\u5feb":["ku\u00e0i","fast, quick, soon"],
-    "\u6162":["m\u00e0n","slow"],
-    "\u9ad8":["g\u0101o","tall, high"],
-    "\u4f4e":["d\u012b","low, short (height)"],
-    "\u7ea2":["h\u00f3ng","red"],
-    "\u9ec4":["hu\u00e1ng","yellow"],
-    "\u84dd":["l\u00e1n","blue"],
-    "\u7eff":["l\u01dc","green"],
-    "\u767d":["b\u00e1i","white"],
-    "\u9ed1":["h\u0113i","black"],
-    "\u4e00":["y\u012b","one (1)"],
-    "\u4e8c":["h\u00e8r","two (2)"],
-    "\u4e09":["s\u0101n","three (3)"],
-    "\u56db":["s\u00ec","four (4)"],
-    "\u4e94":["w\u01d4","five (5)"],
-    "\u516d":["li\u00f9","six (6)"],
-    "\u4e03":["q\u012b","seven (7)"],
-    "\u516b":["b\u0101","eight (8)"],
-    "\u4e5d":["ji\u01d4","nine (9)"],
-    "\u5341":["sh\u00ed","ten (10)"],
-    "\u767e":["b\u01cei","hundred (100)"],
-    "\u5343":["qi\u0101n","thousand (1000)"],
-    "\u4eca\u5929":["j\u012bti\u0101n","today"],
-    "\u660e\u5929":["m\u00edngti\u0101n","tomorrow"],
-    "\u6628\u5929":["zu\u00f3ti\u0101n","yesterday"],
-    "\u670b\u53cb":["p\u00e9ngyou","friend"],
-    "\u8001\u5e08":["l\u01ceo sh\u012b","teacher"],
-    "\u540c\u5b66":["t\u00f3ng xu\u00e9","classmate"],
-    "\u4f59\u4eba":["y\u00fa r\u00e9n","other people, the rest of the people"]
-  };
 
   var out = "";
-  // Check full word first
-  if(ZH[word]){
-    var info=ZH[word];
-    out += "HANYU PINYIN\n" + info[0] + "\n\n";
-    out += "MEANING\n" + info[1] + "\n\n";
-    out += "STROKE GUIDE\nTap the character button below to see the stroke order! \u270f\ufe0f";
-    return out;
-  }
-  // Break down character by character
-  var parts=[], pinyins=[];
-  chars.forEach(function(ch){
-    if(ZH[ch]){
-      parts.push("\u2022 " + ch + " (" + ZH[ch][0] + ") = " + ZH[ch][1]);
-      pinyins.push(ZH[ch][0]);
-    } else {
-      parts.push("\u2022 " + ch + " = not yet in our dictionary");
-      pinyins.push("?");
+
+  // Try live Chinese dictionary API (MDBG/CC-CEDICT via free proxy)
+  try{
+    // Use the free Chinese dictionary API from hanzidb.org for each character
+    var results = [];
+    for(var i=0;i<chars.length;i++){
+      var ch = chars[i];
+      var r = await fetch("https://api.hanzidb.org/v1/hanzi/" + encodeURIComponent(ch), {mode:"cors"});
+      if(r.ok){
+        var d = await r.json();
+        if(d && (d.definition || d.pinyin_numeric)){
+          results.push({
+            ch: ch,
+            pinyin: d.pinyin_with_tones || d.pinyin_numeric || "",
+            def: d.definition || ""
+          });
+        }
+      }
     }
-  });
-  if(pinyins.some(function(p){return p!=="?";})){
-    out += "HANYU PINYIN\n" + pinyins.join(" ") + "\n\n";
+
+    if(results.length > 0){
+      // Build pinyin line
+      var pinyins = results.map(function(r){ return r.pinyin; }).filter(Boolean);
+      if(pinyins.length) out += "HANYU PINYIN\n" + pinyins.join("  ") + "\n\n";
+
+      // Build meaning
+      out += "MEANING\n";
+      results.forEach(function(r){
+        if(r.def) out += "• " + r.ch + " — " + r.def + "\n";
+        else out += "• " + r.ch + " — (see stroke guide below)\n";
+      });
+      out += "\n";
+    } else {
+      // hanzidb returned nothing — fall back to local data
+      out += buildLocalChineseDef(word, chars);
+    }
+  }catch(apiErr){
+    // API not reachable — use local fallback
+    out += buildLocalChineseDef(word, chars);
   }
-  out += "MEANING\n" + parts.join("\n") + "\n\n";
-  out += "STROKE GUIDE\nTap each character below to see the stroke order and practise writing! \u270f\ufe0f";
+
+  out += "STROKE GUIDE\nTap each character below to see the stroke order and practise writing! ✏️";
   return out;
 }
+
 
 function buildPinyinDef(word){
   var tones={"\u0101":1,"\u00e1":2,"\u01ce":3,"\u00e0":4,"\u0113":1,"\u00e9":2,"\u011b":3,"\u00e8":4,"\u012b":1,"\u00ed":2,"\u01d0":3,"\u00ec":4,"\u014d":1,"\u00f3":2,"\u01d2":3,"\u00f2":4,"\u016b":1,"\u00fa":2,"\u01d4":3,"\u00f9":4};
@@ -1131,11 +1061,11 @@ function renderLUHist(){
   if(!luHistory.length){hc.style.display="none";return;}
   hc.style.display="block";
   hl.innerHTML=luHistory.map(function(h){
-    return"<div style=\"display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1.5px solid #f0f0f8\">"
-      +"<div style=\"font-size:18px;font-weight:800;color:var(--pu);flex:1\">"+h.word+"</div>"
-      +"<span class=\"wlang l-"+h.lang+"\" style=\"font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700\">"+h.lang.toUpperCase()+"</span>"
-      +"<button data-w=\""+h.word.replace(/"/g,"&quot;")+"\" style=\"background:var(--pul);border:none;border-radius:20px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--pud);cursor:pointer;touch-action:manipulation\">Look up again</button>"
-      +"</div>";
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1.5px solid #f0f0f8">'
+      +'<div style="font-size:18px;font-weight:800;color:var(--pu);flex:1">'+h.word+'</div>'
+      +'<span class="wlang l-'+h.lang+'" style="font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700">'+h.lang.toUpperCase()+'</span>'
+      +'<button data-w="'+h.word.replace(/'/g,"&#39;")+'" style="background:var(--pul);border:none;border-radius:20px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--pud);cursor:pointer;touch-action:manipulation">Look up again</button>'
+      +'</div>';
   }).join("");
   hl.querySelectorAll("button[data-w]").forEach(function(btn){btn.addEventListener("click",function(){doLookup(this.getAttribute("data-w"));});});
 }

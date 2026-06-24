@@ -455,6 +455,201 @@ function formatDef(text){
   return html||"<div style=\"font-size:14px;white-space:pre-wrap;color:#2D2A45\">"+text+"</div>";
 }
 
+
+// ── FREE ENGLISH DICTIONARY (no API key, CORS-open) ──
+// Uses dictionaryapi.dev which is specifically CORS-enabled
+async function fetchEnglishDef(word){
+  var url = "https://api.dictionaryapi.dev/api/v2/entries/en/" + encodeURIComponent(word.toLowerCase());
+  var r = await fetch(url);
+  if(!r.ok) throw new Error("Word \"" + word + "\" not found. Please check the spelling.");
+  var data = await r.json();
+  if(!data||!data[0]) throw new Error("No definition found for \"" + word + "\".");
+
+  var entry = data[0];
+
+  // Bad/adult-only definitions to skip
+  var BAD = /slang|vulgar|offensive|derogatory|arrest|dated\s+usage|historical\s+usage|sexual/i;
+
+  // Part-of-speech priority for kids (adjective most useful first)
+  var POS_ORDER = ["adjective","adverb","noun","verb","conjunction","preposition","pronoun"];
+  var meanings = (entry.meanings||[]).slice();
+  meanings.sort(function(a,b){
+    var ai=POS_ORDER.indexOf(a.partOfSpeech), bi=POS_ORDER.indexOf(b.partOfSpeech);
+    return (ai<0?99:ai)-(bi<0?99:bi);
+  });
+
+  // Build output
+  var out = "";
+  var shown = 0;
+  for(var i=0;i<meanings.length&&shown<2;i++){
+    var m = meanings[i];
+    var defs = (m.definitions||[]).filter(function(d){ return !BAD.test(d.definition); });
+    if(!defs.length) continue;
+    // pick the last def (most common/simple usually last)
+    var def = defs[defs.length-1];
+    out += "MEANING\n" + def.definition + "\n\n";
+    if(def.example) out += "EXAMPLE\n" + def.example + "\n\n";
+    shown++;
+  }
+
+  if(!out) throw new Error("Only adult definitions found for this word. Please try another word.");
+
+  // Synonyms as similar words
+  var syns = [];
+  (entry.meanings||[]).forEach(function(m){
+    (m.synonyms||[]).slice(0,3).forEach(function(s){ if(syns.indexOf(s)<0&&syns.length<4) syns.push(s); });
+  });
+  if(syns.length) out += "SIMILAR WORDS\n" + syns.join(", ") + "\n\n";
+
+  // Phonetic
+  if(entry.phonetic) out += "HANYU PINYIN\nHow to say it: " + entry.phonetic + "\n\n";
+
+  // Spelling tip
+  out += "SPELLING TIP\n" + word.toUpperCase().split("").join(" - ") + " (" + word.length + " letters)";
+
+  return out;
+}
+
+// ── FREE CHINESE LOOKUP ───────────────────────────────
+// Uses built-in data for common chars + Unicode Unihan for others
+async function fetchChineseDef(word){
+  var chars = word.split("").filter(function(ch){ return /[\u4e00-\u9fff]/.test(ch); });
+  if(!chars.length) throw new Error("No Chinese characters detected.");
+
+  // Built-in meanings for common Primary 1 characters
+  var ZH_DICT = {
+    "\u6211":["w\u01d2","I / me","This is how you say \"I\" or \"me\" in Chinese. It is one of the most important words!"],
+    "\u4f60":["n\u01d0","you","Use this when talking TO someone. N\u012b h\u01ceo (\u4f60\u597d) means Hello!"],
+    "\u4ed6":["t\u0101","he / him","Use this to talk about a boy or man who is not here with you."],
+    "\u5979":["t\u0101","she / her","Use this to talk about a girl or woman who is not here with you."],
+    "\u597d":["h\u01ceo","good / well","When something is good or when you feel well. N\u012b h\u01ceo means Hello!"],
+    "\u5927":["d\u00e0","big / large","The opposite of small (\u5c0f). An elephant is \u5927!"],
+    "\u5c0f":["xi\u01ceo","small / little","The opposite of big (\u5927). An ant is \u5c0f!"],
+    "\u4e0a":["sh\u00e0ng","up / above / on top","The line on TOP of \u4e0a shows it means UP!"],
+    "\u4e0b":["xi\u00e0","down / below / under","The line at the BOTTOM of \u4e0b shows it means DOWN!"],
+    "\u4eba":["r\u00e9n","person / people","This character looks like a person walking \u2014 see the two legs?"],
+    "\u624b":["sh\u01d2u","hand","This character has lines like the fingers on your hand!"],
+    "\u6c34":["shu\u01d0","water","This looks like flowing water with ripples. \ud83d\udca7"],
+    "\u706b":["hu\u01d2","fire","This looks like flames going up. \ud83d\udd25"],
+    "\u5c71":["sh\u0101n","mountain","This looks like three mountain peaks. \ud83c\udfd4\ufe0f"],
+    "\u65e5":["r\u00ec","sun / day","This looks like the sun \u2014 a box with a line in the middle. \u2600\ufe0f"],
+    "\u6708":["yu\u00e8","moon / month","This looks like a crescent moon. \ud83c\udf19"],
+    "\u6728":["m\u00f9","wood / tree","This looks like a tree with roots and branches. \ud83c\udf33"],
+    "\u706b":["hu\u01d2","fire","This looks like flames going up. \ud83d\udd25"],
+    "\u5929":["ti\u0101n","sky / heaven / day","The sky above everything. Today is \u4eca\u5929 (j\u012bti\u0101n)."],
+    "\u5730":["d\u00ec","ground / earth","The ground below our feet."],
+    "\u5fc3":["x\u012bn","heart / mind","The shape looks like a heart! \u2764\ufe0f"],
+    "\u53e3":["k\u01d2u","mouth","This little square looks like an open mouth!"],
+    "\u76ee":["m\u00f9","eye","This looks like an eye standing upright. \ud83d\udc41\ufe0f"],
+    "\u8033":["ti\u0101n","ear","How we listen to sounds. \ud83d\udc42"],
+    "\u8db3":["z\u00fa","foot / leg","Used for walking and running."],
+    "\u9b5a":["y\u00fa","fish","A fish that lives in water. \ud83d\udc1f"],
+    "\u9e1f":["ni\u01ceo","bird","A bird that flies in the sky. \ud83d\udc26"],
+    "\u82b1":["hu\u0101","flower","A beautiful flower that grows in gardens. \ud83c\udf38"],
+    "\u6811":["sh\u00f9","tree","A big plant with a trunk and branches. \ud83c\udf33"],
+    "\u8349":["c\u01ceo","grass","Green grass that grows on the ground. \ud83c\udf3f"],
+    "\u5b66":["xu\u00e9","study / learn","What you do at school every day!"],
+    "\u6821":["xi\u00e0o","school","Where you go to learn. \ud83c\udfeb"],
+    "\u5bb6":["ji\u0101","home / family","Where your family lives. \ud83c\udfe0"],
+    "\u7231":["c\u00e0i","love","A very important word. \u7231 means love! \u2764\ufe0f"],
+    "\u6765":["l\u00e1i","come","To come towards something or somewhere."],
+    "\u53bb":["q\u00f9","go","To go somewhere away from here."],
+    "\u770b":["k\u00e0n","look / see / read","To use your eyes to see something."],
+    "\u542c":["t\u012bng","listen / hear","To use your ears to hear something. \ud83d\udc42"],
+    "\u8bf4":["shu\u014d","speak / say","To use your mouth to say words."],
+    "\u5403":["ch\u012b","eat","To put food in your mouth and chew. \ud83d\ude0b"],
+    "\u559d":["h\u0113","drink","To swallow water or juice. \ud83e\udd64"],
+    "\u8de8":["z\u01d2u","walk","To move on your feet, one step at a time."],
+    "\u8dd1":["p\u01ceo","run","To move your legs very fast, faster than walking. \ud83c\udfc3"],
+    "\u5199":["xi\u011b","write","To make letters or characters with a pen. \u270f\ufe0f"],
+    "\u753b":["hu\u00e0","draw / picture","To make a picture. \ud83c\udfa8"],
+    "\u73a9":["w\u00e1n","play","What children love to do! \ud83c\udfc8"],
+    "\u7761":["shu\u00ec","sleep","To rest with your eyes closed at night. \ud83d\udca4"],
+    "\u5c0f":["xi\u01ceo","small","The opposite of big! Tiny things are \u5c0f."],
+    "\u591a":["du\u014d","many / much","When there is a lot of something."],
+    "\u5c11":["sh\u01ceo","few / little","When there is not much of something."],
+    "\u65b0":["x\u012bn","new","Something that has just been made or bought. \u2728"],
+    "\u8001":["l\u01ceo","old","Something that has existed for a long time."],
+    "\u957f":["ch\u00e1ng","long","Something that stretches far from one end to another."],
+    "\u77ed":["du\u01cen","short","The opposite of long."],
+    "\u5feb":["ku\u00e0i","fast / quick","Moving at high speed. \ud83d\udca8"],
+    "\u6162":["m\u00e0n","slow","Moving at low speed, not fast."],
+    "\u9ad8":["g\u0101o","tall / high","Very far up from the ground."],
+    "\u4f4e":["d\u012b","low / short (height)","Close to the ground, not tall."],
+    "\u7ea2":["h\u00f3ng","red","The colour of apples and roses. \ud83d\udd34"],
+    "\u9ec4":["hu\u00e1ng","yellow","The colour of the sun and bananas. \ud83d\udfe1"],
+    "\u84dd":["l\u00e1n","blue","The colour of the sky and the sea. \ud83d\udd35"],
+    "\u7eff":["l\u01dc","green","The colour of grass and leaves. \ud83d\udfe2"],
+    "\u767d":["b\u00e1i","white","The colour of clouds and snow. \u26aa"],
+    "\u9ed1":["h\u0113i","black","The darkest colour, like the night sky. \u26ab"],
+    "\u4e00":["y\u012b","one (1)","The number 1. One finger! \u261d\ufe0f"],
+    "\u4e8c":["h\u00e8r","two (2)","The number 2. Two lines!"],
+    "\u4e09":["s\u0101n","three (3)","The number 3. Three lines!"],
+    "\u56db":["s\u00ec","four (4)","The number 4."],
+    "\u4e94":["w\u01d4","five (5)","The number 5. Like five fingers on one hand! \u270b"],
+    "\u516d":["li\u00f9","six (6)","The number 6."],
+    "\u4e03":["q\u012b","seven (7)","The number 7."],
+    "\u516b":["b\u0101","eight (8)","The number 8. Lucky number in Chinese culture! \ud83c\udf80"],
+    "\u4e5d":["ji\u01d4","nine (9)","The number 9."],
+    "\u5341":["sh\u00ed","ten (10)","The number 10. This character looks like a plus sign (+)!"],
+    "\u767e":["b\u01cei","one hundred (100)","One hundred \u2014 that is a lot!"],
+    "\u5343":["qi\u0101n","one thousand (1000)","One thousand is even more than one hundred!"],
+    "\u7236":["f\u00f9","father / dad","Your father, also called \u5df4\u5df4 (b\u00e0ba). \ud83d\udc68"],
+    "\u6bcd":["m\u01d4","mother / mum","Your mother, also called \u5988\u5988 (m\u0101ma). \ud83d\udc69"],
+    "\u54e5":["g\u0113","older brother","An older brother."],
+    "\u59d0":["ji\u011b","older sister","An older sister."],
+    "\u5f1f":["d\u00ec","younger brother","A younger brother."],
+    "\u59b9":["m\u00e8i","younger sister","A younger sister."],
+    "\u670b\u53cb":["p\u00e9ngyou","friend","Someone you like to play and spend time with. \ud83d\udc6b"],
+    "\u8001\u5e08":["l\u01ceo sh\u012b","teacher","The person who teaches you at school. \ud83d\udc69\u200d\ud83c\udfeb"],
+    "\u540c\u5b66":["t\u00f3ng xu\u00e9","classmate","The friends who sit with you in class."]
+  };
+
+  var out = "";
+  if(chars.length===1&&ZH_DICT[chars[0]]){
+    var info = ZH_DICT[chars[0]];
+    out = "HANYU PINYIN\n" + info[0] + "\n\n"
+        + "MEANING\n" + info[1] + "\n\n"
+        + "FUN FACT\n" + info[2] + "\n\n"
+        + "EXAMPLE (CHINESE)\n" + chars[0] + " \u662f\u4e00\u4e2a\u5f88\u91cd\u8981\u7684\u5b57\u3002\n\n"
+        + "EXAMPLE (ENGLISH)\n" + "\"" + info[1].split("/")[0].trim() + "\" is a very important word to know!\n\n"
+        + "STROKE GUIDE\nTap the character button below to see how to write it step by step! \u270f\ufe0f";
+  } else {
+    // Multiple characters or unknown — break down each one
+    out = "MEANING\n";
+    var parts = [];
+    chars.forEach(function(ch){
+      if(ZH_DICT[ch]) parts.push(ch + " (" + ZH_DICT[ch][0] + ") = " + ZH_DICT[ch][1]);
+      else parts.push(ch + " = (tap below to learn this character)");
+    });
+    out += parts.join("\n") + "\n\n";
+    // try to get a combined meaning
+    if(ZH_DICT[word]){
+      var info=ZH_DICT[word];
+      out = "HANYU PINYIN\n"+info[0]+"\n\nMEANING\n"+info[1]+"\n\nFUN FACT\n"+info[2]+"\n\n";
+    }
+    out += "STROKE GUIDE\nTap each character below to see the stroke order animation! \u270f\ufe0f";
+  }
+  return out;
+}
+
+// ── PINYIN definition ─────────────────────────────────
+function buildPinyinDef(word){
+  var tones = {
+    "\u0101":1,"\u00e1":2,"\u01ce":3,"\u00e0":4,
+    "\u0113":1,"\u00e9":2,"\u011b":3,"\u00e8":4,
+    "\u012b":1,"\u00ed":2,"\u01d0":3,"\u00ec":4,
+    "\u014d":1,"\u00f3":2,"\u01d2":3,"\u00f2":4,
+    "\u016b":1,"\u00fa":2,"\u01d4":3,"\u00f9":4
+  };
+  var toneNum = 5, toneNames = {1:"1st tone (flat \u2014 )",2:"2nd tone (rising \u2197)",3:"3rd tone (dip \u2198\u2197)",4:"4th tone (falling \u2198)",5:"no tone (light)"};
+  for(var ch in tones){ if(word.indexOf(ch)>-1){ toneNum=tones[ch]; break; } }
+  return "MEANING\nThis is Hanyu Pinyin \u2014 the letters that show how to pronounce Chinese words.\n\n"
+    + "HANYU PINYIN\n" + word + "\n\n"
+    + "TONE GUIDE\nThis pinyin uses the " + toneNames[toneNum] + ".\n\n"
+    + "SPELLING TIP\nListen carefully to the recording and copy the sounds you hear! \ud83c\udfa7";
+}
+
 async function doLookup(rawWord){
   if(!rawWord||rawWord==="\u2014"||rawWord==="\u2026")return;
   var word=rawWord.trim().replace(/[^\w\u4e00-\u9fff\u0300-\u036f\s\-]/g,"").trim().split(/\s+/).slice(0,3).join(" ");
@@ -476,16 +671,16 @@ async function doLookup(rawWord){
   // Definition
   var defEl=document.getElementById("lu-def");
   defEl.innerHTML="<div class=\"dots\"><span></span><span></span><span></span></div> Getting the meaning\u2026";
-  var prompt;
-  if(lang==="zh"){
-    prompt="You are a Chinese teacher for Primary 1 students in Singapore (age 6-7). Explain the Chinese word: "+word+"\n\nFormat your answer with these section headings (write the heading in CAPS on its own line, then the content below):\n\nMEANING\n[Simple English meaning a 6-year-old understands, 1 sentence]\n\nHANYU PINYIN\n[Correct pinyin with tone marks]\n\nEXAMPLE (CHINESE)\n[Short simple Chinese sentence using this word]\n\nEXAMPLE (ENGLISH)\n[English translation of above]\n\nFUN FACT\n[One fun or interesting thing about this character to help kids remember it]\n\nUse simple words, be encouraging, add 1-2 emojis. Keep it short.";
-  } else if(lang==="py"){
-    prompt="You are a teacher for Primary 1 students in Singapore (age 6-7). Explain this Hanyu Pinyin: "+word+"\n\nFormat with section headings in CAPS:\n\nMEANING\n[What this pinyin means in English, simple 1 sentence]\n\nHANYU PINYIN\n[Confirm correct pinyin, note any tone errors]\n\nEXAMPLE (CHINESE)\n[Short sentence using this pinyin]\n\nEXAMPLE (ENGLISH)\n[English translation]\n\nTONE GUIDE\n[Simple explanation of the tone mark used]\n\nBe friendly and use simple language with emojis!";
-  } else {
-    prompt="You are a Cambridge Dictionary for kids. Define the English word: "+word+"\n\nThis is for a Primary 1 student in Singapore (age 6-7). Format with section headings in CAPS on their own line:\n\nMEANING\n[What the word means in ONE very simple sentence that a 6-year-old understands. Use simple everyday words only.]\n\nEXAMPLE\n[One short fun example sentence using the word in a situation a child would know]\n\nSPELLING TIP\n[A fun rhyme, memory trick, or letter-by-letter tip to remember the spelling]\n\nSIMILAR WORDS\n[2-3 other simple words with a similar meaning]\n\nUse cheerful encouraging language. Add 1-2 relevant emojis. Keep it short and easy to read. Use the most common everyday meaning of the word.";
-  }
+  // definitions fetched by free APIs below
   try{
-    var resp=await callAI([{type:"text",text:prompt}],500);
+    var resp;
+    if(lang==="en"){
+      resp = await fetchEnglishDef(word);
+    } else if(lang==="zh"){
+      resp = await fetchChineseDef(word);
+    } else {
+      resp = buildPinyinDef(word);
+    }
     defEl.innerHTML=formatDef(resp);
     luHistory.unshift({word:word,lang:lang});
     if(luHistory.length>15)luHistory.pop();

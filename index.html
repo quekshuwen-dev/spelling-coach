@@ -21,7 +21,7 @@ body{padding-bottom:82px}
 .ctitle{font-size:14px;font-weight:700;margin-bottom:.85rem;display:flex;align-items:center;gap:8px}
 .bb{width:100%;padding:18px 16px;border-radius:18px;border:none;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:var(--sh);min-height:62px;touch-action:manipulation;transition:transform .1s,opacity .1s;-webkit-appearance:none;line-height:1.2}
 .bb:active{transform:scale(.95);opacity:.85}
-.bb.pu{background:var(--pu);color:#fff}.bb.gr{background:var(--gr);color:#fff}.bb.or{background:var(--or);color:#fff}
+.bb.pu{background:var(--pu);color:#fff}.bb.gr{background:var(--gr);color:#fff}.bb.or{background:var(--or);color:#fff}.bb.re{background:var(--re);color:#fff}
 .bb.wh{background:var(--wh);color:var(--pu);border:2.5px solid var(--pu);box-shadow:none}
 .bb.sm{font-size:14px;padding:12px 16px;min-height:48px;border-radius:14px}
 .inp{width:100%;padding:14px 16px;border-radius:14px;border:2.5px solid #ddd;font-size:17px;font-family:inherit;background:var(--wh);color:var(--tx);outline:none;min-height:52px;-webkit-appearance:none}
@@ -31,7 +31,7 @@ body{padding-bottom:82px}
 .sec-body{display:none;padding-top:4px}.sec-body.open{display:block}
 .wrow{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1.5px solid #f0f0f8}.wrow:last-child{border-bottom:none}
 .wplay{width:42px;height:42px;border-radius:50%;border:none;background:var(--pul);cursor:pointer;font-size:20px;flex-shrink:0;touch-action:manipulation;display:flex;align-items:center;justify-content:center}.wplay:active{background:var(--pu)}
-.wtxt{flex:1;min-width:0}.wword{font-size:17px;font-weight:700}.wmean{font-size:12px;color:var(--tx2);margin-top:2px}
+.wtxt{flex:1;min-width:0}.wword{font-size:17px;font-weight:700}.wmeta{font-size:11px;color:var(--tx2);margin-top:2px}
 .wlang{font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700;flex-shrink:0}
 .l-en{background:#EDE7F6;color:#4527A0}.l-zh{background:#E8F5E9;color:#1B5E20}.l-py{background:#FFF3E0;color:#BF360C}
 .wdel{width:34px;height:34px;border-radius:50%;border:none;background:#ffeaea;cursor:pointer;font-size:16px;flex-shrink:0;touch-action:manipulation}
@@ -73,11 +73,65 @@ body{padding-bottom:82px}
 #toast{position:fixed;bottom:86px;left:50%;transform:translateX(-50%) translateY(8px);background:#2D2A45;color:#fff;padding:11px 22px;border-radius:30px;font-size:13px;font-weight:600;z-index:9999;max-width:88vw;text-align:center;opacity:0;transition:all .25s;pointer-events:none}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 .divider{border:none;border-top:2px solid #f0f0f8;margin:.9rem 0}.gap{height:10px}
+/* Profile selector */
+#profile-screen{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;gap:1.5rem}
+.profile-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:400px}
+.profile-card{background:var(--wh);border-radius:20px;padding:1.25rem .5rem 1rem;text-align:center;box-shadow:var(--sh);cursor:pointer;touch-action:manipulation;transition:transform .15s,box-shadow .15s;border:3px solid transparent}
+.profile-card:active{transform:scale(.95)}
+.profile-card.active-profile{border-color:var(--pu);background:var(--pul)}
+.profile-avatar{font-size:48px;display:block;margin-bottom:.4rem}
+.profile-name{font-size:14px;font-weight:700;color:var(--tx);word-break:break-word}
+.profile-count{font-size:11px;color:var(--tx2);margin-top:2px}
+/* Profile bar */
+#profile-bar{background:var(--wh);border-bottom:1.5px solid #eeeef8;padding:.5rem 1rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
+.profile-bar-name{font-size:14px;font-weight:700;color:var(--pu);display:flex;align-items:center;gap:6px}
+.profile-bar-switch{font-size:12px;color:var(--tx2);padding:6px 12px;border-radius:20px;border:1.5px solid #ddd;background:var(--wh);cursor:pointer;touch-action:manipulation}
+/* History */
+.hist-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1.5px solid #f0f0f8}
+.hist-row:last-child{border-bottom:none}
+.hist-word{font-size:16px;font-weight:700;flex:1}
+.hist-meta{font-size:10px;color:var(--tx2);display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.hist-tag{font-size:9px;padding:2px 7px;border-radius:8px;font-weight:700;background:#f0f0f8;color:var(--tx2)}
+/* Sort buttons */
+.sort-row{display:flex;gap:6px;margin-bottom:.75rem;flex-wrap:wrap}
+.sort-btn{padding:7px 13px;border-radius:20px;border:1.5px solid #ddd;background:var(--wh);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;touch-action:manipulation;color:var(--tx2)}
+.sort-btn.on{background:var(--pu);border-color:var(--pu);color:#fff}
+/* Scan pick list */
+.pick-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1.5px solid #f0f0f8}
+.pick-row:last-child{border-bottom:none}
+.pick-cb{width:22px;height:22px;accent-color:var(--pu);cursor:pointer;flex-shrink:0}
+.pick-word{font-size:16px;font-weight:700;flex:1}
+/* Stroke modal */
+#stroke-modal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:1rem}
+#stroke-modal.open{display:flex}
 </style>
 </head>
 <body>
+<!-- PROFILE SELECTION SCREEN -->
+<div id="profile-screen">
+  <div style="text-align:center;margin-bottom:.5rem">
+    <span style="font-size:64px;display:block;animation:bob 2.5s ease-in-out infinite">🦉</span>
+    <h1 style="font-size:28px;font-weight:800;color:var(--pu);margin-top:.5rem">Spelling Coach</h1>
+    <p style="font-size:14px;color:var(--tx2);margin-top:4px">Who is learning today?</p>
+  </div>
+  <div class="profile-grid" id="profile-grid"></div>
+  <button class="bb wh sm" onclick="openProfileEdit()" style="width:auto;padding:10px 20px;font-size:13px;min-height:44px">✏️ Edit Names</button>
+</div>
+
+<!-- PROFILE EDIT MODAL -->
+<div id="profile-edit-modal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:1.5rem">
+  <div style="background:var(--wh);border-radius:24px;padding:1.5rem;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.4)">
+    <div style="font-size:18px;font-weight:800;color:var(--pu);margin-bottom:1rem">✏️ Edit Child Names</div>
+    <div id="profile-edit-list"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:1rem">
+      <button class="bb wh sm" onclick="closeProfileEdit()">Cancel</button>
+      <button class="bb pu sm" onclick="saveProfileNames()">✅ Save</button>
+    </div>
+  </div>
+</div>
+
 <!-- STROKE MODAL -->
-<div id="stroke-modal" onclick="if(event.target===this)closeStrokeModal()" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:1rem">
+<div id="stroke-modal" onclick="if(event.target===this)closeStrokeModal()">
   <div style="background:#fff;border-radius:24px;padding:1.5rem;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.4)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
       <div><div style="font-size:12px;font-weight:700;color:var(--tx2);text-transform:uppercase;margin-bottom:4px">Learning to write</div><div id="stroke-char-title" style="font-size:36px;font-weight:800;color:var(--pu)"></div></div>
@@ -104,9 +158,19 @@ body{padding-bottom:82px}
     </div>
   </div>
 </div>
+
+<!-- PROFILE BAR (shown when in app) -->
+<div id="profile-bar" style="display:none">
+  <div class="profile-bar-name">
+    <span id="profile-bar-avatar">🦉</span>
+    <span id="profile-bar-name">Charlotte</span>
+  </div>
+  <button class="profile-bar-switch" onclick="showProfileScreen()">Switch Child</button>
+</div>
+
 <!-- PAGE 1: WORDS -->
 <div class="pg on" id="pg-words">
-  <div class="hdr"><span class="ico">🦉</span><h1>My Spelling Words</h1><p>Add your words to practise today! 🌈</p></div>
+  <div class="hdr"><span class="ico">📚</span><h1>My Spelling Words</h1><p id="words-subhead">Add your words to practise today! 🌈</p></div>
   <div class="card">
     <button class="sec-btn" onclick="toggleSec('s-photo')"><span>📷 &nbsp;Scan photo of list</span><i class="arr">▼</i></button>
     <div class="sec-body" id="s-photo">
@@ -137,7 +201,7 @@ body{padding-bottom:82px}
     <div class="sec-body" id="s-sample"><div style="display:flex;flex-direction:column;gap:8px;padding-top:4px"><button class="bb pu sm" onclick="loadS('en')">📖 English Primary 1</button><button class="bb gr sm" onclick="loadS('zh')">📖 Chinese 华文</button><button class="bb or sm" onclick="loadS('py')">📖 Hanyu Pinyin</button></div></div>
   </div>
   <div class="card" id="wl-card" style="display:none">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem"><div class="ctitle" style="margin:0">📝 Words added (<span id="wc">0</span>)</div><button class="bb wh sm" onclick="clearAll()" style="width:auto;padding:8px 14px;font-size:13px;min-height:38px">Clear all</button></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem"><div class="ctitle" style="margin:0">📝 Today's words (<span id="wc">0</span>)</div><button class="bb wh sm" onclick="clearSession()" style="width:auto;padding:8px 14px;font-size:13px;min-height:38px">Clear list</button></div>
     <p style="font-size:12px;color:var(--tx2);margin-bottom:.75rem">Tap 🔊 to hear. Tap ✕ to remove.</p>
     <div id="word-list"></div>
     <div class="divider"></div>
@@ -146,6 +210,7 @@ body{padding-bottom:82px}
     <button class="bb gr" onclick="goP('pg-test')" style="font-size:18px">🎮 START!</button>
   </div>
 </div>
+
 <!-- PAGE 2: TEST -->
 <div class="pg" id="pg-test">
   <div class="hdr"><span class="ico">👂</span><h1>Listen &amp; Write!</h1><p>Tap the big button, hear the word,<br>write it on your paper! ✏️</p></div>
@@ -161,9 +226,10 @@ body{padding-bottom:82px}
   </div>
   <div style="text-align:center"><button class="bb wh sm" onclick="goP('pg-words')" style="width:auto;padding:10px 22px">← Back</button></div>
 </div>
+
 <!-- PAGE 3: MARK -->
 <div class="pg" id="pg-mark">
-  <div class="hdr"><span class="ico">📸</span><h1>Check My Work!</h1><p>Take a photo of your writing<br>to see how you did! 🌟</p></div>
+  <div class="hdr"><span class="ico">📸</span><h1>Check My Work!</h1><p>Take a photo of your writing to see how you did! 🌟</p></div>
   <div class="card"><label class="upzone"><input type="file" accept="image/*" onchange="markUp(event)"><span class="upzone-ico">📷</span><div class="upzone-t">Tap to upload your answers</div><div class="upzone-s">Take a clear photo of your writing</div></label></div>
   <div id="mark-prev" style="display:none">
     <div class="card"><img id="mark-img" class="prev-img" src="" alt=""><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="bb pu" onclick="doMark()" id="mark-btn" style="font-size:16px;flex:1">🪄 Mark My Work!</button><button class="bb wh sm" onclick="clearMark()" style="width:auto;padding:10px 14px">🔄</button></div></div>
@@ -171,6 +237,7 @@ body{padding-bottom:82px}
   </div>
   <div style="text-align:center"><button class="bb wh sm" onclick="goP('pg-test')" style="width:auto;padding:10px 22px">← Back</button></div>
 </div>
+
 <!-- PAGE 4: RESULTS -->
 <div class="pg" id="pg-results">
   <div class="hdr"><span class="ico" id="r-ico">🏆</span><h1 id="r-title">Well Done!</h1><p id="r-msg" style="font-size:15px;font-weight:600;color:var(--pu)"></p></div>
@@ -178,6 +245,7 @@ body{padding-bottom:82px}
   <div class="card"><div class="ctitle">📋 Words in this test</div><div id="r-hist"></div></div>
   <div style="display:flex;flex-direction:column;gap:10px"><button class="bb pu" onclick="goP('pg-test')" style="font-size:17px">🔁 Play Again!</button><button class="bb wh" onclick="goP('pg-words')" style="font-size:16px">📚 Change Word List</button></div>
 </div>
+
 <!-- PAGE 5: LOOKUP -->
 <div class="pg" id="pg-lookup">
   <div class="hdr"><span class="ico">🔍</span><h1>Word Lookup</h1><p>Type any word — hear it and learn its meaning! 📖</p></div>
@@ -185,6 +253,23 @@ body{padding-bottom:82px}
     <div class="ctitle" style="color:#7D5A00">👨‍👩‍👧 Parent types for child</div>
     <p style="font-size:13px;color:var(--tx2);margin-bottom:.85rem;line-height:1.6">Type a word below — the app reads it aloud and shows the meaning!</p>
     <div style="display:flex;gap:8px"><input class="inp" id="parent-inp" placeholder="Type any word (English or Chinese)…" onkeydown="if(event.key==='Enter')parentLookup()"><button class="bb pu sm" onclick="parentLookup()" style="flex-shrink:0;width:58px;font-size:22px;padding:0;min-height:52px">▶️</button></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">📷 Scan &amp; Pick Words</div>
+    <p style="font-size:13px;color:var(--tx2);margin-bottom:.85rem;line-height:1.6">Take a photo of any word list — tick the words you want to add!</p>
+    <label class="upzone"><input type="file" accept="image/*" onchange="scanPickUp(event)"><span class="upzone-ico">📷</span><div class="upzone-t">Tap to scan a word list</div><div class="upzone-s">Choose from gallery or take a photo</div></label>
+    <div id="scan-pick-prev" style="display:none;margin-top:12px">
+      <img id="scan-pick-img" class="prev-img" src="" alt="">
+      <button class="bb pu" onclick="doScanPick()" id="scan-pick-btn">🪄 Detect Words</button>
+      <div id="scan-pick-result" style="display:none;margin-top:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-size:14px;font-weight:700;color:var(--tx)">Tick the words to add:</div>
+          <div style="display:flex;gap:6px"><button class="sort-btn" onclick="pickSelectAll()">All</button><button class="sort-btn" onclick="pickSelectNone()">None</button></div>
+        </div>
+        <div id="scan-pick-list"></div>
+        <div style="margin-top:12px"><button class="bb gr" id="scan-pick-add-btn" onclick="addPickedWords()">➕ Add Selected Words</button></div>
+      </div>
+    </div>
   </div>
   <div class="card">
     <div class="ctitle">🎤 Or speak the word</div>
@@ -211,59 +296,230 @@ body{padding-bottom:82px}
     </div>
     <div style="margin-top:1rem"><button class="bb gr" id="lu-add-btn" onclick="addLUWord()" style="font-size:15px;min-height:54px">➕ Add to my spelling list</button></div>
   </div>
-  <div class="card" id="lu-hist-card" style="display:none">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem"><div class="ctitle" style="margin:0">📚 Words I looked up</div><button class="bb wh sm" onclick="clearLUHist()" style="width:auto;padding:6px 12px;font-size:12px;min-height:34px">Clear</button></div>
-    <div id="lu-hist-list"></div>
-    <div style="margin-top:1rem"><button class="bb or" onclick="addAllLU()" style="font-size:15px">➕ Add ALL to spelling list</button></div>
+</div>
+
+<!-- PAGE 6: HISTORY -->
+<div class="pg" id="pg-history">
+  <div class="hdr"><span class="ico">📖</span><h1>Spelling History</h1><p id="hist-subhead">Words saved for the last 14 days</p></div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+      <div class="ctitle" style="margin:0">📋 All words (<span id="hist-count">0</span>)</div>
+      <button class="bb re sm" onclick="confirmClearHistory()" style="width:auto;padding:8px 14px;font-size:13px;min-height:38px">🗑️ Clear</button>
+    </div>
+    <div class="sort-row">
+      <button class="sort-btn on" id="sort-new" onclick="setSort('new')">Newest</button>
+      <button class="sort-btn" id="sort-old" onclick="setSort('old')">Oldest</button>
+      <button class="sort-btn" id="sort-az" onclick="setSort('az')">A→Z</button>
+    </div>
+    <div id="hist-list"></div>
+    <div id="hist-empty" style="text-align:center;padding:2rem 0;color:var(--tx2);font-size:14px;display:none">No words yet! Add words and they will appear here.</div>
+  </div>
+  <div class="card" style="background:var(--pul)">
+    <div class="ctitle">➕ Add history words to today's list</div>
+    <p style="font-size:13px;color:var(--tx2);margin-bottom:.85rem">Tick words from history and add them to today's spelling test:</p>
+    <div id="hist-pick-list"></div>
+    <div style="margin-top:10px;display:flex;gap:8px">
+      <button class="bb wh sm" onclick="histPickAll()">All</button>
+      <button class="bb wh sm" onclick="histPickNone()">None</button>
+      <button class="bb gr" onclick="addHistPicked()" style="flex:1">➕ Add Selected</button>
+    </div>
   </div>
 </div>
-<!-- Tab bar -->
+
+<!-- TAB BAR -->
 <div class="tbar">
   <button class="ti on" id="tb-words" onclick="goP('pg-words')"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>WORDS</span></button>
   <button class="ti" id="tb-test" onclick="goP('pg-test')"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg><span>TEST</span></button>
   <button class="ti" id="tb-mark" onclick="goP('pg-mark')"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>MARK</span></button>
   <button class="ti" id="tb-results" onclick="goP('pg-results')"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><span>RESULTS</span></button>
   <button class="ti" id="tb-lookup" onclick="goP('pg-lookup')"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35M11 8v6M8 11h6"/></svg><span>LOOKUP</span></button>
+  <button class="ti" id="tb-history" onclick="goP('pg-history')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span>HISTORY</span></button>
 </div>
 <div id="toast"></div>
 <script>
-// State
-var W=[],dictOrder=[],dictIdx=0,testOrd="seq",score=null;
-var scanData=null,markData=null,wordShown=false;
-var micRec=null,micOn=false,voiceLang="en-SG",heardWord="";
-var luMicRec=null,luMicOn=false,luLang="en-SG",currentLUWord="",luHistory=[];
-var hwWriter=null,strokeChars=[],strokeIdx=0;
+// ═══════════════════════════════════════════════════════════════
+// SPELLING COACH — Multi-Profile Edition
+// ═══════════════════════════════════════════════════════════════
 
-// Samples
+// ── Profile System ────────────────────────────────────────────
+var DEFAULT_PROFILES = [
+  {id:"p1", name:"Charlotte", avatar:"👧"},
+  {id:"p2", name:"Kyler",     avatar:"👦"},
+  {id:"p3", name:"My Child",  avatar:"🌟"}
+];
+var HISTORY_DAYS = 14;
+var currentProfileId = null;
+
+// Load profiles from storage, or use defaults
+function loadProfiles(){
+  try{
+    var raw = localStorage.getItem("sc_profiles");
+    return raw ? JSON.parse(raw) : DEFAULT_PROFILES.map(function(p){return Object.assign({},p);});
+  }catch(e){ return DEFAULT_PROFILES.map(function(p){return Object.assign({},p);}); }
+}
+function saveProfiles(profiles){
+  try{ localStorage.setItem("sc_profiles", JSON.stringify(profiles)); }catch(e){}
+}
+function getProfile(id){
+  return loadProfiles().find(function(p){return p.id===id;}) || null;
+}
+
+// ── History (localStorage per profile) ───────────────────────
+// Each entry: {word, lang, source, addedAt}
+// source: "typed" | "speech" | "lookup" | "scan"
+function histKey(pid){ return "sc_hist_" + pid; }
+
+function loadHistory(pid){
+  try{
+    var raw = localStorage.getItem(histKey(pid));
+    var items = raw ? JSON.parse(raw) : [];
+    // Prune older than 14 days
+    var cutoff = Date.now() - HISTORY_DAYS * 86400000;
+    return items.filter(function(i){ return i.addedAt > cutoff; });
+  }catch(e){ return []; }
+}
+function saveHistory(pid, items){
+  try{ localStorage.setItem(histKey(pid), JSON.stringify(items)); }catch(e){}
+}
+function addToHistory(word, lang, source){
+  if(!currentProfileId) return;
+  var hist = loadHistory(currentProfileId);
+  // Avoid duplicates — update timestamp if word already exists
+  var existing = hist.findIndex(function(i){ return i.word===word; });
+  var entry = {word:word, lang:lang, source:source||"typed", addedAt:Date.now()};
+  if(existing>-1) hist[existing] = entry;
+  else hist.unshift(entry);
+  saveHistory(currentProfileId, hist);
+}
+function clearHistoryForProfile(pid){
+  try{ localStorage.removeItem(histKey(pid)); }catch(e){}
+}
+
+// ── Session word list (current words for test) ────────────────
+function sessionKey(pid){ return "sc_session_" + pid; }
+function loadSession(pid){
+  try{
+    var raw = localStorage.getItem(sessionKey(pid));
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){ return []; }
+}
+function saveSession(){
+  if(!currentProfileId) return;
+  try{ localStorage.setItem(sessionKey(currentProfileId), JSON.stringify(W)); }catch(e){}
+}
+
+// ── App State ─────────────────────────────────────────────────
+var W=[], dictOrder=[], dictIdx=0, testOrd="seq", score=null;
+var scanData=null, markData=null, wordShown=false;
+var micRec=null, micOn=false, voiceLang="en-SG", heardWord="";
+var luMicRec=null, luMicOn=false, luLang="en-SG", currentLUWord="";
+var hwWriter=null, strokeChars=[], strokeIdx=0;
+var scanPickData=null, scanPickedWords=[];
+var histSort="new";
+
 var SAMPLES={
   en:[{t:"cat",m:"a small furry pet"},{t:"dog",m:"a pet that barks"},{t:"run",m:"to move fast"},{t:"sun",m:"the big star"},{t:"hat",m:"worn on your head"},{t:"sit",m:"rest on a chair"},{t:"cup",m:"you drink from this"},{t:"bed",m:"you sleep here"},{t:"big",m:"very large"},{t:"red",m:"a bright colour"}],
   zh:[{t:"\u6211",m:"w\u01d2 \u2014 I/me"},{t:"\u4f60",m:"n\u01d0 \u2014 you"},{t:"\u4ed6",m:"t\u0101 \u2014 he"},{t:"\u597d",m:"h\u01ceo \u2014 good"},{t:"\u5927",m:"d\u00e0 \u2014 big"},{t:"\u5c0f",m:"xi\u01ceo \u2014 small"},{t:"\u4eba",m:"r\u00e9n \u2014 person"},{t:"\u6c34",m:"shu\u01d0 \u2014 water"},{t:"\u706b",m:"hu\u01d2 \u2014 fire"},{t:"\u5c71",m:"sh\u0101n \u2014 mountain"}],
   py:[{t:"m\u0101o",m:"\u732b cat"},{t:"g\u01d2u",m:"\u72d7 dog"},{t:"shu\u01d0",m:"\u6c34 water"},{t:"hu\u01d2",m:"\u706b fire"},{t:"r\u00e9n",m:"\u4eba person"},{t:"sh\u01d2u",m:"\u624b hand"},{t:"d\u00e0",m:"\u5927 big"},{t:"xi\u01ceo",m:"\u5c0f small"},{t:"sh\u0101n",m:"\u5c71 mountain"},{t:"yu\u00e8",m:"\u6708 moon"}]
 };
 
-// Toast
+// ── Profile Screen ────────────────────────────────────────────
+function renderProfileGrid(){
+  var profiles = loadProfiles();
+  var grid = document.getElementById("profile-grid");
+  grid.innerHTML = profiles.map(function(p){
+    var hist = loadHistory(p.id);
+    var session = loadSession(p.id);
+    return '<div class="profile-card" onclick="selectProfile(\''+p.id+'\')">'
+      +'<span class="profile-avatar">'+p.avatar+'</span>'
+      +'<div class="profile-name">'+p.name+'</div>'
+      +'<div class="profile-count">'+hist.length+' words saved</div>'
+      +(session.length?'<div class="profile-count">'+session.length+' in today\'s list</div>':'')
+      +'</div>';
+  }).join("");
+}
+
+function showProfileScreen(){
+  renderProfileGrid();
+  document.getElementById("profile-screen").style.display="flex";
+  document.getElementById("profile-bar").style.display="none";
+  document.querySelectorAll(".pg").forEach(function(p){p.classList.remove("on");});
+  document.querySelectorAll(".tbar").forEach(function(t){t.style.display="none";});
+}
+
+function selectProfile(pid){
+  currentProfileId = pid;
+  try{ localStorage.setItem("sc_last_profile", pid); }catch(e){}
+  var profile = getProfile(pid);
+  if(profile){
+    document.getElementById("profile-bar-avatar").textContent = profile.avatar;
+    document.getElementById("profile-bar-name").textContent = profile.name;
+    document.getElementById("words-subhead").textContent = profile.name + "'s words \u2014 practise today! \ud83c\udf08";
+    document.getElementById("hist-subhead").textContent = profile.name + "'s words (last 14 days)";
+  }
+  // Restore session
+  W = loadSession(pid);
+  renderW();
+  document.getElementById("profile-screen").style.display="none";
+  document.getElementById("profile-bar").style.display="flex";
+  document.querySelector(".tbar").style.display="flex";
+  document.querySelectorAll(".pg").forEach(function(p){p.classList.remove("on");});
+  document.getElementById("pg-words").classList.add("on");
+  document.querySelectorAll(".ti").forEach(function(t){t.classList.remove("on");});
+  document.getElementById("tb-words").classList.add("on");
+}
+
+function openProfileEdit(){
+  var profiles = loadProfiles();
+  var list = document.getElementById("profile-edit-list");
+  list.innerHTML = profiles.map(function(p,i){
+    return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
+      +'<span style="font-size:28px">'+p.avatar+'</span>'
+      +'<input class="inp" id="pe-name-'+i+'" value="'+p.name+'" placeholder="Child name" style="min-height:44px;font-size:15px">'
+      +'</div>';
+  }).join("");
+  document.getElementById("profile-edit-modal").style.display="flex";
+}
+function closeProfileEdit(){
+  document.getElementById("profile-edit-modal").style.display="none";
+}
+function saveProfileNames(){
+  var profiles = loadProfiles();
+  profiles.forEach(function(p,i){
+    var inp = document.getElementById("pe-name-"+i);
+    if(inp) p.name = inp.value.trim() || p.name;
+  });
+  saveProfiles(profiles);
+  closeProfileEdit();
+  renderProfileGrid();
+  toast("\u2705 Names saved!");
+}
+
+// ── Toast ─────────────────────────────────────────────────────
 function toast(msg){var t=document.getElementById("toast");t.textContent=msg;t.classList.add("on");clearTimeout(window._tt);window._tt=setTimeout(function(){t.classList.remove("on");},3200);}
 
-// Section toggles
+// ── Sections ──────────────────────────────────────────────────
 function toggleSec(id){var b=document.getElementById(id),btn=b.previousElementSibling,was=b.classList.contains("open");document.querySelectorAll(".sec-body").forEach(function(x){x.classList.remove("open");});document.querySelectorAll(".sec-btn").forEach(function(x){x.classList.remove("open");});if(!was){b.classList.add("open");btn.classList.add("open");}}
 
-// Page nav
-var PT={"pg-words":"tb-words","pg-test":"tb-test","pg-mark":"tb-mark","pg-results":"tb-results","pg-lookup":"tb-lookup"};
+// ── Page Nav ──────────────────────────────────────────────────
+var PT={"pg-words":"tb-words","pg-test":"tb-test","pg-mark":"tb-mark","pg-results":"tb-results","pg-lookup":"tb-lookup","pg-history":"tb-history"};
 function goP(id){
-  if(id!=="pg-words"&&id!=="pg-lookup"&&W.length===0){toast("Please add some words first! \ud83d\ude0a");return;}
+  var noWords=["pg-words","pg-lookup","pg-history"];
+  if(noWords.indexOf(id)===-1 && W.length===0){toast("Please add some words first! \ud83d\ude0a");return;}
   document.querySelectorAll(".pg").forEach(function(p){p.classList.remove("on");});
   document.getElementById(id).classList.add("on");
   document.querySelectorAll(".ti").forEach(function(t){t.classList.remove("on");});
   var tb=document.getElementById(PT[id]);if(tb)tb.classList.add("on");
   window.scrollTo({top:0,behavior:"smooth"});
-  if(id==="pg-test")initDict();
-  if(id==="pg-results")renderRes();
+  if(id==="pg-test") initDict();
+  if(id==="pg-results") renderRes();
+  if(id==="pg-history") renderHistory();
 }
 
-// Language detect
+// ── Language detect ───────────────────────────────────────────
 function getLang(w){if(/[\u4e00-\u9fff]/.test(w))return "zh";if(/[\u0101\u00e1\u01ce\u00e0\u0113\u00e9\u011b\u00e8\u012b\u00ed\u01d0\u00ec\u014d\u00f3\u01d2\u00f2\u016b\u00fa\u01d4\u00f9\u01d6\u01d8\u01da\u01dc]/.test(w))return "py";return "en";}
 
-// Speech
+// ── Speech ────────────────────────────────────────────────────
 function speak(text,lang){
   if(!window.speechSynthesis)return;
   try{
@@ -272,31 +528,42 @@ function speak(text,lang){
     u.rate=0.7;u.volume=1.0;
     u.lang=(lang==="zh"||lang==="py")?"zh-CN":"en-US";
     var vs=window.speechSynthesis.getVoices();
-    var fv=vs.find(function(v){return /female|zira|samantha|karen/i.test(v.name)&&v.lang.indexOf(u.lang.slice(0,2))===0;})||vs.find(function(v){return v.lang===u.lang;});
+    var fv=vs.find(function(v){return /female|samantha|karen|zira/i.test(v.name)&&v.lang.indexOf(u.lang.slice(0,2))===0;})||vs.find(function(v){return v.lang===u.lang;});
     if(fv)u.voice=fv;
     window.speechSynthesis.speak(u);
   }catch(e){}
 }
 
-// Words
-function addW(t,m){t=t.trim();if(!t)return;if(W.find(function(w){return w.t===t;})){toast('"'+t+'" already added');return;}W.push({t:t,l:getLang(t),m:m||""});renderW();}
-function delW(i){W.splice(i,1);renderW();}
-function clearAll(){W=[];renderW();}
+// ── Words ─────────────────────────────────────────────────────
+function addW(t,m,source){
+  t=t.trim();if(!t)return;
+  if(W.find(function(w){return w.t===t;})){toast('"'+t+'" already in list');return;}
+  var lang=getLang(t);
+  W.push({t:t,l:lang,m:m||""});
+  addToHistory(t, lang, source||"typed");
+  saveSession();
+  renderW();
+}
+function delW(i){W.splice(i,1);saveSession();renderW();}
+function clearSession(){
+  if(!confirm("Clear today's word list? (History is kept)")) return;
+  W=[];saveSession();renderW();
+}
 function setOrd(o){testOrd=o;document.getElementById("ord-seq").classList.toggle("on",o==="seq");document.getElementById("ord-mix").classList.toggle("on",o==="mix");}
-function typeAdd(){var i=document.getElementById("tinp");addW(i.value,"");i.value="";}
-function loadS(l){SAMPLES[l].forEach(function(s){addW(s.t,s.m);});toast("\u2705 Sample words loaded!");}
+function typeAdd(){var i=document.getElementById("tinp");addW(i.value,"","typed");i.value="";}
+function loadS(l){SAMPLES[l].forEach(function(s){addW(s.t,s.m,"typed");});toast("\u2705 Sample words loaded!");}
 function renderW(){
   document.getElementById("wc").textContent=W.length;
   document.getElementById("wl-card").style.display=W.length?"block":"none";
   document.getElementById("word-list").innerHTML=W.map(function(w,i){
-    return "<div class=\"wrow\"><button class=\"wplay\" onclick=\"speak('"+w.t.replace(/'/g,"\\'")+"','"+w.l+"')"+"\">\ud83d\udd0a</button>"
-      +"<div class=\"wtxt\"><div class=\"wword\">"+w.t+"</div>"+(w.m?"<div class=\"wmean\">"+w.m+"</div>":"")+"</div>"
-      +"<span class=\"wlang l-"+w.l+"\">"+w.l.toUpperCase()+"</span>"
-      +"<button class=\"wdel\" onclick=\"delW("+i+")\">&#x2715;</button></div>";
+    return '<div class="wrow"><button class="wplay" onclick="speak(\''+w.t.replace(/'/g,"\\'")+'\',\''+w.l+'\')">🔊</button>'
+      +'<div class="wtxt"><div class="wword">'+w.t+'</div>'+(w.m?'<div class="wmeta">'+w.m+'</div>':'')+'</div>'
+      +'<span class="wlang l-'+w.l+'">'+w.l.toUpperCase()+'</span>'
+      +'<button class="wdel" onclick="delW('+i+')">&#x2715;</button></div>';
   }).join("");
 }
 
-// Mic add words
+// ── Mic (add words) ───────────────────────────────────────────
 function setVLang(l){voiceLang=l;document.getElementById("lp-en").classList.toggle("on",l==="en-SG");document.getElementById("lp-zh").classList.toggle("on",l==="zh-CN");}
 function toggleMic(){
   if(micOn){stopMic();return;}
@@ -313,26 +580,79 @@ function toggleMic(){
   try{micRec.start();}catch(e){l.textContent="Could not start mic.";micOn=false;b.classList.remove("rec");}
 }
 function stopMic(){micOn=false;if(micRec){try{micRec.stop();}catch(_){}micRec=null;}document.getElementById("mic-btn").classList.remove("rec");}
-function confirmVoice(){if(!heardWord)return;heardWord.split(/[,\s]+/).filter(Boolean).forEach(function(p){addW(p.trim(),"");});document.getElementById("mic-heard").textContent="\u2705 Added!";document.getElementById("mic-lbl").textContent="Tap mic to add another!";document.getElementById("mic-add").style.display="none";document.getElementById("mic-retry").style.display="none";heardWord="";}
+function confirmVoice(){if(!heardWord)return;heardWord.split(/[,\s]+/).filter(Boolean).forEach(function(p){addW(p.trim(),"","speech");});document.getElementById("mic-heard").textContent="\u2705 Added!";document.getElementById("mic-lbl").textContent="Tap mic to add another!";document.getElementById("mic-add").style.display="none";document.getElementById("mic-retry").style.display="none";heardWord="";}
 function retryVoice(){heardWord="";document.getElementById("mic-heard").textContent="\u2014";document.getElementById("mic-lbl").textContent="Tap the mic and say a word";document.getElementById("mic-add").style.display="none";document.getElementById("mic-retry").style.display="none";}
 
-// Scan
+// ── Scan (words page) ─────────────────────────────────────────
 function scanUp(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){scanData=ev.target.result;document.getElementById("scan-img").src=scanData;document.getElementById("scan-prev").style.display="block";document.getElementById("scan-out").style.display="none";};r.readAsDataURL(f);e.target.value="";}
 async function doScan(){
-  if(!scanData)return;if(!navigator.onLine){toast("No internet. Please connect.");return;}
+  if(!scanData)return;
   var btn=document.getElementById("scan-btn");btn.disabled=true;btn.textContent="\u23f3 Reading\u2026";
   document.getElementById("scan-out").style.display="block";
-  var st=document.getElementById("scan-txt");st.innerHTML="<div class=\"dots\"><span></span><span></span><span></span></div> Reading list\u2026";
+  var st=document.getElementById("scan-txt");st.innerHTML='<div class="dots"><span></span><span></span><span></span></div> Reading list\u2026';
   try{
-    var resp=await callAI([{type:"image",source:{type:"base64",media_type:"image/jpeg",data:scanData.split(",")[1]}},{type:"text",text:"You are helping a Primary 1 student in Singapore. The image shows their school spelling or \u542c\u5199 word list. Read every word. For EACH item: number it, write the word exactly as shown, if Chinese add Hanyu Pinyin with tone marks and simple English meaning, if English add simple meaning a 7-year-old understands. Be friendly. On the LAST LINE write exactly: WORDS: word1, word2, word3"}]);
+    var resp=await callAI([{type:"image",source:{type:"base64",media_type:"image/jpeg",data:scanData.split(",")[1]}},{type:"text",text:"You are helping a student in Singapore. The image shows a school spelling or \u542c\u5199 word list. Read every word. For EACH item: number it, write the word exactly as shown, if Chinese add Hanyu Pinyin with tone marks and simple English meaning, if English add a simple meaning. Be friendly. On the LAST LINE write exactly: WORDS: word1, word2, word3"}]);
     var m=resp.match(/WORDS:\s*(.+)/i);
-    if(m){var ws=m[1].split(/[,\uff0c]+/).map(function(w){return w.trim();}).filter(Boolean);ws.forEach(function(w){addW(w,"");});st.textContent=resp.replace(/WORDS:.+/i,"").trim()+"\n\n\u2705 "+ws.length+" words added!";}
+    if(m){var ws=m[1].split(/[,\uff0c]+/).map(function(w){return w.trim();}).filter(Boolean);ws.forEach(function(w){addW(w,"","scan");});st.textContent=resp.replace(/WORDS:.+/i,"").trim()+"\n\n\u2705 "+ws.length+" words added!";}
     else st.textContent=resp;
   }catch(e){st.textContent="Could not read photo. Try a clearer image.\n\nError: "+e.message;}
   btn.disabled=false;btn.textContent="\ud83e\ude84 Read This List!";
 }
 
-// Dictation
+// ── Scan & Pick (lookup page) ─────────────────────────────────
+function scanPickUp(e){
+  var f=e.target.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(ev){
+    scanPickData=ev.target.result;
+    document.getElementById("scan-pick-img").src=scanPickData;
+    document.getElementById("scan-pick-prev").style.display="block";
+    document.getElementById("scan-pick-result").style.display="none";
+  };
+  r.readAsDataURL(f);e.target.value="";
+}
+async function doScanPick(){
+  if(!scanPickData)return;
+  var btn=document.getElementById("scan-pick-btn");btn.disabled=true;btn.textContent="\u23f3 Detecting words\u2026";
+  try{
+    var resp=await callAI([
+      {type:"image",source:{type:"base64",media_type:"image/jpeg",data:scanPickData.split(",")[1]}},
+      {type:"text",text:"You are a spelling assistant for students in Singapore (Primary 1 to 6). Look at this image and extract every word or phrase that appears to be a vocabulary or spelling word. Include both English and Chinese words. Return ONLY a comma-separated list of the exact words as they appear in the image, nothing else. Example: cat, dog, \u5927, \u5c0f, friend, together"}
+    ]);
+    var words=resp.split(/[,\uff0c\n]+/).map(function(w){return w.trim().replace(/^\d+[\.\)]\s*/,"");}).filter(function(w){return w.length>0&&w.length<30;});
+    scanPickedWords=words;
+    renderScanPickList(words);
+    document.getElementById("scan-pick-result").style.display="block";
+    document.getElementById("scan-pick-add-btn").textContent="\u2795 Add Selected Words ("+words.length+" found)";
+  }catch(e){
+    toast("Could not detect words. Please try a clearer photo.");
+  }
+  btn.disabled=false;btn.textContent="\ud83e\ude84 Detect Words";
+}
+function renderScanPickList(words){
+  var el=document.getElementById("scan-pick-list");
+  el.innerHTML=words.map(function(w,i){
+    return '<div class="pick-row">'
+      +'<input type="checkbox" class="pick-cb" id="pick-'+i+'" checked>'
+      +'<label for="pick-'+i+'" class="pick-word">'+w+'</label>'
+      +'<span class="wlang l-'+getLang(w)+'">'+getLang(w).toUpperCase()+'</span>'
+      +'</div>';
+  }).join("");
+}
+function pickSelectAll(){document.querySelectorAll(".pick-cb").forEach(function(cb){cb.checked=true;});}
+function pickSelectNone(){document.querySelectorAll(".pick-cb").forEach(function(cb){cb.checked=false;});}
+function addPickedWords(){
+  var added=0;
+  document.querySelectorAll(".pick-cb").forEach(function(cb,i){
+    if(cb.checked&&scanPickedWords[i]){addW(scanPickedWords[i],"","scan");added++;}
+  });
+  toast("\u2705 "+added+" word"+(added===1?"":"s")+" added to your spelling list!");
+  document.getElementById("scan-pick-result").style.display="none";
+  document.getElementById("scan-pick-prev").style.display="none";
+  scanPickData=null;
+}
+
+// ── Dictation ─────────────────────────────────────────────────
 function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
 function initDict(){dictIdx=0;var idx=W.map(function(_,i){return i;});dictOrder=testOrd==="mix"?shuffle(idx):idx.slice();showWord();}
 function showWord(){
@@ -360,24 +680,24 @@ function hearNow(){
 function toggleShow(){wordShown=!wordShown;document.getElementById("d-word").classList.toggle("show",wordShown);document.getElementById("show-btn").textContent=wordShown?"\ud83d\ude48 Hide the word":"\ud83d\udc41\ufe0f Show the word (if no sound)";}
 function nxtWord(){dictIdx++;showWord();}
 
-// Mark
+// ── Mark ──────────────────────────────────────────────────────
 function markUp(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){markData=ev.target.result;document.getElementById("mark-img").src=markData;document.getElementById("mark-prev").style.display="block";document.getElementById("mark-card").style.display="none";};r.readAsDataURL(f);e.target.value="";}
 function clearMark(){markData=null;document.getElementById("mark-prev").style.display="none";}
 async function doMark(){
-  if(!markData)return;if(!navigator.onLine){toast("No internet. Please connect.");return;}
+  if(!markData)return;
   var btn=document.getElementById("mark-btn");btn.disabled=true;btn.textContent="\u23f3 Marking\u2026";
   document.getElementById("mark-card").style.display="block";document.getElementById("mark-title").textContent="Marking\u2026";
-  var mt=document.getElementById("mark-txt");mt.innerHTML="<div class=\"dots\"><span></span><span></span><span></span></div> Reading handwriting\u2026";
+  var mt=document.getElementById("mark-txt");mt.innerHTML='<div class="dots"><span></span><span></span><span></span></div> Reading handwriting\u2026';
   var ow=dictOrder.map(function(i){return W[i];});
   try{
-    var resp=await callAI([{type:"image",source:{type:"base64",media_type:"image/jpeg",data:markData.split(",")[1]}},{type:"text",text:"You are a warm encouraging Primary 1 teacher in Singapore. A child wrote spelling answers on paper. Correct words in order: "+ow.map(function(w,i){return(i+1)+". "+w.t;}).join(", ")+". Mark each answer. For EACH word: show \u2705 if correct with a cheer, or \u274c if wrong showing what they wrote \u2192 correct answer \u2192 simple kind reason for a 7-year-old. Check spelling, capitals, punctuation, pinyin tones. End with encouraging message, score out of "+ow.length+", and one helpful tip. Write SCORE: X/"+ow.length+" at the end. Be warm and kind!"}]);
+    var resp=await callAI([{type:"image",source:{type:"base64",media_type:"image/jpeg",data:markData.split(",")[1]}},{type:"text",text:"You are a warm encouraging teacher in Singapore. A student wrote spelling answers on paper. Correct words in order: "+ow.map(function(w,i){return(i+1)+". "+w.t;}).join(", ")+". Mark each answer. For EACH word show \u2705 if correct with a short cheer, or \u274c if wrong showing what they wrote \u2192 correct answer \u2192 simple kind explanation. Check spelling, capitals, punctuation, pinyin tones. End with encouraging message, SCORE: X/"+ow.length+", and one helpful tip."}]);
     mt.textContent=resp;document.getElementById("mark-title").textContent="\ud83d\udcdd Your results!";
     var m=resp.match(/SCORE:\s*(\d+)\s*\/\s*(\d+)/i);if(m)score={ok:parseInt(m[1]),total:parseInt(m[2])};
-  }catch(e){mt.textContent="Could not read photo. Try a clearer, well-lit image.\n\nError: "+e.message;}
+  }catch(e){mt.textContent="Could not read photo. Try a clearer image.\n\nError: "+e.message;}
   btn.disabled=false;btn.textContent="\ud83e\ude84 Mark My Work!";
 }
 
-// Results
+// ── Results ───────────────────────────────────────────────────
 function celebrate(){
   var emojis=["\u2b50","\ud83c\udf89","\ud83c\udf1f","\u2728","\ud83c\udf8a","\ud83d\udcab","\ud83c\udfc6"];
   for(var i=0;i<20;i++){(function(){var e=document.createElement("div");e.textContent=emojis[Math.floor(Math.random()*emojis.length)];e.style.cssText="position:fixed;top:-40px;left:"+(Math.random()*100)+"vw;font-size:"+(18+Math.random()*18)+"px;z-index:9999;pointer-events:none;transition:transform 2.5s ease-in,opacity 2.5s";document.body.appendChild(e);setTimeout(function(){e.style.transform="translateY(110vh) rotate("+(Math.random()*360)+"deg)";e.style.opacity="0";},30);setTimeout(function(){e.remove();},2800);})();}
@@ -385,20 +705,91 @@ function celebrate(){
 function renderRes(){
   if(!score)return;
   var pct=Math.round((score.ok/score.total)*100);
-  var stars=pct>=90?"\u2b50\u2b50\u2b50":pct>=70?"\u2b50\u2b50":"\u2b50";
-  var ico=pct===100?"\ud83c\udf89":pct>=80?"\ud83c\udf1f":pct>=60?"\ud83d\udc4d":"\ud83d\udcaa";
-  var msgs=["\ud83d\udcaa Keep going!","\ud83d\udc4d Good effort!","\ud83c\udf1f Nearly perfect!","\ud83c\udf89 Perfect! You are a star!"];
   if(pct>=70)setTimeout(celebrate,300);
-  document.getElementById("r-ico").textContent=ico;
+  var stars=pct>=90?"\u2b50\u2b50\u2b50":pct>=70?"\u2b50\u2b50":"\u2b50";
+  var msgs=["Keep going!","Good effort!","Nearly perfect!","Perfect! You are a star!"];
+  document.getElementById("r-ico").textContent=pct===100?"\ud83c\udf89":pct>=80?"\ud83c\udf1f":pct>=60?"\ud83d\udc4d":"\ud83d\udcaa";
   document.getElementById("r-title").textContent=pct===100?"Perfect! \ud83c\udf89":"Well done!";
   document.getElementById("r-msg").textContent=msgs[pct>=90?3:pct>=70?2:pct>=50?1:0];
   document.getElementById("r-ok").textContent=score.ok;
   document.getElementById("r-ng").textContent=score.total-score.ok;
   document.getElementById("r-st").textContent=stars;
-  document.getElementById("r-hist").innerHTML=dictOrder.map(function(wi,i){var w=W[wi];return"<div style=\"display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1.5px solid #f0f0f8;font-size:14px\"><span style=\"font-weight:600\">"+(i+1)+". "+w.t+"</span>"+(w.m?"<span style=\"font-size:11px;color:var(--tx2);flex:1;padding:0 6px\">"+w.m+"</span>":"")+"<span class=\"wlang l-"+w.l+"\" style=\"font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700\">"+w.l.toUpperCase()+"</span></div>";}).join("");
+  document.getElementById("r-hist").innerHTML=dictOrder.map(function(wi,i){var w=W[wi];return'<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1.5px solid #f0f0f8;font-size:14px"><span style="font-weight:600">'+(i+1)+". "+w.t+"</span>"+(w.m?'<span style="font-size:11px;color:var(--tx2);flex:1;padding:0 6px">'+w.m+"</span>":"")+'<span class="wlang l-'+w.l+'" style="font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700">'+w.l.toUpperCase()+"</span></div>";}).join("");
 }
 
-// LOOKUP
+// ── History Page ──────────────────────────────────────────────
+function setSort(s){
+  histSort=s;
+  ["new","old","az"].forEach(function(k){document.getElementById("sort-"+k).classList.toggle("on",k===s);});
+  renderHistory();
+}
+function renderHistory(){
+  if(!currentProfileId) return;
+  var items=loadHistory(currentProfileId);
+  document.getElementById("hist-count").textContent=items.length;
+
+  if(!items.length){
+    document.getElementById("hist-list").innerHTML="";
+    document.getElementById("hist-empty").style.display="block";
+    document.getElementById("hist-pick-list").innerHTML='<p style="font-size:13px;color:var(--tx2)">No history yet.</p>';
+    return;
+  }
+  document.getElementById("hist-empty").style.display="none";
+
+  var sorted=items.slice();
+  if(histSort==="new") sorted.sort(function(a,b){return b.addedAt-a.addedAt;});
+  else if(histSort==="old") sorted.sort(function(a,b){return a.addedAt-b.addedAt;});
+  else sorted.sort(function(a,b){return a.word.localeCompare(b.word);});
+
+  var sourceIcon={typed:"\u2328\ufe0f",speech:"\ud83c\udfa4",lookup:"\ud83d\udd0d",scan:"\ud83d\udcf8"};
+
+  document.getElementById("hist-list").innerHTML=sorted.map(function(item){
+    var d=new Date(item.addedAt);
+    var dateStr=d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear();
+    var ago=Math.floor((Date.now()-item.addedAt)/86400000);
+    var agoStr=ago===0?"Today":ago===1?"Yesterday":ago+" days ago";
+    return '<div class="hist-row">'
+      +'<div class="hist-word">'+item.word+'</div>'
+      +'<div class="hist-meta">'
+      +'<span class="hist-tag">'+( sourceIcon[item.source]||"\u2022")+" "+(item.source||"typed")+'</span>'
+      +'<span class="hist-tag wlang l-'+item.lang+'" style="margin-top:2px">'+item.lang.toUpperCase()+'</span>'
+      +'<span style="font-size:10px;color:var(--tx2)">'+agoStr+'</span>'
+      +'</div></div>';
+  }).join("");
+
+  // Pick list
+  document.getElementById("hist-pick-list").innerHTML=sorted.map(function(item,i){
+    return '<div class="pick-row">'
+      +'<input type="checkbox" class="pick-cb" id="hpick-'+i+'">'
+      +'<label for="hpick-'+i+'" class="pick-word" style="font-size:15px">'+item.word+'</label>'
+      +'<span class="wlang l-'+item.lang+'" style="font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700">'+item.lang.toUpperCase()+'</span>'
+      +'</div>';
+  }).join("");
+  // Store sorted order for picking
+  window._histSorted = sorted;
+}
+function histPickAll(){document.querySelectorAll("#hist-pick-list .pick-cb").forEach(function(cb){cb.checked=true;});}
+function histPickNone(){document.querySelectorAll("#hist-pick-list .pick-cb").forEach(function(cb){cb.checked=false;});}
+function addHistPicked(){
+  var added=0;
+  document.querySelectorAll("#hist-pick-list .pick-cb").forEach(function(cb,i){
+    if(cb.checked&&window._histSorted&&window._histSorted[i]){
+      addW(window._histSorted[i].word,"","typed");added++;
+    }
+  });
+  if(added) toast("\u2705 "+added+" word"+(added===1?"":"s")+" added to today's list!");
+  else toast("Please tick at least one word.");
+}
+function confirmClearHistory(){
+  var profile=getProfile(currentProfileId);
+  var name=profile?profile.name:"this child";
+  if(!confirm("Clear ALL spelling history for "+name+"? This cannot be undone.")) return;
+  clearHistoryForProfile(currentProfileId);
+  renderHistory();
+  toast("\u2705 History cleared.");
+}
+
+// ── Lookup ────────────────────────────────────────────────────
 function setLULang(l){luLang=l;document.getElementById("lu-lang-en").classList.toggle("on",l==="en-SG");document.getElementById("lu-lang-zh").classList.toggle("on",l==="zh-CN");}
 function toggleLUMic(){
   if(luMicOn){stopLUMic();return;}
@@ -410,553 +801,67 @@ function toggleLUMic(){
   document.getElementById("lu-mic-look").style.display="none";document.getElementById("lu-mic-retry").style.display="none";
   luMicRec.onresult=function(e){var f="",t="";for(var i=0;i<e.results.length;i++){if(e.results[i].isFinal)f+=e.results[i][0].transcript+" ";else t+=e.results[i][0].transcript;}var c=(f+t).trim();if(c)box.textContent=c;};
   luMicRec.onerror=function(e){if(e.error==="no-speech"||e.error==="aborted")return;lbl.textContent=e.error==="not-allowed"?"Mic blocked. Please type instead.":"Could not hear. Try again.";btn.classList.remove("rec");luMicOn=false;};
-  luMicRec.onend=function(){if(luMicOn){try{luMicRec.start();}catch(_){}return;}btn.classList.remove("rec");var heard=box.textContent.trim();if(heard&&heard!=="\u2014"&&heard!=="\u2026"){lbl.textContent="You said: \""+heard+"\"";document.getElementById("lu-mic-look").style.display="";document.getElementById("lu-mic-retry").style.display="";}else lbl.textContent="Could not hear. Try again or type the word.";};
+  luMicRec.onend=function(){if(luMicOn){try{luMicRec.start();}catch(_){}return;}btn.classList.remove("rec");var heard=box.textContent.trim();if(heard&&heard!=="\u2014"&&heard!=="\u2026"){lbl.textContent="You said: \""+heard+"\"";document.getElementById("lu-mic-look").style.display="";document.getElementById("lu-mic-retry").style.display="";}else lbl.textContent="Could not hear. Try again or type.";};
   try{luMicRec.start();}catch(e){lbl.textContent="Could not start mic.";luMicOn=false;btn.classList.remove("rec");}
 }
 function stopLUMic(){luMicOn=false;if(luMicRec){try{luMicRec.stop();}catch(_){}luMicRec=null;}document.getElementById("lu-mic-btn").classList.remove("rec");}
 function retryLUMic(){document.getElementById("lu-heard").textContent="\u2014";document.getElementById("lu-mic-lbl").textContent="Tap the mic and say a word clearly!";document.getElementById("lu-mic-look").style.display="none";document.getElementById("lu-mic-retry").style.display="none";}
 function parentLookup(){var w=document.getElementById("parent-inp").value.trim();if(!w){toast("Please type a word first!");return;}doLookup(w);document.getElementById("parent-inp").value="";}
 function speakLU(){if(currentLUWord)speak(currentLUWord,getLang(currentLUWord));}
+function addLUWord(){if(!currentLUWord)return;addW(currentLUWord,"","lookup");toast("\u2705 \""+currentLUWord+"\" added to spelling list!");document.getElementById("lu-add-btn").textContent="\u2705 Added!";setTimeout(function(){document.getElementById("lu-add-btn").textContent="\u2795 Add to my spelling list";},2000);}
 
-// Format definition into pretty colour-coded boxes
+// Format definition into coloured boxes
 function formatDef(text){
   var SECS={
-    "MEANING":{icon:"\ud83d\udca1",bg:"#FFF8E1",bd:"#FFD60A",tx:"#7D5A00"},
-    "EXAMPLE":{icon:"\ud83d\udcdd",bg:"#E8F5E9",bd:"#34C759",tx:"#1B5E20"},
-    "EXAMPLE (CHINESE)":{icon:"\ud83c\udde8\ud83c\uddf3",bg:"#E8F5E9",bd:"#34C759",tx:"#1B5E20"},
-    "EXAMPLE (ENGLISH)":{icon:"\ud83c\uddec\ud83c\udde7",bg:"#E3F2FD",bd:"#2196F3",tx:"#0D47A1"},
-    "SPELLING TIP":{icon:"\u2728",bg:"#FCE4EC",bd:"#FF4D6D",tx:"#880E4F"},
+    "MEANING":      {icon:"\ud83d\udca1",bg:"#FFF8E1",bd:"#FFD60A",tx:"#7D5A00"},
+    "EXAMPLE":      {icon:"\ud83d\udcdd",bg:"#E8F5E9",bd:"#34C759",tx:"#1B5E20"},
+    "MEANING (NOUN)":{icon:"\ud83d\udca1",bg:"#FFF8E1",bd:"#FFD60A",tx:"#7D5A00"},
+    "MEANING (VERB)":{icon:"\ud83d\udca1",bg:"#FFF3E0",bd:"#FF9F1C",tx:"#E65100"},
+    "MEANING (ADJECTIVE)":{icon:"\ud83d\udca1",bg:"#E8F5E9",bd:"#34C759",tx:"#1B5E20"},
+    "MEANING (ADVERB)":{icon:"\ud83d\udca1",bg:"#E3F2FD",bd:"#2196F3",tx:"#0D47A1"},
+    "PRONUNCIATION":{icon:"\ud83d\udd0a",bg:"#E8EAF6",bd:"#5C6BC0",tx:"#283593"},
+    "HANYU PINYIN": {icon:"\ud83d\udd24",bg:"#E8EAF6",bd:"#5C6BC0",tx:"#283593"},
+    "SPELLING":     {icon:"\u2728",bg:"#FCE4EC",bd:"#FF4D6D",tx:"#880E4F"},
     "SIMILAR WORDS":{icon:"\ud83d\udd17",bg:"#EDE7F6",bd:"#7C5CFC",tx:"#4527A0"},
-    "HANYU PINYIN":{icon:"\ud83d\udd24",bg:"#E8EAF6",bd:"#5C6BC0",tx:"#283593"},
-    "FUN FACT":{icon:"\u2b50",bg:"#FFF3E0",bd:"#FF9F1C",tx:"#E65100"},
-    "CHARACTERS":{icon:"\u5b57",bg:"#F3E5F5",bd:"#AB47BC",tx:"#4A148C"},
-    "STROKE GUIDE":{icon:"\u270f\ufe0f",bg:"#F0ECFF",bd:"#7C5CFC",tx:"#4B44CC"},
-    "PINYIN":{icon:"\ud83d\udd24",bg:"#E8EAF6",bd:"#5C6BC0",tx:"#283593"},
-    "TONE GUIDE":{icon:"\ud83c\udfb5",bg:"#E8F5E9",bd:"#34C759",tx:"#1B5E20"}
+    "TONE GUIDE":   {icon:"\ud83c\udfb5",bg:"#E8F5E9",bd:"#34C759",tx:"#1B5E20"},
+    "STROKE GUIDE": {icon:"\u270f\ufe0f",bg:"#F0ECFF",bd:"#7C5CFC",tx:"#4B44CC"}
   };
+  // Also handle dynamic MEANING (xxx) headers
+  function getSection(line){
+    var k=line.trim().toUpperCase();
+    if(SECS[k]) return k;
+    if(/^MEANING\s*\(/.test(k)) return k;
+    return null;
+  }
   var lines=text.trim().split("\n"),html="",cur=null,buf=[];
   function flush(){
     if(!cur)return;
-    var s=SECS[cur]||{icon:"\ud83d\udcd6",bg:"#F0ECFF",bd:"#7C5CFC",tx:"#4B44CC"};
+    var k=cur.toUpperCase();
+    var s=SECS[k]||SECS["MEANING"]||{icon:"\ud83d\udcd6",bg:"#F0ECFF",bd:"#7C5CFC",tx:"#4B44CC"};
+    // For dynamic MEANING (xxx) keys
+    if(!SECS[k]&&/^MEANING/.test(k)) s=SECS["MEANING"];
     var content=buf.join("\n").trim();
     if(!content){cur=null;buf=[];return;}
-    html+="<div style=\"background:"+s.bg+";border-left:4px solid "+s.bd+";border-radius:0 12px 12px 0;padding:10px 14px;margin-bottom:10px\">"
-      +"<div style=\"font-size:11px;font-weight:700;color:"+s.tx+";text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px\">"+s.icon+" "+cur+"</div>"
-      +"<div style=\"font-size:15px;color:#2D2A45;line-height:1.65;white-space:pre-wrap\">"+content+"</div></div>";
+    html+='<div style="background:'+s.bg+';border-left:4px solid '+s.bd+';border-radius:0 12px 12px 0;padding:10px 14px;margin-bottom:10px">'
+      +'<div style="font-size:11px;font-weight:700;color:'+s.tx+';text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">'+s.icon+" "+cur+'</div>'
+      +'<div style="font-size:15px;color:#2D2A45;line-height:1.65;white-space:pre-wrap">'+content+'</div></div>';
     cur=null;buf=[];
   }
   for(var i=0;i<lines.length;i++){
-    var line=lines[i],key=line.trim().toUpperCase();
-    if(SECS[key]){flush();cur=key;}
+    var line=lines[i];
+    var sec=getSection(line);
+    if(sec){flush();cur=line.trim();}
     else if(cur)buf.push(line);
-    else if(line.trim())html+="<div style=\"font-size:15px;color:#2D2A45;margin-bottom:8px\">"+line+"</div>";
+    else if(line.trim())html+='<div style="font-size:15px;color:#2D2A45;margin-bottom:8px">'+line+'</div>';
   }
   flush();
-  return html||"<div style=\"font-size:14px;white-space:pre-wrap;color:#2D2A45\">"+text+"</div>";
-}
-
-
-// ── WORD LOOKUP ─────────────────────────────────────────
-// Built-in dictionary with clear, accurate definitions for common words.
-// For unknown words, uses dictionaryapi.dev with strict filtering.
-
-// Format: "word": ["part of speech", "definition", "example sentence"]
-var WORDS = {
-  // A
-  "able":["adjective","having the power, skill, or means to do something","She is able to swim very well."],
-  "above":["preposition","in or to a higher position than something else","The bird flew above the trees."],
-  "across":["preposition","from one side to the other side of something","We walked across the bridge."],
-  "afraid":["adjective","feeling fear; frightened","He was afraid of the dark."],
-  "after":["preposition","following in time or place; later than","We play after school ends."],
-  "again":["adverb","one more time","Please say your name again."],
-  "angry":["adjective","having a strong feeling of being very annoyed","She was angry when someone broke her toy."],
-  "answer":["noun","something you say or write when someone asks a question","The answer to 2 + 2 is 4."],
-  "ask":["verb","to say a question to get information","Please ask your teacher if you need help."],
-  // B
-  "baby":["noun","a very young child who cannot yet walk or talk","The baby is sleeping in the cot."],
-  "bad":["adjective","not good; of poor quality; harmful","Eating too much sugar is bad for your teeth."],
-  "beautiful":["adjective","very attractive or pleasing to look at","The flowers in the garden are beautiful."],
-  "because":["conjunction","for the reason that","I wore a coat because it was cold."],
-  "begin":["verb","to start doing something","Let us begin the lesson now."],
-  "believe":["verb","to feel sure that something is true","I believe you can do it!"],
-  "best":["adjective","of the highest quality; better than all others","She is the best singer in the class."],
-  "better":["adjective","of a higher quality or more suitable than another","This book is better than that one."],
-  "big":["adjective","large in size","An elephant is a very big animal."],
-  "brave":["adjective","willing to do things that are difficult or dangerous; not afraid","The brave girl helped her injured friend."],
-  // C
-  "calm":["adjective","peaceful and quiet; not excited, worried, or angry","Stay calm and take a deep breath."],
-  "careful":["adjective","giving attention to what you are doing so you avoid mistakes or danger","Be careful when you cross the road."],
-  "cheerful":["adjective","feeling happy and showing it","She has a cheerful smile every morning."],
-  "clever":["adjective","able to learn and understand things quickly; intelligent","He is a very clever student."],
-  "correct":["adjective","right; having no mistakes","All your answers are correct — well done!"],
-  // D
-  "difficult":["adjective","not easy; needing a lot of skill or effort","That maths problem is very difficult."],
-  "dirty":["adjective","not clean; covered in mud, dust, or marks","His shoes are dirty after playing outside."],
-  // E
-  "early":["adjective","before the usual or expected time","We arrived early so we got good seats."],
-  "easy":["adjective","not difficult; simple to do or understand","This question is easy — I know the answer!"],
-  "enjoy":["verb","to get pleasure from something","I enjoy reading books before bed."],
-  "enough":["determiner","as much or as many as is needed","I have enough rice, thank you."],
-  "excited":["adjective","feeling very happy and enthusiastic because something good is happening","I am excited about my birthday party tomorrow!"],
-  // F
-  "famous":["adjective","known by many people","The Merlion is a famous statue in Singapore."],
-  "fast":["adjective","moving or happening quickly","A cheetah is the fastest land animal."],
-  "favourite":["noun","the person or thing you like best","Blue is my favourite colour."],
-  "find":["verb","to discover something you were looking for","I cannot find my pencil anywhere."],
-  "finish":["verb","to complete something; to come to an end","Finish your homework before you play."],
-  "friendly":["adjective","behaving in a kind and pleasant way towards others","My new classmate is very friendly."],
-  "funny":["adjective","making you laugh or smile; amusing","That joke was very funny!"],
-  // G
-  "gentle":["adjective","mild and kind; not rough or violent","Be gentle when you hold the baby bird."],
-  "glad":["adjective","feeling happy or pleased about something","I am glad you came to my birthday party."],
-  "great":["adjective","very good; of high quality","You did a great job on your test!"],
-  // H
-  "happy":["adjective","feeling pleasure and contentment; the opposite of sad","I feel happy when I play with my friends."],
-  "hard":["adjective","needing a lot of physical or mental effort; not easy","Learning to ride a bike is hard at first."],
-  "heavy":["adjective","weighing a lot; difficult to lift","The box of books is very heavy."],
-  "help":["verb","to make it easier for someone to do something","Please help me carry these bags."],
-  "honest":["adjective","telling the truth and not lying or cheating","An honest person always tells the truth."],
-  "humble":["adjective","not thinking that you are better or more important than other people","Even after winning the prize, she stayed humble and thanked her teammates."],
-  "hungry":["adjective","wanting or needing food","I am hungry — can we have lunch soon?"],
-  // I
-  "idea":["noun","a thought or plan that comes into your mind","I have a great idea for our science project!"],
-  "important":["adjective","having a lot of value or meaning; mattering greatly","It is important to be kind to others."],
-  "interesting":["adjective","making you want to know more; not boring","That book about dinosaurs is very interesting."],
-  // J
-  "junk":["noun","things that are considered useless or of low value; rubbish or waste items","He cleared out a lot of old junk from his room."],
-  "join":["verb","to come together with others; to become part of a group","Please join us for lunch!"],
-  "jump":["verb","to push your body up off the ground into the air","The children love to jump on the trampoline."],
-  // K
-  "kind":["adjective","caring about others and wanting to help them; generous and gentle","It is kind to share your food with a friend who forgot theirs."],
-  "know":["verb","to have information in your mind; to be certain about something","I know the answer to that question!"],
-  // L
-  "laugh":["verb","to make sounds that show you think something is funny","That story made the whole class laugh."],
-  "learn":["verb","to get new knowledge or a new skill through study or experience","We learn something new at school every day."],
-  "little":["adjective","small in size; not much","A little ant was carrying a huge crumb."],
-  "lonely":["adjective","unhappy because you are alone and have no friends nearby","She felt lonely on her first day at the new school."],
-  "long":["adjective","measuring a great distance from one end to the other","The Amazon River is very long."],
-  "lucky":["adjective","having or bringing good things happen to you by chance","I was lucky to find a coin on the ground."],
-  // M
-  "mean":["adjective","unkind and unpleasant to others","It is mean to make fun of someone."],
-  // N
-  "neat":["adjective","arranged in a tidy and organised way","Please keep your desk neat and clean."],
-  "new":["adjective","recently made, bought, or created; not used before","I have a new school bag this year."],
-  "nice":["adjective","pleasant and enjoyable; kind and friendly","She is a very nice person to talk to."],
-  "noisy":["adjective","making a lot of loud sound","The playground is very noisy during recess."],
-  // O
-  "old":["adjective","having existed or lived for a long time; not new or young","That old tree has been there for 100 years."],
-  // P
-  "patient":["adjective","able to wait calmly for a long time without complaining","Be patient — the food will be ready soon."],
-  "patience":["noun","the ability to wait calmly without getting upset or angry","Learning a new skill takes patience and practice."],
-  "polite":["adjective","behaving in a respectful and considerate way towards others","Always be polite and say please and thank you."],
-  "poor":["adjective","having very little money; also used to show sympathy for someone","The poor little cat was lost in the rain."],
-  "proud":["adjective","feeling very pleased about something good you or someone else has done","I am proud of you for trying your very best."],
-  // Q
-  "quick":["adjective","moving or doing things fast; done in a short time","We need to be quick or we will miss the bus."],
-  "quiet":["adjective","making very little or no noise; peaceful","Please be quiet in the library."],
-  // R
-  "ready":["adjective","fully prepared for something; able to start","Are you ready for school?"],
-  "real":["adjective","actually existing; not pretend or imaginary","Is that a real diamond or a fake one?"],
-  "remember":["verb","to bring something back into your mind that you knew before","Remember to bring your homework tomorrow."],
-  "responsible":["adjective","in charge of something and having to make sure it is done properly","A responsible student always completes their homework."],
-  // S
-  "sad":["adjective","feeling unhappy; the opposite of happy","She felt sad when she lost her favourite toy."],
-  "safe":["adjective","not in danger; protected from harm","Always wear your seatbelt to stay safe in the car."],
-  "shy":["adjective","nervous and uncomfortable with people you do not know well","He is shy at first but very kind once you know him."],
-  "silly":["adjective","not sensible; foolish or not serious","It is silly to run with scissors."],
-  "simple":["adjective","easy to understand or do; not complicated","The instructions are simple — just follow the pictures."],
-  "slow":["adjective","not moving or happening quickly; the opposite of fast","A tortoise is slow but it never gives up."],
-  "smart":["adjective","intelligent; quick to learn and understand","You are a very smart student."],
-  "sorry":["adjective","feeling regret or sadness about something wrong you have done","I am sorry for accidentally breaking your pencil."],
-  "special":["adjective","different from normal things in a way that makes it more important or better","Your birthday is a very special day."],
-  "strong":["adjective","having great physical power; able to lift heavy things; the opposite of weak","He is strong enough to carry both bags."],
-  // T
-  "tired":["adjective","needing rest or sleep; without much energy","I am tired after a long day at school."],
-  // U
-  "understand":["verb","to know what something means or how something works","Do you understand the instructions?"],
-  "upset":["adjective","feeling sad, worried, or unhappy about something","She was upset when her balloon popped."],
-  // W
-  "wonderful":["adjective","extremely good; causing great pleasure or admiration","You did a wonderful job on your art project!"],
-  "worry":["verb","to keep thinking that something bad might happen","Do not worry — I will help you with the problem."],
-  // Common sight words
-  "the":["article","used before a noun to refer to a specific thing","The cat sat on the mat."],
-  "a":["article","used before a noun to refer to one of something","I have a dog at home."],
-  "and":["conjunction","used to join two words, phrases, or sentences","I like cats and dogs."],
-  "is":["verb","the form of 'be' used with he, she, it","The sky is blue."],
-  "in":["preposition","inside something; enclosed by something","The pencil is in the box."],
-  "on":["preposition","touching and supported by the surface of something","Put the book on the table."],
-  "at":["preposition","used to show where someone or something is","I am at school right now."],
-  "to":["preposition","in the direction of; towards","We are going to the park."],
-  "of":["preposition","belonging to; relating to","The colour of the sky is blue."],
-  "it":["pronoun","used to refer to a thing, animal, or idea already mentioned","I found a book. It is very interesting."],
-  "my":["pronoun","belonging to me","This is my school bag."],
-  "we":["pronoun","I and other people together","We are going to learn something new today."],
-  "he":["pronoun","used to refer to a male person or animal","He is my best friend."],
-  "she":["pronoun","used to refer to a female person or animal","She is a kind teacher."],
-  "they":["pronoun","used to refer to more than one person or thing","They are playing football."],
-  "was":["verb","the past form of 'be' used with I, he, she, it","Yesterday was a sunny day."],
-  "for":["preposition","intended to belong to or be used by someone","This gift is for you."],
-  "not":["adverb","used to make a word or statement negative","I do not like spicy food."],
-  "are":["verb","the form of 'be' used with you, we, they","We are students at this school."],
-  "but":["conjunction","used to introduce something different from what was said before","I like cats but my brother likes dogs."],
-  "do":["verb","to perform or complete an action","Do your best in the test."],
-  "can":["verb","to be able to do something","I can ride a bicycle."],
-  "go":["verb","to move from one place to another","Let us go to the library."],
-  "get":["verb","to obtain or receive something; to become","Go and get your school bag."],
-  "come":["verb","to move towards the speaker or a particular place","Please come here quickly."],
-  "see":["verb","to notice something using your eyes","Can you see the rainbow?"],
-  "look":["verb","to turn your eyes towards something in order to see it","Look both ways before crossing the road."],
-  "say":["verb","to speak words; to express something in words","Please say please when you ask for something."],
-  "make":["verb","to create or build something; to cause something to happen","Let us make a birthday card for Mum."],
-  "give":["verb","to hand something to another person","Please give me the pencil."],
-  "take":["verb","to reach out and hold something; to carry something","Take your umbrella — it might rain."],
-  "put":["verb","to move something to a particular place","Put your bag on the shelf."],
-  "think":["verb","to use your mind to consider something carefully","Think carefully before you answer."],
-  "want":["verb","to feel that you would like to have or do something","I want to be a doctor when I grow up."],
-  "use":["verb","to do something with an object for a purpose","Use a ruler to draw a straight line."],
-  "many":["adjective","a large number of things or people","There are many stars in the night sky."],
-  "some":["determiner","an amount or number of something, but not all","Have some water — you look thirsty."],
-  "with":["preposition","accompanied by; in the company of","I went to school with my friend."],
-  "all":["determiner","the whole number or amount of something","All the students finished their homework."],
-  "very":["adverb","used to emphasise an adjective or adverb; extremely","This maths problem is very hard."],
-  "here":["adverb","in, at, or to this place","Please come here at once."],
-  "when":["conjunction","at the time that something happens","I read a book when I have free time."],
-  "your":["pronoun","belonging to the person being spoken to","Is this your pencil?"],
-  "our":["pronoun","belonging to us","Our school has a beautiful garden."],
-  "then":["adverb","at that time; after that","Finish your work, then you may play."],
-  "so":["conjunction","therefore; with the result that","I was tired, so I went to sleep early."],
-  "if":["conjunction","used to say that one thing depends on another thing","If you study hard, you will do well."],
-  "up":["adverb","towards a higher position; the opposite of down","The balloon floated up into the sky."],
-  "out":["adverb","away from the inside of a place","Please go out to play during recess."],
-  "what":["pronoun","asking for information about something","What is your favourite animal?"],
-  "who":["pronoun","asking about or referring to a person","Who is your best friend?"],
-  "how":["adverb","in what way; to what degree","How do you spell your name?"],
-  "just":["adverb","only; very recently","I just finished my homework."],
-  "now":["adverb","at this moment; at the present time","Please sit down now."],
-  "also":["adverb","in addition to something else; too","I like cats. I also like dogs."],
-  "back":["adverb","to a place or position where someone or something was before","Please give the book back to the library."],
-  "down":["adverb","towards a lower position; the opposite of up","The ball rolled down the hill."],
-  "way":["noun","how something is done; the route to get somewhere","Do you know the way to school?"],
-  "even":["adverb","used to emphasise something surprising","Even the teacher laughed at that joke."],
-  "well":["adverb","in a good or satisfactory way; in good health","You have done very well on your spelling test."],
-  "too":["adverb","more than is needed; also; as well","This bag is too heavy for me to carry."],
-  "any":["determiner","used in questions and negatives; one or some","Do you have any pencils I can borrow?"],
-  "same":["adjective","exactly alike; not different or not another","We are wearing the same colour today."],
-  "off":["adverb","away from a place; not switched on","Please turn off the lights when you leave."],
-  "much":["adverb","to a great degree; a large amount","Thank you very much for your help."],
-  "right":["adjective","correct; morally good; the direction opposite to left","That is the right answer — well done!"],
-  "left":["adjective","on the side opposite to the right","Turn left at the traffic light."],
-  "move":["verb","to change position; to go from one place to another","Please move your chair closer to the desk."],
-  "still":["adverb","continuing to happen or existing; not moving","Please sit still while I take your photo."],
-  "own":["adjective","belonging to a particular person and no one else","I have my own pencil case."],
-  "each":["determiner","every one of two or more people or things separately","Each child in the class got one sticker."],
-  "both":["determiner","the two of them together; not just one","Both my hands are clean."],
-  "between":["preposition","in the space or period separating two things","The library is between the canteen and the hall."],
-  "never":["adverb","not at any time; not ever","Never run across a busy road without looking."],
-  "always":["adverb","at all times; on every occasion","I always brush my teeth before bed."],
-  "every":["determiner","each one of a group without exception","Every student must bring their homework tomorrow."],
-  "next":["adjective","coming immediately after in time, order, or space","Who is next in line please?"],
-  "first":["adjective","coming before all others in position or time","She was the first student to finish the test."],
-  "last":["adjective","coming after all others; the one at the end","He was the last person to arrive."],
-  "most":["determiner","the greatest amount or number of something","Most students enjoy recess."],
-  "more":["determiner","a greater amount or number","Can I have a little more water please?"],
-  "less":["determiner","a smaller amount of something","Try to eat less junk food and more fruit."],
-  "few":["determiner","a small number of things","Only a few students were absent today."],
-  "keep":["verb","to continue to have something; to not lose or give away","You can keep the sticker — it is yours."],
-  "start":["verb","to begin doing or happening","Let us start the lesson with a spelling warm-up."],
-  "stop":["verb","to no longer do something; to come to an end","Stop running in the corridor please."],
-  "let":["verb","to allow someone to do something","Let me help you carry that."],
-  "show":["verb","to allow someone to see something; to explain by demonstrating","Show me how you solve this maths problem."],
-  "try":["verb","to make an effort to do something","Always try your best — that is all that matters."],
-  "turn":["verb","to move in a circular direction; to change direction","Turn the page when you are ready."],
-  "walk":["verb","to move forward on your feet at a normal pace","We walk to school every morning."],
-  "run":["verb","to move on your feet at a fast pace, faster than walking","Run quickly or we will miss the bus!"],
-  "stand":["verb","to be upright on your feet; not sitting or lying","Please stand up when the teacher enters."],
-  "sit":["verb","to lower yourself onto a seat and rest your weight on it","Please sit down quietly."],
-  "eat":["verb","to put food in your mouth, chew it, and swallow it","Eat your vegetables — they are good for you!"],
-  "drink":["verb","to swallow a liquid such as water or juice","Drink plenty of water every day."],
-  "sleep":["verb","to rest with your eyes closed and your mind not active","Children should sleep for about 10 hours each night."],
-  "write":["verb","to make letters or words on paper using a pen or pencil","Write your name at the top of the page."],
-  "read":["verb","to look at and understand written words","I read a chapter of my book every night."],
-  "play":["verb","to do activities for fun and enjoyment","We play in the park after school."],
-  "sing":["verb","to make musical sounds with your voice","We sing our national anthem every morning."],
-  "draw":["verb","to make a picture using a pencil, pen, or other tool","Draw a picture of your favourite animal."],
-  "swim":["verb","to move through water using your arms and legs","She can swim across the whole pool."],
-  "jump":["verb","to push yourself up from the ground into the air","He can jump very high."],
-  "catch":["verb","to stop and hold something that is moving through the air","Catch the ball with both hands."],
-  "throw":["verb","to send something through the air using your hand","Throw the ball to your partner."],
-  "bring":["verb","to carry something or someone with you to a place","Please bring your textbook tomorrow."],
-  "buy":["verb","to get something by paying money for it","Mum will buy groceries at the supermarket."],
-  "sell":["verb","to give something to someone in exchange for money","The shop sells stationery and books."],
-  "open":["verb","to move something so that it is no longer closed","Open the door gently please."],
-  "close":["verb","to move something so it covers an opening; to shut","Please close your books and listen."],
-  "clean":["verb","to remove dirt from something; adjective: free from dirt","Please clean your desk before you go home."],
-  "wash":["verb","to clean something using water and soap","Wash your hands before eating."],
-  "cut":["verb","to divide something using scissors or a knife","Cut the paper along the dotted line."],
-  "break":["verb","to separate into pieces, especially by being hit or dropped","Be careful not to break the glass."],
-  "build":["verb","to make something by putting parts together","We will build a model aeroplane in class."],
-  "hold":["verb","to keep something in your hands or arms","Hold the railing when you walk down the stairs."],
-  "pull":["verb","to hold something and bring it towards you","Pull the door to open it — do not push!"],
-  "push":["verb","to press something away from you using force","Push the trolley to the checkout counter."],
-  "fall":["verb","to drop down from a higher position","Be careful not to fall off the chair."],
-  "miss":["verb","to feel sad because someone or something is not with you","I miss my grandma when she is overseas."],
-  "meet":["verb","to see and speak to someone for the first time; to come together","I will meet my friend at the library."],
-  "teach":["verb","to help someone learn something by explaining or showing them","My teacher teaches us new things every day."],
-  "wait":["verb","to stay in a place until something happens","Wait patiently for your turn."],
-  "carry":["verb","to hold something and take it to another place","Can you carry these books to the library?"],
-  "follow":["verb","to go behind someone and go the same way","Follow the instructions carefully."],
-  "reach":["verb","to stretch out your arm to touch or get something","Can you reach the top shelf?"],
-  "help":["verb","to do something useful for another person","Please help your friend if they are stuck."],
-  "love":["verb","to have a very strong feeling of affection for someone","I love my family very much."],
-  "like":["verb","to find something pleasant or enjoyable","I like to eat fruit for snacks."],
-  "hate":["verb","to dislike something very much","I hate it when it rains during recess!"],
-  "share":["verb","to give part of something you have to others","Please share the crayons with your friend."],
-  "care":["verb","to feel interest and concern for someone","Good friends care about each other."],
-  "tell":["verb","to give information to someone using words","Please tell me about your day."],
-  "ask":["verb","to say a question in order to get information","Always ask if you do not understand."],
-  "listen":["verb","to give attention to a sound; to pay attention to someone speaking","Listen carefully when your teacher is speaking."],
-  "talk":["verb","to say words; to have a conversation","We talk with our friends during recess."],
-  "call":["verb","to give a name to someone; to telephone someone; to shout to someone","Call your mum if you feel unwell."],
-  "choose":["verb","to decide which one you want from a group of things","Choose your favourite book from the shelf."],
-  "decide":["verb","to make a choice after thinking about it","Decide what you want to be when you grow up."],
-  "remember":["verb","to bring something back into your mind that you knew before","Remember to switch off the lights."],
-  "forget":["verb","to be unable to remember something you knew before","Do not forget to bring your water bottle."],
-  "need":["verb","to require something because it is very important or necessary","We need water to survive."],
-  "add":["verb","to put numbers together to get a larger total; to put something extra in","Add these two numbers together."],
-  "count":["verb","to say numbers in order; to find out how many there are","Count from one to twenty out loud."],
-  "number":["noun","a symbol or word that represents a quantity","The number 8 is a lucky number."],
-  "time":["noun","the progression of events from past to present to future; hours and minutes","What time does school start?"],
-  "day":["noun","the period from sunrise to sunset; a 24-hour period","Today is a wonderful day to learn."],
-  "night":["noun","the period of darkness between sunset and sunrise","Stars come out at night."],
-  "week":["noun","a period of seven days","There are five school days in a week."],
-  "month":["noun","one of the twelve periods that a year is divided into","My birthday is in the month of July."],
-  "year":["noun","the period of 365 days from January to December","I am seven years old this year."],
-  "morning":["noun","the early part of the day, from when you wake up until midday","We do spelling practice every morning."],
-  "afternoon":["noun","the part of the day between midday and evening","We have PE in the afternoon on Tuesdays."],
-  "evening":["noun","the later part of the day, from the end of the afternoon until night","We have family dinner every evening."],
-  "today":["noun","this present day","Today is Monday."],
-  "tomorrow":["noun","the day after today","Our spelling test is tomorrow — study tonight!"],
-  "yesterday":["noun","the day before today","Yesterday we went to the zoo."],
-  "home":["noun","the house or place where you live with your family","I feel safe and happy at home."],
-  "school":["noun","a place where children go to study and learn","I go to school five days a week."],
-  "class":["noun","a group of students who are taught together; a lesson","Our class has 30 students."],
-  "book":["noun","a set of printed pages joined together inside a cover","I love reading books."],
-  "pen":["noun","a long thin object with ink inside, used for writing","Use a blue or black pen to write your name."],
-  "pencil":["noun","a thin wooden stick with a dark centre, used for writing or drawing","Please sharpen your pencil."],
-  "bag":["noun","a container made of material, used for carrying things","I pack my school bag every night."],
-  "food":["noun","things that people and animals eat to get energy and stay healthy","Eat healthy food to grow strong."],
-  "water":["noun","the clear liquid that fills rivers, lakes, and oceans; what we drink","Drink water to stay hydrated."],
-  "house":["noun","a building where people, especially a family, live","We live in a red house near the park."],
-  "room":["noun","a separate area inside a building with its own walls, floor, and ceiling","My bedroom is on the second floor."],
-  "door":["noun","a flat panel that you open and close to enter or leave a room","Close the door quietly when you leave."],
-  "table":["noun","a piece of furniture with a flat top and legs, used to put things on","Put your books on the table."],
-  "chair":["noun","a piece of furniture with four legs and a back, designed for sitting on","Sit up straight on your chair."],
-  "family":["noun","a group of people who are related to each other, especially parents and children","I love spending time with my family."],
-  "friend":["noun","a person you know well and like to spend time with","My best friend sits next to me in class."],
-  "teacher":["noun","a person whose job is to teach others, especially in a school","My teacher is very patient and kind."],
-  "parent":["noun","a father or mother","My parents help me with my homework."],
-  "brother":["noun","a boy or man who has the same parents as you","My brother is two years younger than me."],
-  "sister":["noun","a girl or woman who has the same parents as you","My sister and I share a bedroom."],
-  "child":["noun","a young person; a boy or girl","Every child deserves a good education."],
-  "boy":["noun","a male child","The boy ran quickly across the field."],
-  "girl":["noun","a female child","The girl won first prize in the spelling competition."],
-  "man":["noun","an adult male person","The man helped the lost child find her mother."],
-  "woman":["noun","an adult female person","The woman is a kind doctor."],
-  "animal":["noun","a living creature that can move and is not a plant, such as a dog or fish","A cat is a common household animal."],
-  "cat":["noun","a small furry animal with four legs and a tail that is often kept as a pet","My cat loves to sleep in a sunny spot."],
-  "dog":["noun","a common animal with four legs that is often kept as a pet and makes a barking sound","My dog wags its tail when I come home."],
-  "bird":["noun","an animal with wings, feathers, and a beak that usually can fly","A bird was singing in the tree outside."],
-  "fish":["noun","an animal that lives in water and breathes through gills","We saw many colourful fish at the aquarium."],
-  "flower":["noun","the colourful part of a plant that produces seeds","Mum planted beautiful flowers in the garden."],
-  "tree":["noun","a tall plant with a thick wooden trunk, branches, and leaves","We sat in the shade under a big tree."],
-  "sun":["noun","the star at the centre of our solar system that gives us light and warmth","The sun rises in the east every morning."],
-  "rain":["noun","water that falls from clouds in the sky","We brought our umbrellas because of the rain."],
-  "colour":["noun","the way light appears to the eye, such as red, blue, or yellow","What is your favourite colour?"],
-  "red":["adjective","having the colour of blood or a ripe tomato","She wore a beautiful red dress."],
-  "blue":["adjective","having the colour of the clear sky on a sunny day","The sky is bright blue today."],
-  "green":["adjective","having the colour of grass and leaves","The grass in the park is very green."],
-  "yellow":["adjective","having the colour of the sun or a ripe banana","She drew a yellow sun in the corner of her picture."],
-  "white":["adjective","having the colour of milk or fresh snow","He wore a clean white shirt to school."],
-  "black":["adjective","having the darkest colour, like the night sky with no stars","The cat has shiny black fur."],
-  "big":["adjective","large in size","An elephant is a very big animal."],
-  "small":["adjective","little in size; not big","An ant is a very small insect."],
-  "tall":["adjective","having a great height; measuring a lot from bottom to top","Giraffes are the tallest animals on land."],
-  "short":["adjective","not measuring much from top to bottom; not tall","The short boy stood at the front of the class photo."],
-  "long":["adjective","measuring a great distance from one end to the other; not short","A snake has a long, flexible body."],
-  "hot":["adjective","having a high temperature; very warm","Be careful — the soup is very hot."],
-  "cold":["adjective","having a low temperature; the opposite of hot","It was so cold that we could see our breath."],
-  "wet":["adjective","covered with water or another liquid; not dry","My shoes got wet when I stepped in a puddle."],
-  "dry":["adjective","having no water or moisture; not wet","Dry your hands with a towel after washing them."],
-  "clean":["adjective","free from dirt or marks; not dirty","Wash your hands to keep them clean."],
-  "dirty":["adjective","covered in mud, dust, or marks; not clean","His shoes were dirty after playing in the garden."],
-  "light":["adjective","not heavy; easy to lift. Also: not dark; bright","This school bag is light and easy to carry."],
-  "dark":["adjective","with little or no light; the opposite of bright or light in colour","It gets dark early in winter."],
-  "fast":["adjective","moving or doing things quickly; the opposite of slow","A racing car is very fast."],
-  "slow":["adjective","not moving quickly; taking a long time; the opposite of fast","The tortoise is slow but it always reaches the finish line."],
-  "loud":["adjective","making a lot of noise; not quiet","The music at the party was very loud."],
-  "quiet":["adjective","making very little noise; peaceful; the opposite of loud","Please keep quiet during the exam."],
-  "kind":["adjective","friendly, generous, and caring towards others","It was very kind of you to help him."],
-  "smart":["adjective","having or showing intelligence; able to learn quickly","She is a very smart student who always asks good questions."],
-  "brave":["adjective","willing to do difficult or frightening things; not afraid","The brave firefighter ran into the burning building."],
-  "careful":["adjective","giving attention to what you do to avoid mistakes or accidents","Be careful when using scissors."],
-  "beautiful":["adjective","very attractive and pleasant to look at","What a beautiful painting you have made!"],
-  "funny":["adjective","making you laugh; amusing","That was such a funny story!"],
-  "strange":["adjective","unusual or surprising; not familiar","That is a very strange noise — what could it be?"],
-  "young":["adjective","having lived for only a short time; not old","Young children learn very quickly."],
-  "number":["noun","a symbol or word used to count or measure","Choose any number between one and ten."],
-  "answer":["noun","something said, written, or done in response to a question","Write your answer in the space provided."],
-  "question":["noun","a sentence or phrase that asks for information","Raise your hand if you have a question."],
-  "story":["noun","a description of events, whether real or imagined","Please write a story about your best day ever."],
-  "name":["noun","the word or words that a person or thing is known by","What is your full name?"],
-  "idea":["noun","a thought or suggestion about a possible course of action","I have an idea — let us make a surprise card for the teacher!"],
-  "world":["noun","the Earth and all the people, animals, and things on it","There are many countries in the world."],
-  "country":["noun","an area of land with its own government, laws, and people","Singapore is our beloved country."],
-  "place":["noun","a particular area or position","This is a good place to have a picnic."],
-  "thing":["noun","an object or item, especially one that you do not know the name of","What is that thing in your bag?"],
-  "part":["noun","a piece or section of something larger","Learning new words is part of being a good reader."],
-  "life":["noun","the state of being alive; the time between birth and death","Life is beautiful when we are kind to each other."],
-  "hand":["noun","the part at the end of your arm, including your fingers and thumb","Raise your hand if you know the answer."],
-  "eye":["noun","one of the two organs in your head that you use to see","Cover one eye and tell me how many fingers I am holding up."],
-  "face":["noun","the front part of your head, where your eyes, nose, and mouth are","She had a big smile on her face."],
-  "head":["noun","the part of your body above your neck, which contains your brain","Nod your head if you agree."],
-  "arm":["noun","one of the two long parts of your body attached to your shoulders","Stretch your arms up as high as you can."],
-  "leg":["noun","one of the limbs attached to the bottom of your body, used for walking","I hurt my leg when I fell off my bicycle."],
-  "mouth":["noun","the opening in your face that you use to eat and speak","Open your mouth wide at the dentist."],
-  "ear":["noun","one of the two organs on the sides of your head that you use to hear","I can hear music — it is so loud it hurts my ears!"],
-  "nose":["noun","the part of your face between your eyes and mouth, used for breathing and smelling","My nose tickles when I smell pepper."],
-  "heart":["noun","the organ in your chest that pumps blood around your body","Exercise makes your heart strong."],
-  "money":["noun","coins and notes that you use to buy things","Save your money so you can buy something special."],
-  "work":["noun/verb","effort put into doing something; a job or task; to do a job","Work hard and you will achieve your goals."],
-  "game":["noun","an activity done for fun, with rules","My favourite game is chess."],
-  "team":["noun","a group of people who play or work together","Our team won the football match!"],
-  "music":["noun","sounds arranged in a pleasant or interesting way to be sung or played","I love listening to music while I draw."],
-  "sport":["noun","a physical activity done for exercise or fun, often with rules and competition","Swimming is my favourite sport."],
-  "junk":["noun","things that are considered useless or of very poor quality; rubbish or waste material","Please do not eat too much junk food — eat fruit instead."],
-};
-
-async function fetchEnglishDef(word){
-  var key = word.toLowerCase().trim();
-  try{
-    var r = await fetch("https://api.dictionaryapi.dev/api/v2/entries/en/" + encodeURIComponent(key));
-    if(!r.ok) throw new Error("The word \"" + word + "\" was not found. Please check the spelling.");
-    var data = await r.json();
-    if(!data||!data[0]) throw new Error("No definition found for \"" + word + "\".");
-    var entry = data[0];
-    var out = "";
-    // Show all meanings — unfiltered, exactly as the dictionary says
-    var meanings = entry.meanings || [];
-    for(var i=0;i<meanings.length;i++){
-      var m = meanings[i];
-      var defs = m.definitions || [];
-      for(var j=0;j<defs.length;j++){
-        out += "MEANING (" + m.partOfSpeech + ")\n" + defs[j].definition + "\n\n";
-        if(defs[j].example) out += "EXAMPLE\n" + defs[j].example + "\n\n";
-      }
-    }
-    if(!out) throw new Error("No definitions available for this word.");
-    if(entry.phonetic) out += "PRONUNCIATION\n" + entry.phonetic + "\n\n";
-    out += "SPELLING\n" + key.toUpperCase().split("").join(" - ") + " (" + key.length + " letters)";
-    return out;
-  }catch(err){
-    if(err.message.indexOf("Failed to fetch")>-1 || err.message.indexOf("NetworkError")>-1){
-      return "MEANING\nCould not connect to the dictionary. Please check your internet and try again.\n\nSPELLING\n" + key.toUpperCase().split("").join(" - ");
-    }
-    return "MEANING\n" + err.message + "\n\nSPELLING\n" + key.toUpperCase().split("").join(" - ");
-  }
-}
-
-
-async function fetchChineseDef(word){
-  var chars = word.split("").filter(function(ch){ return /[一-鿿]/.test(ch); });
-  if(!chars.length) throw new Error("No Chinese characters found.");
-
-  var out = "";
-
-  // Try live Chinese dictionary API (MDBG/CC-CEDICT via free proxy)
-  try{
-    // Use the free Chinese dictionary API from hanzidb.org for each character
-    var results = [];
-    for(var i=0;i<chars.length;i++){
-      var ch = chars[i];
-      var r = await fetch("https://api.hanzidb.org/v1/hanzi/" + encodeURIComponent(ch), {mode:"cors"});
-      if(r.ok){
-        var d = await r.json();
-        if(d && (d.definition || d.pinyin_numeric)){
-          results.push({
-            ch: ch,
-            pinyin: d.pinyin_with_tones || d.pinyin_numeric || "",
-            def: d.definition || ""
-          });
-        }
-      }
-    }
-
-    if(results.length > 0){
-      // Build pinyin line
-      var pinyins = results.map(function(r){ return r.pinyin; }).filter(Boolean);
-      if(pinyins.length) out += "HANYU PINYIN\n" + pinyins.join("  ") + "\n\n";
-
-      // Build meaning
-      out += "MEANING\n";
-      results.forEach(function(r){
-        if(r.def) out += "• " + r.ch + " — " + r.def + "\n";
-        else out += "• " + r.ch + " — (see stroke guide below)\n";
-      });
-      out += "\n";
-    } else {
-      // hanzidb returned nothing — fall back to local data
-      out += buildLocalChineseDef(word, chars);
-    }
-  }catch(apiErr){
-    // API not reachable — use local fallback
-    out += buildLocalChineseDef(word, chars);
-  }
-
-  out += "STROKE GUIDE\nTap each character below to see the stroke order and practise writing! ✏️";
-  return out;
-}
-
-
-function buildPinyinDef(word){
-  var tones={"\u0101":1,"\u00e1":2,"\u01ce":3,"\u00e0":4,"\u0113":1,"\u00e9":2,"\u011b":3,"\u00e8":4,"\u012b":1,"\u00ed":2,"\u01d0":3,"\u00ec":4,"\u014d":1,"\u00f3":2,"\u01d2":3,"\u00f2":4,"\u016b":1,"\u00fa":2,"\u01d4":3,"\u00f9":4};
-  var toneNum=5,toneNames={1:"1st tone (flat)",2:"2nd tone (rising)",3:"3rd tone (dip then rise)",4:"4th tone (falling)",5:"neutral tone"};
-  for(var ch in tones){if(word.indexOf(ch)>-1){toneNum=tones[ch];break;}}
-  return "HANYU PINYIN\n"+word+"\n\nMEANING\nThis is Hanyu Pinyin, which shows how to pronounce a Chinese character using letters.\n\nTONE GUIDE\nThis pinyin uses the "+toneNames[toneNum]+".\n\nSPELLING\n"+word.toUpperCase().split("").join(" - ");
-}
-
-
-// ── Read definition aloud ────────────────────────────
-function readDefAloud(text, lang){
-  if(!window.speechSynthesis) return;
-  // Extract just the meaning lines (strip section headers and bullet points)
-  var lines = text.split("\n");
-  var toRead = [];
-  var inMeaning = false;
-  for(var i=0;i<lines.length;i++){
-    var line = lines[i].trim();
-    if(line==="MEANING"||line.indexOf("MEANING (")===0){ inMeaning=true; continue; }
-    if(line===""&&inMeaning){ break; } // stop at blank line after meaning
-    if(inMeaning&&line) toRead.push(line.replace(/^\u2022\s*/,""));
-  }
-  if(!toRead.length) return;
-  var sentence = toRead.join(". ");
-  // Speak the word first, then the meaning
-  var defLang = (lang==="zh"||lang==="py") ? "zh-CN" : "en-US";
-  // Speak meaning in English always (it's in English)
-  window.speechSynthesis.cancel();
-  var u = new SpeechSynthesisUtterance(sentence);
-  u.lang = "en-US"; u.rate = 0.82; u.volume = 1.0;
-  var vs = window.speechSynthesis.getVoices();
-  var fv = vs.find(function(v){return /female|samantha|karen|zira/i.test(v.name)&&v.lang.indexOf("en")===0;})||vs.find(function(v){return v.lang==="en-US"||v.lang==="en-GB";});
-  if(fv) u.voice = fv;
-  setTimeout(function(){window.speechSynthesis.speak(u);}, 600);
+  return html||'<div style="font-size:14px;white-space:pre-wrap;color:#2D2A45">'+text+'</div>';
 }
 
 async function doLookup(rawWord){
   if(!rawWord||rawWord==="\u2014"||rawWord==="\u2026")return;
   var word=rawWord.trim().replace(/[^\w\u4e00-\u9fff\u0300-\u036f\s\-]/g,"").trim().split(/\s+/).slice(0,3).join(" ");
   if(!word){toast("Please say or type a word first!");return;}
-  if(!navigator.onLine){toast("No internet needed — try a word from the built-in list!");return;}
   currentLUWord=word;
   var lang=getLang(word);
   var rc=document.getElementById("lu-result");rc.style.display="block";
@@ -966,42 +871,45 @@ async function doLookup(rawWord){
   var spEl=document.getElementById("lu-spelling");
   var cols=["#FFE4E4","#FFF3D4","#E4FFE9","#E4EEFF","#F9E4FF","#FFE4F4","#E4FFF9","#FFFEE4"];
   var txc=["#C0392B","#B7770D","#196F3D","#154360","#6C3483","#C0235E","#117A65","#9A7D0A"];
-  if(lang==="en"){spEl.innerHTML=word.split("").map(function(lt,i){var ci=i%cols.length;return"<div style=\"background:"+cols[ci]+";color:"+txc[ci]+";border-radius:14px;padding:12px 10px;font-size:26px;font-weight:900;min-width:44px;text-align:center;box-shadow:0 3px 0 rgba(0,0,0,.1)\">"+lt+"</div>";}).join("");}
-  else{spEl.innerHTML="<div style=\"background:var(--pul);border-radius:16px;padding:14px 22px;font-size:28px;font-weight:800;color:var(--pud);letter-spacing:2px\">"+word+"</div>";}
+  if(lang==="en"){spEl.innerHTML=word.split("").map(function(lt,i){var ci=i%cols.length;return'<div style="background:'+cols[ci]+';color:'+txc[ci]+';border-radius:14px;padding:12px 10px;font-size:26px;font-weight:900;min-width:44px;text-align:center;box-shadow:0 3px 0 rgba(0,0,0,.1)">'+lt+'</div>';}).join("");}
+  else{spEl.innerHTML='<div style="background:var(--pul);border-radius:16px;padding:14px 22px;font-size:28px;font-weight:800;color:var(--pud);letter-spacing:2px">'+word+'</div>';}
   speak(word,lang);
   showStrokeGuide(word);
-  // Definition
   var defEl=document.getElementById("lu-def");
-  defEl.innerHTML="<div class=\"dots\"><span></span><span></span><span></span></div> Getting the meaning\u2026";
-  // definitions fetched by free APIs below
+  defEl.innerHTML='<div class="dots"><span></span><span></span><span></span></div> Getting the meaning\u2026';
   try{
     var resp;
-    if(lang==="en"){
-      resp = await fetchEnglishDef(word);
-    } else if(lang==="zh"){
-      resp = await fetchChineseDef(word);
-    } else {
-      resp = buildPinyinDef(word);
-    }
+    if(lang==="en") resp=await fetchEnglishDef(word);
+    else if(lang==="zh") resp=await fetchChineseDef(word);
+    else resp=buildPinyinDef(word);
     defEl.innerHTML=formatDef(resp);
-    // Read the definition aloud
-    readDefAloud(resp, lang);
-    luHistory.unshift({word:word,lang:lang});
-    if(luHistory.length>15)luHistory.pop();
-    renderLUHist();
-    document.getElementById("lu-inp")&&(document.getElementById("lu-inp").value="");
-    document.getElementById("lu-heard").textContent="\u2014";
-    document.getElementById("lu-mic-lbl").textContent="Tap the mic and say a word clearly!";
-    document.getElementById("lu-mic-look").style.display="none";
-    document.getElementById("lu-mic-retry").style.display="none";
+    readDefAloud(resp,lang);
   }catch(e){
-    defEl.innerHTML="<div style=\"background:#FFF3E0;border-left:4px solid #FF9F1C;border-radius:0 12px 12px 0;padding:10px 14px;font-size:14px;color:#7D5A00\">"
-      +"<strong>\u26a0\ufe0f Could not get meaning.</strong><br><br>"+e.message+"<br><br>"
-      +"Make sure you are using the GitHub Pages link:<br><strong>https://quekshuwen-dev.github.io/spelling-coach</strong></div>";
+    defEl.innerHTML='<div style="background:#FFF3E0;border-left:4px solid #FF9F1C;border-radius:0 12px 12px 0;padding:10px 14px;font-size:14px;color:#7D5A00"><strong>\u26a0\ufe0f '+e.message+'</strong></div>';
   }
 }
 
-// Stroke guide
+// ── Read definition aloud ─────────────────────────────────────
+function readDefAloud(text,lang){
+  if(!window.speechSynthesis)return;
+  var lines=text.split("\n"),toRead=[],inMeaning=false;
+  for(var i=0;i<lines.length;i++){
+    var line=lines[i].trim();
+    if(/^MEANING/i.test(line)){inMeaning=true;continue;}
+    if(line===""&&inMeaning){break;}
+    if(inMeaning&&line)toRead.push(line.replace(/^\u2022\s*/,""));
+  }
+  if(!toRead.length)return;
+  window.speechSynthesis.cancel();
+  var u=new SpeechSynthesisUtterance(toRead.join(". "));
+  u.lang="en-US";u.rate=0.82;u.volume=1.0;
+  var vs=window.speechSynthesis.getVoices();
+  var fv=vs.find(function(v){return /female|samantha|karen|zira/i.test(v.name)&&v.lang.indexOf("en")===0;})||vs.find(function(v){return v.lang==="en-US"||v.lang==="en-GB";});
+  if(fv)u.voice=fv;
+  setTimeout(function(){window.speechSynthesis.speak(u);},600);
+}
+
+// ── Stroke Guide ──────────────────────────────────────────────
 function showStrokeGuide(word){
   var sec=document.getElementById("lu-stroke-section"),frames=document.getElementById("lu-stroke-frames");
   var chars=word.split("").filter(function(ch){return /[\u4e00-\u9fff]/.test(ch);});
@@ -1009,21 +917,21 @@ function showStrokeGuide(word){
   sec.style.display="block";frames.innerHTML="";
   chars.forEach(function(ch,i){
     var btn=document.createElement("button");
-    btn.style.cssText="display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--pul);border:2.5px solid var(--pu);border-radius:16px;padding:14px 18px;cursor:pointer;touch-action:manipulation;min-width:70px";
-    btn.innerHTML="<span style=\"font-size:38px;line-height:1;color:var(--tx)\">"+ch+"</span><span style=\"font-size:11px;font-weight:700;color:var(--pud)\">\u270f\ufe0f Learn to write</span>";
+    btn.style.cssText='display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--pul);border:2.5px solid var(--pu);border-radius:16px;padding:14px 18px;cursor:pointer;touch-action:manipulation;min-width:70px';
+    btn.innerHTML='<span style="font-size:38px;line-height:1;color:var(--tx)">'+ch+'</span><span style="font-size:11px;font-weight:700;color:var(--pud)">\u270f\ufe0f Learn to write</span>';
     (function(character,index,allChars){btn.addEventListener("click",function(){openStrokeModal(character,index,allChars);});})(ch,i,chars.slice());
     frames.appendChild(btn);
   });
 }
 function openStrokeModal(ch,idx,chars){
   strokeChars=chars||[ch];strokeIdx=idx||0;
-  document.getElementById("stroke-modal").style.display="flex";
+  var modal=document.getElementById("stroke-modal");modal.classList.add("open");
   var nav=document.getElementById("stroke-nav");
   if(strokeChars.length>1){nav.style.display="flex";document.getElementById("stroke-nav-lbl").textContent=(strokeIdx+1)+" / "+strokeChars.length;}
   else nav.style.display="none";
   renderHW(ch);
 }
-function closeStrokeModal(){document.getElementById("stroke-modal").style.display="none";hwWriter=null;}
+function closeStrokeModal(){document.getElementById("stroke-modal").classList.remove("open");hwWriter=null;}
 function renderHW(ch){
   var svg=document.getElementById("stroke-svg");
   while(svg.children.length>4)svg.removeChild(svg.lastChild);
@@ -1032,11 +940,8 @@ function renderHW(ch){
   if(typeof HanziWriter==="undefined"){document.getElementById("stroke-msg").textContent="Loading\u2026 please wait and tap again.";return;}
   try{
     hwWriter=HanziWriter.create("stroke-svg",ch,{width:240,height:240,padding:16,strokeColor:"#7C5CFC",radicalColor:"#FF4D6D",highlightColor:"#FFD60A",outlineColor:"#DDDDEE",strokeAnimationSpeed:0.8,delayBetweenStrokes:300,showOutline:true,
-      onLoadCharDataError:function(){document.getElementById("stroke-msg").textContent="Stroke data not available for this character.";}
-    });
-    setTimeout(function(){
-      if(hwWriter){hwWriter.animateCharacter();document.getElementById("stroke-msg").textContent="Watch how to write it! Tap \u25b6\ufe0f to replay or \u270f\ufe0f to practise.";}
-    },400);
+      onLoadCharDataError:function(){document.getElementById("stroke-msg").textContent="Stroke data not available for this character.";}});
+    setTimeout(function(){if(hwWriter){hwWriter.animateCharacter();document.getElementById("stroke-msg").textContent="Watch how to write it! Tap \u25b6\ufe0f to replay or \u270f\ufe0f to practise.";}},400);
   }catch(e){document.getElementById("stroke-msg").textContent="Could not load character. Please check internet.";}
 }
 function animateStroke(){if(!hwWriter)return;hwWriter.animateCharacter();document.getElementById("stroke-msg").textContent="Watch carefully! Tap again to replay.";}
@@ -1052,25 +957,7 @@ function quizStroke(){
 function prevChar(){if(strokeIdx>0){strokeIdx--;openStrokeModal(strokeChars[strokeIdx],strokeIdx,strokeChars);}}
 function nextChar(){if(strokeIdx<strokeChars.length-1){strokeIdx++;openStrokeModal(strokeChars[strokeIdx],strokeIdx,strokeChars);}}
 
-// Lookup helpers
-function addLUWord(){if(!currentLUWord)return;addW(currentLUWord,"");toast("\u2705 \""+currentLUWord+"\" added to spelling list!");document.getElementById("lu-add-btn").textContent="\u2705 Added!";setTimeout(function(){document.getElementById("lu-add-btn").textContent="\u2795 Add to my spelling list";},2000);}
-function clearLUHist(){luHistory=[];document.getElementById("lu-hist-card").style.display="none";}
-function addAllLU(){luHistory.forEach(function(h){addW(h.word,"");});toast("\u2705 All "+luHistory.length+" words added!");}
-function renderLUHist(){
-  var hc=document.getElementById("lu-hist-card"),hl=document.getElementById("lu-hist-list");
-  if(!luHistory.length){hc.style.display="none";return;}
-  hc.style.display="block";
-  hl.innerHTML=luHistory.map(function(h){
-    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1.5px solid #f0f0f8">'
-      +'<div style="font-size:18px;font-weight:800;color:var(--pu);flex:1">'+h.word+'</div>'
-      +'<span class="wlang l-'+h.lang+'" style="font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700">'+h.lang.toUpperCase()+'</span>'
-      +'<button data-w="'+h.word.replace(/'/g,"&#39;")+'" style="background:var(--pul);border:none;border-radius:20px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--pud);cursor:pointer;touch-action:manipulation">Look up again</button>'
-      +'</div>';
-  }).join("");
-  hl.querySelectorAll("button[data-w]").forEach(function(btn){btn.addEventListener("click",function(){doLookup(this.getAttribute("data-w"));});});
-}
-
-// AI
+// ── AI ────────────────────────────────────────────────────────
 async function callAI(content,maxTokens){
   maxTokens=maxTokens||800;
   var r=await fetch("https://api.anthropic.com/v1/messages",{
@@ -1086,8 +973,106 @@ async function callAI(content,maxTokens){
   return b.text;
 }
 
-// Voice preload
+// ── English Dictionary Lookup ─────────────────────────────────
+async function fetchEnglishDef(word){
+  var key=word.toLowerCase().trim();
+  try{
+    var r=await fetch("https://api.dictionaryapi.dev/api/v2/entries/en/"+encodeURIComponent(key));
+    if(!r.ok)throw new Error("The word \""+word+"\" was not found. Please check the spelling.");
+    var data=await r.json();
+    if(!data||!data[0])throw new Error("No definition found for \""+word+"\".");
+    var entry=data[0];
+    var out="";
+    var meanings=entry.meanings||[];
+    for(var i=0;i<meanings.length;i++){
+      var m=meanings[i];
+      var defs=m.definitions||[];
+      for(var j=0;j<defs.length;j++){
+        out+="MEANING ("+m.partOfSpeech+")\n"+defs[j].definition+"\n\n";
+        if(defs[j].example)out+="EXAMPLE\n"+defs[j].example+"\n\n";
+      }
+    }
+    if(!out)throw new Error("No definitions available for this word.");
+    if(entry.phonetic)out+="PRONUNCIATION\n"+entry.phonetic+"\n\n";
+    out+="SPELLING\n"+key.toUpperCase().split("").join(" - ")+" ("+key.length+" letters)";
+    return out;
+  }catch(err){
+    if(err.message.indexOf("Failed to fetch")>-1)return "MEANING\nCould not connect to the dictionary. Please check your internet connection.\n\nSPELLING\n"+key.toUpperCase().split("").join(" - ");
+    return "MEANING\n"+err.message+"\n\nSPELLING\n"+key.toUpperCase().split("").join(" - ");
+  }
+}
+
+// ── Chinese Dictionary Lookup ─────────────────────────────────
+async function fetchChineseDef(word){
+  var chars=word.split("").filter(function(ch){return /[\u4e00-\u9fff]/.test(ch);});
+  if(!chars.length)throw new Error("No Chinese characters found.");
+  return buildLocalChineseDef(word,chars);
+}
+
+function buildLocalChineseDef(word,chars){
+  var ZH={
+    "\u6211":["w\u01d2","I, me"],"\u4f60":["n\u01d0","you"],"\u4ed6":["t\u0101","he, him"],"\u5979":["t\u0101","she, her"],
+    "\u597d":["h\u01ceo","good, well"],"\u5927":["d\u00e0","big, large"],"\u5c0f":["xi\u01ceo","small, little"],
+    "\u4e0a":["sh\u00e0ng","up, above, on top"],"\u4e0b":["xi\u00e0","down, below, under"],"\u4eba":["r\u00e9n","person, people"],
+    "\u624b":["sh\u01d2u","hand"],"\u6c34":["shu\u01d0","water"],"\u706b":["hu\u01d2","fire"],"\u5c71":["sh\u0101n","mountain"],
+    "\u65e5":["r\u00ec","sun, day"],"\u6708":["yu\u00e8","moon, month"],"\u6728":["m\u00f9","wood, tree"],
+    "\u5929":["ti\u0101n","sky, day, heaven"],"\u5730":["d\u00ec","earth, ground"],"\u5fc3":["x\u012bn","heart, mind"],
+    "\u53e3":["k\u01d2u","mouth"],"\u76ee":["m\u00f9","eye"],"\u9b5a":["y\u00fa","fish"],"\u9e1f":["ni\u01ceo","bird"],
+    "\u82b1":["hu\u0101","flower"],"\u6811":["sh\u00f9","tree"],"\u5b66":["xu\u00e9","to study, to learn"],
+    "\u6821":["xi\u00e0o","school"],"\u5bb6":["ji\u0101","home, family, house"],
+    "\u7236":["f\u00f9","father"],"\u6bcd":["m\u01d4","mother"],"\u54e5":["g\u0113","older brother"],
+    "\u59d0":["ji\u011b","older sister"],"\u5f1f":["d\u00ec","younger brother"],"\u59b9":["m\u00e8i","younger sister"],
+    "\u5403":["ch\u012b","to eat"],"\u559d":["h\u0113","to drink"],"\u770b":["k\u00e0n","to look, to see, to read"],
+    "\u542c":["t\u012bng","to listen, to hear"],"\u8bf4":["shu\u014d","to speak, to say"],"\u5199":["xi\u011b","to write"],
+    "\u73a9":["w\u00e1n","to play"],"\u8de8":["z\u01d2u","to walk"],"\u8dd1":["p\u01ceo","to run"],"\u7761":["shu\u00ec","to sleep"],
+    "\u591a":["du\u014d","many, much"],"\u5c11":["sh\u01ceo","few, little"],"\u5feb":["ku\u00e0i","fast, quick"],"\u6162":["m\u00e0n","slow"],
+    "\u9ad8":["g\u0101o","tall, high"],"\u4f4e":["d\u012b","low, short"],
+    "\u7ea2":["h\u00f3ng","red"],"\u9ec4":["hu\u00e1ng","yellow"],"\u84dd":["l\u00e1n","blue"],"\u7eff":["l\u01dc","green"],"\u767d":["b\u00e1i","white"],"\u9ed1":["h\u0113i","black"],
+    "\u4e00":["y\u012b","one (1)"],"\u4e8c":["h\u00e8r","two (2)"],"\u4e09":["s\u0101n","three (3)"],"\u56db":["s\u00ec","four (4)"],
+    "\u4e94":["w\u01d4","five (5)"],"\u516d":["li\u00f9","six (6)"],"\u4e03":["q\u012b","seven (7)"],"\u516b":["b\u0101","eight (8)"],
+    "\u4e5d":["ji\u01d4","nine (9)"],"\u5341":["sh\u00ed","ten (10)"],"\u767e":["b\u01cei","hundred (100)"],"\u5343":["qi\u0101n","thousand (1000)"],
+    "\u4eca\u5929":["j\u012bti\u0101n","today"],"\u660e\u5929":["m\u00edngti\u0101n","tomorrow"],"\u6628\u5929":["zu\u00f3ti\u0101n","yesterday"],
+    "\u670b\u53cb":["p\u00e9ngyou","friend"],"\u8001\u5e08":["l\u01ceo sh\u012b","teacher"],"\u540c\u5b66":["t\u00f3ng xu\u00e9","classmate"],
+    "\u4f59\u4eba":["y\u00fa r\u00e9n","other people"]
+  };
+  var out="";
+  if(ZH[word]){
+    return "HANYU PINYIN\n"+ZH[word][0]+"\n\nMEANING\n"+ZH[word][1]+"\n\nSTROKE GUIDE\nTap the character button below to see stroke order! \u270f\ufe0f";
+  }
+  var parts=[],pinyins=[];
+  chars.forEach(function(ch){
+    if(ZH[ch]){parts.push("\u2022 "+ch+" ("+ZH[ch][0]+") = "+ZH[ch][1]);pinyins.push(ZH[ch][0]);}
+    else{parts.push("\u2022 "+ch+" = not yet in local dictionary");pinyins.push("?");}
+  });
+  if(pinyins.some(function(p){return p!=="?";}))out+="HANYU PINYIN\n"+pinyins.join(" ")+"\n\n";
+  out+="MEANING\n"+parts.join("\n")+"\n\nSTROKE GUIDE\nTap each character below to see stroke order and practise writing! \u270f\ufe0f";
+  return out;
+}
+
+function buildPinyinDef(word){
+  var tones={"\u0101":1,"\u00e1":2,"\u01ce":3,"\u00e0":4,"\u0113":1,"\u00e9":2,"\u011b":3,"\u00e8":4,"\u012b":1,"\u00ed":2,"\u01d0":3,"\u00ec":4,"\u014d":1,"\u00f3":2,"\u01d2":3,"\u00f2":4,"\u016b":1,"\u00fa":2,"\u01d4":3,"\u00f9":4};
+  var tn=5,tnames={1:"1st tone (flat)",2:"2nd tone (rising)",3:"3rd tone (dip then rise)",4:"4th tone (falling)",5:"neutral tone"};
+  for(var ch in tones){if(word.indexOf(ch)>-1){tn=tones[ch];break;}}
+  return "HANYU PINYIN\n"+word+"\n\nMEANING\nThis is Hanyu Pinyin, which shows how to pronounce a Chinese character using letters.\n\nTONE GUIDE\nThis pinyin uses the "+tnames[tn]+".\n\nSPELLING\n"+word.toUpperCase().split("").join(" - ");
+}
+
+// ── Voice preload ──────────────────────────────────────────────
 if(window.speechSynthesis){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=function(){window.speechSynthesis.getVoices();};}
+
+// ── Init ──────────────────────────────────────────────────────
+(function init(){
+  // Hide tab bar until profile selected
+  document.querySelector(".tbar").style.display="none";
+  // Load last used profile
+  var lastPid=null;
+  try{lastPid=localStorage.getItem("sc_last_profile");}catch(e){}
+  if(lastPid&&getProfile(lastPid)){
+    selectProfile(lastPid);
+  } else {
+    renderProfileGrid();
+    // Profile screen already visible by default
+  }
+})();
 </script>
 </body>
 </html>

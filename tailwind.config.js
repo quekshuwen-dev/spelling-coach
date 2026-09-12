@@ -5,18 +5,18 @@ export default {
     extend: {
       colors: {
         // One friendly palette, used everywhere. Kept small on purpose.
-        ink: { DEFAULT: '#2D2A45', soft: '#6B6890' },
-        grape: { 50: '#F4F1FF', 100: '#EAE4FF', 400: '#9B82FF', DEFAULT: '#7C5CFC', 600: '#5A3FD6' },
+        ink: { DEFAULT: '#2D1F0E', soft: '#7A5C3A' },
+        grape: { 50: '#FFF3E0', 100: '#FFE0B2', 400: '#FFA040', DEFAULT: '#FF5722', 600: '#E64A19' },
         leaf: { 50: '#E9F9EE', DEFAULT: '#34C759', 600: '#1F9B42' },
         berry: { 50: '#FFEDF1', DEFAULT: '#FF4D6D', 600: '#D62B4C' },
         sunny: { 50: '#FFF7E0', DEFAULT: '#FF9F1C', 600: '#D97E00' },
-        cream: '#FFF8F0',
+        cream: '#FFF3E0',
       },
       fontFamily: {
         sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'sans-serif'],
       },
       borderRadius: { xl2: '1.25rem' },
-      boxShadow: { soft: '0 6px 22px rgba(124, 92, 252, 0.16)' },
+      boxShadow: { soft: '0 6px 22px rgba(255, 87, 34, 0.18)' },
       keyframes: {
         bob: { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-8px)' } },
         pop: { '0%': { transform: 'scale(0.8)', opacity: '0' }, '100%': { transform: 'scale(1)', opacity: '1' } },

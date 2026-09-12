@@ -18,7 +18,7 @@
     font-size: 16px;
   }
   :focus-visible {
-    @apply outline-none ring-4 ring-grape/40 ring-offset-2 ring-offset-cream;
+    @apply outline-none ring-4 ring-grape/30 ring-offset-2 ring-offset-cream;
   }
 }
 

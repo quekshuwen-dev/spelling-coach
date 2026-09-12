@@ -3,7 +3,7 @@
  * tests pin down, because everything downstream (de-duplication, OCR cleanup,
  * which voice to use) depends on them behaving predictably.
  */
-import type { WordLang } from '../types'
+import type { WordLang, WordQuality } from '../types'
 
 const HANZI = /[一-鿿]/
 /** Pinyin tone-marked vowels. Their presence is what distinguishes "mǎ" from "ma". */
@@ -46,8 +46,29 @@ export function normalizeWord(word: string): string {
 }
 
 /**
+ * The only two-letter strings that are really words. Photographing packaging or
+ * a textbook throws off dozens of two-letter fragments ("Un", "ig", "er") as the
+ * engine clips the edge of a larger word, and without this list every one of
+ * them reaches the picker looking exactly like a real spelling word.
+ */
+const TWO_LETTER_WORDS = new Set([
+  'am', 'an', 'as', 'at', 'ax', 'be', 'by', 'do', 'go', 'ha', 'he', 'hi', 'id', 'if', 'in', 'is',
+  'it', 'me', 'my', 'no', 'of', 'oh', 'ok', 'on', 'or', 'ox', 'pi', 'so', 'to', 'up', 'us', 'we',
+])
+
+/** Diacritics removed, so "mǎ" tests as "ma" and "café" as "cafe". */
+function deaccent(word: string): string {
+  return word.normalize('NFD').replace(/\p{M}/gu, '')
+}
+
+/**
  * Is this a plausible spelling word rather than OCR noise?
- * Rejects stray glyphs, page numbers and run-on scan artefacts.
+ *
+ * The rules below are tuned against the way OCR actually fails on a photo of
+ * printed packaging: it returns short consonant runs from logos ("RN", "CC",
+ * "TR"), all-caps fragments of stylised text ("EWN"), and two-letter slivers of
+ * longer words. Each one would otherwise land in the picker indistinguishable
+ * from a word the child is meant to learn.
  */
 export function isPlausibleWord(word: string): boolean {
   const w = cleanWord(word)
@@ -56,7 +77,50 @@ export function isPlausibleWord(word: string): boolean {
   if (w.length < 2 || w.length > 28) return false
   // Letters, with an apostrophe or hyphen only between letters, plus an
   // optional possessive apostrophe. Rejects "x/y", "a1b2c3", "12" and "--".
-  return /^\p{L}+(?:['-]\p{L}+)*'?$/u.test(w)
+  if (!/^\p{L}+(?:['-]\p{L}+)*'?$/u.test(w)) return false
+  // A tone mark is never something OCR invents, so tone-marked pinyin is
+  // deliberate text — and short syllables like "mǎ" must survive the rules below.
+  if (detectLang(w) === 'py') return true
+
+  const letters = deaccent(w).replace(/[^\p{L}]/gu, '')
+  // The remaining rules read Latin script only; they would wrongly reject
+  // Greek, Cyrillic, Arabic and the rest, which have their own vowel systems.
+  if (!/^[A-Za-z]+$/.test(letters)) return true
+
+  // No English word is written without a vowel, so "RN", "CC" and "df" are noise.
+  if (!/[aeiouy]/i.test(letters)) return false
+  // A short all-caps run is a logo or a cropped heading, not a spelling word.
+  if (letters.length <= 3 && letters === letters.toUpperCase()) return false
+  // Two letters is only a word when it genuinely is one.
+  if (letters.length === 2 && !TWO_LETTER_WORDS.has(letters.toLowerCase())) return false
+  // Three of the same letter in a row is a scan artefact ("IIl", "oooo").
+  if (/(\p{L})\1\1/iu.test(letters)) return false
+  return true
+}
+
+/**
+ * How confident we are that a candidate is a real spelling word.
+ *
+ * `isPlausibleWord` is the hard gate; this is the soft one. Everything that
+ * survives is still offered to the parent, but only the confident words are
+ * shown up front — a photo of a book cover or a medicine box yields far more
+ * fragments than words, and burying the real list under them is what makes the
+ * picker unusable.
+ */
+export function wordQuality(word: string): WordQuality {
+  const w = cleanWord(word)
+  if (!w) return 'unsure'
+  // A single character is the normal unit of a Chinese 听写 list, not a fragment.
+  if (detectLang(w) === 'zh') return 'likely'
+
+  const letters = deaccent(w).replace(/[^\p{L}]/gu, '')
+  if (!/^[A-Za-z]+$/.test(letters)) return 'likely'
+  if (letters.length <= 2) return 'unsure'
+  // Packaging and headings are set in capitals far more often than word lists.
+  if (letters === letters.toUpperCase()) return 'unsure'
+  // Mid-word capitals ("EWn", "gAd") mean the engine lost the letter shapes.
+  if (!/^[A-Z]?[a-z]+$/.test(letters)) return 'unsure'
+  return 'likely'
 }
 
 /** Split a block of OCR text into individual candidate words, in reading order. */

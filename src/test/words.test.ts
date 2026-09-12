@@ -5,6 +5,7 @@ import {
   detectLang,
   diffAnswer,
   isPlausibleWord,
+  wordQuality,
   normalizeWord,
   splitIntoWords,
 } from '../lib/words'
@@ -66,6 +67,47 @@ describe('isPlausibleWord', () => {
     expect(isPlausibleWord('12')).toBe(false)
     expect(isPlausibleWord('x/y')).toBe(false)
     expect(isPlausibleWord('')).toBe(false)
+  })
+
+  // Every string here came off a real scan of a medicine box, where the engine
+  // read logo and packaging text as if it were a word list.
+  it('rejects the fragments a photo of packaging produces', () => {
+    for (const noise of ['RN', 'CC', 'TR', 'df', 'EWN', 'RE', 'Un', 'ig', 'er']) {
+      expect(isPlausibleWord(noise), noise).toBe(false)
+    }
+  })
+
+  it('keeps short words that really are words', () => {
+    for (const word of ['he', 'go', 'am', 'is', 'up', 'we']) {
+      expect(isPlausibleWord(word), word).toBe(true)
+    }
+  })
+
+  it('keeps accented and tone-marked words, which have vowels once decomposed', () => {
+    expect(isPlausibleWord('café')).toBe(true)
+    expect(isPlausibleWord('mǎ')).toBe(true)
+  })
+
+  it('rejects a run of the same letter', () => {
+    expect(isPlausibleWord('aaa')).toBe(false)
+    expect(isPlausibleWord('oooo')).toBe(false)
+    // Two in a row is ordinary English and must survive.
+    expect(isPlausibleWord('letter')).toBe(true)
+  })
+})
+
+describe('wordQuality', () => {
+  it('trusts ordinary words and single Chinese characters', () => {
+    expect(wordQuality('butterfly')).toBe('likely')
+    expect(wordQuality('Garden')).toBe('likely')
+    expect(wordQuality('川')).toBe('likely')
+    expect(wordQuality('枇杷')).toBe('likely')
+  })
+
+  it('doubts capitals and mid-word case changes, which come from stylised text', () => {
+    expect(wordQuality('COUGH')).toBe('unsure')
+    expect(wordQuality('gAd')).toBe('unsure')
+    expect(wordQuality('he')).toBe('unsure')
   })
 })
 

@@ -13,7 +13,7 @@
  * says "no_provider", we quietly switch to Tesseract rather than failing.
  */
 import { forceLocalOcr } from '../config/env'
-import { cleanWord, detectLang, isPlausibleWord, splitIntoWords } from '../lib/words'
+import { cleanWord, detectLang, isPlausibleWord, splitIntoWords, wordQuality } from '../lib/words'
 import type { OcrResult, OcrWord } from '../types'
 import type { PreparedImage } from './imageProcessingService'
 import type { OcrPayload } from './ocrSchema'
@@ -208,10 +208,19 @@ export function toResult(payload: OcrPayload, engine: string, local: boolean): O
       // Nothing is pre-selected: the parent chooses, which is the whole point
       // of the review step.
       selected: false,
+      quality: wordQuality(text),
     })
   }
 
-  return { text: payload.text, words, engine: engine as OcrResult['engine'], local }
+  // Confident candidates first, each group still in reading order, so the words
+  // the parent is looking for are at the top instead of scattered through the
+  // fragments a photo of packaging or a book cover produces.
+  const ordered = [
+    ...words.filter((w) => w.quality === 'likely'),
+    ...words.filter((w) => w.quality === 'unsure'),
+  ]
+
+  return { text: payload.text, words: ordered, engine: engine as OcrResult['engine'], local }
 }
 
 export const ocrService = { recognise, isServerOcrConfigured }

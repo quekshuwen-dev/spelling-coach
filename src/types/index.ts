@@ -2,6 +2,12 @@
 
 export type WordLang = 'en' | 'zh' | 'py'
 
+/**
+ * How confident we are that an OCR candidate is a real spelling word.
+ * 'unsure' candidates are still offered, but behind a "show more" toggle.
+ */
+export type WordQuality = 'likely' | 'unsure'
+
 export type WordSource = 'image' | 'manual' | 'voice' | 'sample'
 
 export type MasteryStatus = 'new' | 'needs-practice' | 'learning' | 'good' | 'mastered'
@@ -71,6 +77,8 @@ export interface OcrWord {
   selected: boolean
   /** 0..1 when the engine reports one. */
   confidence?: number
+  /** 'unsure' candidates are real enough to offer, but are hidden until asked for. */
+  quality: WordQuality
 }
 
 export interface OcrResult {

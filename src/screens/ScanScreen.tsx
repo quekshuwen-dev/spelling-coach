@@ -36,6 +36,7 @@ export default function ScanScreen() {
   const [manualWord, setManualWord] = useState('')
   const [saving, setSaving] = useState(false)
   const [showRawText, setShowRawText] = useState(false)
+  const [showUnsure, setShowUnsure] = useState(false)
 
   const imageRef = useRef<PreparedImage | null>(null)
   imageRef.current = image
@@ -50,6 +51,8 @@ export default function ScanScreen() {
   )
 
   const selectedCount = useMemo(() => words.filter((w) => w.selected).length, [words])
+  const likely = useMemo(() => words.filter((w) => w.quality === 'likely'), [words])
+  const unsure = useMemo(() => words.filter((w) => w.quality === 'unsure'), [words])
 
   const showError = (title: string, body: string, tip?: string) => {
     setError({ title, body, tip })
@@ -125,8 +128,9 @@ export default function ScanScreen() {
       return
     }
     setWords((current) => [
+      // A word the parent typed is never a guess, so it leads the list ready-ticked.
+      { id: `manual_${Date.now()}`, raw: text, text, lang: detectLang(text), selected: true, quality: 'likely' },
       ...current,
-      { id: `manual_${Date.now()}`, raw: text, text, lang: detectLang(text), selected: true },
     ])
     setManualWord('')
   }
@@ -210,23 +214,31 @@ export default function ScanScreen() {
   }
 
   if (stage === 'pick') {
+    const toggle = (id: string) =>
+      setWords((c) => c.map((w) => (w.id === id ? { ...w, selected: !w.selected } : w)))
+    const edit = (id: string, text: string) =>
+      setWords((c) => c.map((w) => (w.id === id ? { ...w, text, lang: detectLang(text) } : w)))
+    const remove = (id: string) => setWords((c) => c.filter((w) => w.id !== id))
+
     return (
-      <main className="page">
+      <main className="page pb-44">
         <PageHeader
           emoji="👆"
           title="Tap the words you want"
-          subtitle="Tap a word to pick it. Tap ✏️ to fix a spelling mistake the reader made."
+          subtitle="Tap a word to tick it. Tap ✏️ to fix a spelling the reader got wrong."
         />
 
         <Card className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <CardTitle>
-              📝 Found {words.length} word{words.length === 1 ? '' : 's'}
+              ✅ Picked {selectedCount} of {words.length}
             </CardTitle>
             <div className="flex gap-2">
               <button
                 className="btn-quiet"
-                onClick={() => setWords((c) => c.map((w) => ({ ...w, selected: true })))}
+                onClick={() =>
+                  setWords((c) => c.map((w) => (w.quality === 'likely' ? { ...w, selected: true } : w)))
+                }
               >
                 Select all
               </button>
@@ -239,15 +251,40 @@ export default function ScanScreen() {
             </div>
           </div>
 
-          <WordPicker
-            words={words}
-            onToggle={(id) => setWords((c) => c.map((w) => (w.id === id ? { ...w, selected: !w.selected } : w)))}
-            onEdit={(id, text) =>
-              setWords((c) => c.map((w) => (w.id === id ? { ...w, text, lang: detectLang(text) } : w)))
-            }
-            onRemove={(id) => setWords((c) => c.filter((w) => w.id !== id))}
-          />
+          {likely.length > 0 ? (
+            <WordPicker words={likely} onToggle={toggle} onEdit={edit} onRemove={remove} />
+          ) : (
+            <p className="py-2 text-sm text-ink-soft">
+              None of these looked like clear spelling words. Open the list below, or type the words by hand.
+            </p>
+          )}
         </Card>
+
+        {/* OCR on a photo of packaging or a book cover returns far more scraps
+            than words. They are still offered — the reader is sometimes right —
+            but folded away so they cannot bury the real list. */}
+        {unsure.length > 0 && (
+          <Card className="mt-3 space-y-3">
+            <button
+              className="flex w-full items-center justify-between text-sm font-bold"
+              onClick={() => setShowUnsure((s) => !s)}
+              aria-expanded={showUnsure}
+            >
+              <span>
+                🤔 {unsure.length} more the reader wasn&apos;t sure about
+              </span>
+              <span aria-hidden>{showUnsure ? '▲' : '▼'}</span>
+            </button>
+            {showUnsure && (
+              <>
+                <p className="text-xs text-ink-soft">
+                  These are usually bits of a logo or half a word. Tap any that really are words.
+                </p>
+                <WordPicker words={unsure} onToggle={toggle} onEdit={edit} onRemove={remove} />
+              </>
+            )}
+          </Card>
+        )}
 
         <Card className="mt-3">
           <CardTitle>✏️ Add a word by hand</CardTitle>
@@ -275,7 +312,13 @@ export default function ScanScreen() {
           </Card>
         )}
 
-        <div className="sticky bottom-24 z-40 mt-4 space-y-2">
+        {/* Opaque, and spanning the page gutter: as a transparent bar this sat on
+            top of the word chips as they scrolled past, hiding them and swallowing
+            the taps meant for them. */}
+        <div
+          className="sticky bottom-0 z-40 -mx-4 mt-4 space-y-2 border-t border-grape-100 bg-cream px-4 pb-3 pt-3
+                     shadow-[0_-6px_18px_rgba(255,87,34,0.10)]"
+        >
           <button className="btn-success w-full text-lg" onClick={save} disabled={saving || selectedCount === 0}>
             {saving ? 'Saving…' : `➕ Add ${selectedCount || ''} word${selectedCount === 1 ? '' : 's'} to my list`}
           </button>

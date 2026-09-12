@@ -51,13 +51,22 @@ export default function WordPicker({ words, onToggle, onEdit, onRemove }: Props)
               type="button"
               aria-pressed={word.selected}
               onClick={() => onToggle(word.id)}
-              className={`btn min-h-[3rem] rounded-2xl border-[2.5px] px-4 text-base ${
+              className={`btn min-h-[3rem] rounded-2xl border-[2.5px] px-3 text-base ${
                 word.selected
                   ? 'border-grape bg-grape text-white shadow-soft'
                   : 'border-grape-100 bg-white text-ink hover:border-grape-400'
               }`}
             >
-              {word.selected && <span aria-hidden>✓</span>}
+              {/* An empty box on every unpicked word, so "these are tappable" reads
+                  at a glance instead of having to be discovered by tapping one. */}
+              <span
+                aria-hidden
+                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-[0.3rem] border-2 text-xs font-black ${
+                  word.selected ? 'border-white bg-white text-grape' : 'border-grape-400 bg-white'
+                }`}
+              >
+                {word.selected ? '✓' : ''}
+              </span>
               <span>{word.text}</span>
             </button>
             <button

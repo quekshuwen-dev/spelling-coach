@@ -1,0 +1,11 @@
+node_modules
+dist
+dist-ssr
+.env
+.env.local
+*.local
+.vercel
+.DS_Store
+tsconfig.tsbuildinfo
+dev-dist
+firebase-debug.log

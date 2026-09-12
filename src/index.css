@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-cream text-ink font-sans antialiased;
+    /* Bottom nav height + the iPhone home indicator. */
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+  }
+  /* 16px minimum on inputs, or iOS Safari zooms the page on focus. */
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+  :focus-visible {
+    @apply outline-none ring-4 ring-grape/30 ring-offset-2 ring-offset-cream;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl2 bg-white p-5 shadow-soft;
+  }
+  /* Every tappable target is at least 48px tall — these are children's thumbs. */
+  .btn {
+    @apply inline-flex min-h-[3.25rem] touch-manipulation select-none items-center justify-center gap-2
+           rounded-2xl px-5 text-base font-bold transition
+           active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100;
+  }
+  .btn-primary {
+    @apply btn bg-grape text-white shadow-soft hover:bg-grape-600;
+  }
+  .btn-success {
+    @apply btn bg-leaf text-white shadow-soft hover:bg-leaf-600;
+  }
+  .btn-danger {
+    @apply btn bg-berry text-white shadow-soft hover:bg-berry-600;
+  }
+  .btn-ghost {
+    @apply btn border-[2.5px] border-grape bg-white text-grape hover:bg-grape-50;
+  }
+  .btn-quiet {
+    @apply btn min-h-[2.75rem] border border-grape-100 bg-white px-4 text-sm text-ink-soft hover:bg-grape-50;
+  }
+  .field {
+    @apply w-full rounded-2xl border-[2.5px] border-grape-100 bg-white px-4 py-3 text-ink
+           outline-none transition placeholder:text-ink-soft/60 focus:border-grape;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold;
+  }
+  .page {
+    @apply mx-auto w-full max-w-2xl px-4 pb-8 pt-4;
+  }
+}
+
+/* Respect a child (or parent) who has asked the OS for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

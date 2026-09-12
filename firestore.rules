@@ -1,0 +1,27 @@
+rules_version = '2';
+
+// Every document lives under the signing-in user's own uid, so the only rule
+// needed is "you may touch your own subtree, and nothing else".
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      match /spellingWords/{wordId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+
+        match /attempts/{attemptId} {
+          // Attempts are an append-only record of what the child did; allowing
+          // edits would let a bad write rewrite the progress history.
+          allow read, create: if request.auth != null && request.auth.uid == userId;
+          allow update, delete: if false;
+        }
+      }
+    }
+
+    // Anything not matched above is denied.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -66,9 +66,37 @@ src/screens/             Home, Scan, WordList, Test, Progress, Settings
 
 ## The sound
 
-The original app called the Web Speech API the naive way, which sounds wrong on
-real devices for reasons that are not obvious. Each one is fixed in
-`src/services/speechService.ts` and pinned by a test in `src/test/speech.test.ts`.
+**A real neural voice comes first.** The fixes below make the device's own
+voices as good as they can be, and that still is not good enough: they are
+synthetic enough that a child mishears the word they are being asked to spell.
+So the word is fetched as real neural audio (Amazon Polly, via StreamElements'
+free endpoint) and played as an `<audio>` clip — the same approach as the
+reading helper — with everything below as the fallback. See
+`src/services/neuralVoice.ts`.
+
+Two details carry most of the difference:
+
+- **`preservesPitch`.** "Say it slowly" plays at 0.6×. Without this the pitch
+  falls with the speed and the voice becomes a growl. This alone is most of why
+  slowed-down speech used to sound wrong.
+- **Caching.** A child hears the same ten words many times, so each clip is
+  fetched once, and the service worker keeps it — a word heard once can still be
+  heard offline.
+
+The fallback is automatic and total: if the service is unreachable, the network
+is down, or the response is not audio, the word is spoken by the device voice
+instead, and the app stops asking for the rest of the session rather than making
+every word wait for a timeout. Letter-by-letter spelling deliberately stays on
+the device voice — a neural voice applies word-level pronunciation rules, so a
+lone "a" comes back as "uh" rather than the letter name.
+
+Each word is sent to the voice service to be read aloud. **Settings → Natural
+voice** turns this off, which keeps every word on the device.
+
+The rest of this section is the fallback path. The original app called the Web
+Speech API the naive way, which sounds wrong on real devices for reasons that
+are not obvious. Each one is fixed in `src/services/speechService.ts` and pinned
+by a test in `src/test/speech.test.ts`.
 
 | # | What was wrong | What it sounded like | Fix |
 | --- | --- | --- | --- |
@@ -276,5 +304,7 @@ Structured for, but not implemented — each has a seam ready:
 - Tesseract needs one online visit to download its engine before it works offline.
 - Handwriting is genuinely hard for the on-device engine — configure an OCR
   provider if the lists are handwritten.
-- Speech quality is whatever the device has installed. Settings shows which
-  voice will be used and warns when a language has none.
+- The natural voice needs the internet the first time it says a given word.
+  Offline, and with the setting off, quality drops to whatever voices the device
+  has installed; Settings shows which one will be used and warns when a language
+  has none.

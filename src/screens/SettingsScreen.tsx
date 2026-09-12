@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom'
 import { Card, CardTitle, Notice, PageHeader } from '../components/ui'
 import { useApp } from '../context/AppContext'
 import { ACCENTS, SPEEDS, describeVoice, speak, speechSupported, stopSpeaking, type Accent } from '../services/speechService'
+import { setNeuralEnabled } from '../services/neuralVoice'
 
 export default function SettingsScreen() {
   const { settings, setSettings, storage, serverOcr } = useApp()
@@ -36,6 +37,32 @@ export default function SettingsScreen() {
           <Notice tone="warn">This browser cannot speak. Try Chrome, Safari or Edge.</Notice>
         </div>
       )}
+
+      <Card className="mb-3">
+        <CardTitle>✨ Natural voice</CardTitle>
+        <button
+          onClick={() => {
+            const next = !settings.naturalVoice
+            setSettings({ naturalVoice: next })
+            setNeuralEnabled(next)
+            preview(settings.accent, settings.rate)
+          }}
+          aria-pressed={settings.naturalVoice}
+          className={`btn mt-2 w-full justify-between border-[2.5px] ${
+            settings.naturalVoice
+              ? 'border-grape bg-grape-50 text-grape-600'
+              : 'border-grape-100 bg-white text-ink'
+          }`}
+        >
+          <span>{settings.naturalVoice ? 'On — a real human-sounding voice' : 'Off — this device’s built-in voice'}</span>
+          <span aria-hidden>{settings.naturalVoice ? '✓' : ''}</span>
+        </button>
+        <p className="mt-3 text-xs text-ink-soft">
+          The natural voice is downloaded as it is needed, so it wants the internet the first time it says a
+          word — after that the word is saved and works offline. Each word is sent to the voice service to be
+          read aloud. Turn this off to keep every word on this device.
+        </p>
+      </Card>
 
       <Card className="mb-3">
         <CardTitle>🗣️ Accent</CardTitle>

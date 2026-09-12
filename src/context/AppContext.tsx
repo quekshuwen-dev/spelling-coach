@@ -9,12 +9,15 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { getWordsRepository, type AddWordInput, type WordsRepository } from '../services/wordsRepository'
 import { isServerOcrConfigured } from '../services/ocrService'
 import type { Accent } from '../services/speechService'
+import { setNeuralEnabled } from '../services/neuralVoice'
 import type { Attempt, SpellingWord } from '../types'
 
 interface Settings {
   accent: Accent
   rate: number
   childName: string
+  /** Off falls back to the device voice, and sends no word to the voice service. */
+  naturalVoice: boolean
 }
 
 const SETTINGS_KEY = 'sc2_settings'
@@ -25,6 +28,7 @@ const DEFAULT_SETTINGS: Settings = {
   accent: 'en-SG',
   rate: 0.9,
   childName: '',
+  naturalVoice: true,
 }
 
 function loadSettings(): Settings {
@@ -65,6 +69,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [serverOcr, setServerOcr] = useState<boolean | null>(null)
   const [settings, setSettingsState] = useState<Settings>(loadSettings)
   const [toast, setToast] = useState<string | null>(null)
+
+  // The speech service is a module, not a hook, so the stored preference has to
+  // be pushed into it — including on first load, before anything is spoken.
+  useEffect(() => {
+    setNeuralEnabled(settings.naturalVoice)
+  }, [settings.naturalVoice])
 
   const refresh = useCallback(async () => {
     try {

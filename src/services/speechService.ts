@@ -23,10 +23,15 @@
  *     0.9, with an explicit "say it slowly" control at 0.6.
  *  8. ACCENT — a Singapore child was hearing en-US. Accent is now a setting,
  *     defaulting to English (Singapore) with a sensible fallback chain.
+ *  9. ROBOTIC VOICES — the fixes above make the device voice as good as it can
+ *     be, which still is not good enough: the built-in voices are synthetic
+ *     enough that a child mishears the word. Real neural audio is now the
+ *     primary engine (see neuralVoice.ts) and everything below is the fallback.
  */
 import { detectLang } from '../lib/words'
 import { pinyinToHanzi } from '../data/chineseDictionary'
 import type { WordLang } from '../types'
+import { fetchClip, neuralEnabled, playClip, stopClip, unlockNeuralVoice, voiceFor } from './neuralVoice'
 
 export type Accent = 'en-SG' | 'en-GB' | 'en-US' | 'en-AU'
 
@@ -147,6 +152,13 @@ interface QueueItem {
   lang: WordLang
   accent: Accent
   rate: number
+  /**
+   * Single letters go to the device voice even when the neural service is up.
+   * A neural voice applies word-level pronunciation rules, so a lone "a" comes
+   * back as the article "uh" rather than the letter name — the opposite of what
+   * letter-by-letter spelling needs.
+   */
+  preferDevice: boolean
   resolve: () => void
 }
 
@@ -154,11 +166,20 @@ let queue: QueueItem[] = []
 let speaking = false
 let keepAlive: ReturnType<typeof setInterval> | null = null
 let unlocked = false
+/**
+ * Bumped by every stop. A neural clip is fetched asynchronously, so without
+ * this a word cancelled mid-download would still play, over the next one.
+ */
+let generation = 0
 
 /** Safari will not speak unless the first utterance came from a user gesture. */
 export function unlockSpeech(): void {
-  if (unlocked || !speechSupported()) return
+  if (unlocked) return
   unlocked = true
+  // Both engines need a gesture on iOS: the synth, and the <audio> element the
+  // neural clips play through.
+  unlockNeuralVoice()
+  if (!speechSupported()) return
   try {
     const u = new SpeechSynthesisUtterance('')
     u.volume = 0
@@ -177,9 +198,11 @@ function flushQueue(): void {
 }
 
 export function stopSpeaking(): void {
+  generation++
   flushQueue()
   speaking = false
   stopKeepAlive()
+  stopClip()
   if (speechSupported()) {
     try {
       window.speechSynthesis.cancel()
@@ -232,7 +255,31 @@ async function runQueue(): Promise<void> {
     return
   }
   speaking = true
+  const mine = generation
 
+  // Real neural audio first; the device voice is the fallback for offline use,
+  // for single letters, and for when the service cannot be reached.
+  const spoken = item.preferDevice ? false : await speakNeural(item, mine)
+  if (!spoken && generation === mine) await speakOnDevice(item)
+
+  speaking = false
+  item.resolve()
+  if (generation === mine) void runQueue()
+}
+
+/** Returns false when the caller should fall back to the device voice. */
+async function speakNeural(item: QueueItem, mine: number): Promise<boolean> {
+  if (!neuralEnabled()) return false
+  const voiceLang = item.lang === 'zh' || item.lang === 'py' ? 'zh' : 'en'
+  const blob = await fetchClip(item.text, voiceFor(voiceLang, item.accent))
+  if (!blob) return false
+  // The word may have been cancelled while its clip was downloading.
+  if (generation !== mine) return true
+  await playClip(blob, item.rate)
+  return true
+}
+
+async function speakOnDevice(item: QueueItem): Promise<void> {
   const voices = await loadVoices()
   const wanted = item.lang === 'zh' || item.lang === 'py' ? ZH_FALLBACKS : ACCENT_FALLBACKS[item.accent]
   const voice = pickVoice(voices, wanted)
@@ -266,10 +313,6 @@ async function runQueue(): Promise<void> {
       finish()
     }
   })
-
-  speaking = false
-  item.resolve()
-  void runQueue()
 }
 
 /**
@@ -278,7 +321,9 @@ async function runQueue(): Promise<void> {
  * word off.
  */
 export async function speak(text: string, options: SpeakOptions = {}): Promise<void> {
-  if (!speechSupported()) return
+  // Neural clips play through an <audio> element, so a browser with no
+  // speechSynthesis at all can still say the word.
+  if (!speechSupported() && !neuralEnabled()) return
   const trimmed = text.trim()
   if (!trimmed) return
 
@@ -290,20 +335,22 @@ export async function speak(text: string, options: SpeakOptions = {}): Promise<v
   if (!resolved) return
 
   if (!options.queue) {
+    generation++
     flushQueue()
-    window.speechSynthesis.cancel()
+    stopClip()
+    if (speechSupported()) window.speechSynthesis.cancel()
     // Chrome drops an utterance queued in the same tick as cancel().
     await new Promise((r) => setTimeout(r, 120))
     speaking = false
   }
 
-  const items: string[] =
-    options.spellOut && resolved.voiceLang === 'en'
-      ? // Separate utterances, not "b, u, t" in one string: many engines read
-        // the commas aloud, and the pause between utterances is what makes
-        // letter-by-letter spelling intelligible.
-        [...resolved.text.replace(/[^\p{L}\p{N}'-]/gu, '')]
-      : [resolved.text]
+  const spellingOut = Boolean(options.spellOut) && resolved.voiceLang === 'en'
+  const items: string[] = spellingOut
+    ? // Separate utterances, not "b, u, t" in one string: many engines read
+      // the commas aloud, and the pause between utterances is what makes
+      // letter-by-letter spelling intelligible.
+      [...resolved.text.replace(/[^\p{L}\p{N}'-]/gu, '')]
+    : [resolved.text]
 
   const promises = items.map(
     (chunk) =>
@@ -312,7 +359,8 @@ export async function speak(text: string, options: SpeakOptions = {}): Promise<v
           text: chunk,
           lang: resolved.voiceLang === 'zh' ? 'zh' : 'en',
           accent,
-          rate: options.spellOut ? Math.min(rate, 0.8) : rate,
+          rate: spellingOut ? Math.min(rate, 0.8) : rate,
+          preferDevice: spellingOut,
           resolve,
         })
       }),

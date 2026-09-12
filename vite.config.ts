@@ -46,6 +46,18 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
         runtimeCaching: [
           { urlPattern: /\/api\//, handler: 'NetworkOnly' },
+          // Neural voice clips. A child hears the same handful of words many
+          // times, so caching them makes practice instant and lets a word that
+          // has been heard once still be heard offline.
+          {
+            urlPattern: /^https:\/\/api\.streamelements\.com\/kappa\/v2\/speech/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'voice-clips',
+              expiration: { maxEntries: 600, maxAgeSeconds: 60 * 60 * 24 * 60 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
           {
             urlPattern: /\/assets\/firebase-.*\.js$/,
             handler: 'StaleWhileRevalidate',

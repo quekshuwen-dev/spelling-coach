@@ -1,18 +1,14 @@
-// Generates orange Spelling Coach icons
+// Generates orange Spelling Coach PWA icons
 const { createCanvas } = require('canvas');
 const { writeFileSync } = require('fs');
 
 function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
   ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
   ctx.closePath();
 }
 
@@ -20,168 +16,201 @@ function drawIcon(size, maskable) {
   const canvas = createCanvas(size, size);
   const ctx = canvas.getContext('2d');
   const s = size;
-  const pad = maskable ? s * 0.12 : 0;
 
-  // Background
-  const grad = ctx.createLinearGradient(0, 0, s, s);
-  grad.addColorStop(0, '#FF8C42');
-  grad.addColorStop(1, '#FF4E11');
-  ctx.fillStyle = grad;
+  // ── Background ──────────────────────────────────────────
+  const bg = ctx.createLinearGradient(0, 0, s, s);
+  bg.addColorStop(0, '#FF9A3C');
+  bg.addColorStop(1, '#FF4500');
+  ctx.fillStyle = bg;
   if (maskable) {
     ctx.fillRect(0, 0, s, s);
   } else {
-    roundRect(ctx, 0, 0, s, s, s * 0.22);
+    roundRect(ctx, 0, 0, s, s, s * 0.20);
     ctx.fill();
   }
 
-  const wx = pad, wy = pad, ww = s - pad * 2, wh = s - pad * 2;
-  const cx = wx + ww / 2, cy = wy + wh / 2;
-  const u = ww / 8;
+  // Safe zone for maskable (80% of canvas)
+  const safe = maskable ? s * 0.10 : 0;
+  const sw = s - safe * 2;
+  const cx = safe + sw / 2;
+  const cy = safe + sw / 2;
+  const u = sw / 10; // base unit
 
-  // Notebook body
-  const nbx = cx - u * 2.5;
-  const nby = cy - u * 2.8;
-  const nbw = u * 5.0;
-  const nbh = u * 5.4;
-  const nbr = u * 0.4;
+  // ── Book / Notebook body ─────────────────────────────────
+  const bx = cx - u * 3.0;
+  const by = cy - u * 3.8;
+  const bw = u * 6.0;
+  const bh = u * 7.2;
+  const br = u * 0.5;
 
-  // shadow
-  ctx.fillStyle = 'rgba(0,0,0,0.18)';
-  roundRect(ctx, nbx + u * 0.12, nby + u * 0.12, nbw, nbh, nbr);
-  ctx.fill();
-
-  // white body
+  // drop shadow
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.25)';
+  ctx.shadowBlur = u * 0.8;
+  ctx.shadowOffsetX = u * 0.2;
+  ctx.shadowOffsetY = u * 0.4;
   ctx.fillStyle = '#FFFFFF';
-  roundRect(ctx, nbx, nby, nbw, nbh, nbr);
+  roundRect(ctx, bx, by, bw, bh, br);
+  ctx.fill();
+  ctx.restore();
+
+  // white page
+  ctx.fillStyle = '#FFFFFF';
+  roundRect(ctx, bx, by, bw, bh, br);
   ctx.fill();
 
-  // left spine (cream)
-  ctx.fillStyle = '#FFF8E1';
-  roundRect(ctx, nbx, nby, u * 1.0, nbh, nbr);
-  ctx.fill();
-
-  // spine divider
-  ctx.strokeStyle = '#FFE082';
-  ctx.lineWidth = s * 0.005;
+  // ── Spine (left strip) ───────────────────────────────────
+  ctx.save();
   ctx.beginPath();
-  ctx.moveTo(nbx + u * 1.0, nby + nbr);
-  ctx.lineTo(nbx + u * 1.0, nby + nbh - nbr);
+  roundRect(ctx, bx, by, u * 1.4, bh, br);
+  ctx.clip();
+  ctx.fillStyle = '#FFF3CD';
+  ctx.fillRect(bx, by, u * 1.4, bh);
+  ctx.restore();
+
+  // spine right border
+  ctx.strokeStyle = '#FFCC70';
+  ctx.lineWidth = s * 0.004;
+  ctx.beginPath();
+  ctx.moveTo(bx + u * 1.4, by + br);
+  ctx.lineTo(bx + u * 1.4, by + bh - br);
   ctx.stroke();
 
-  // Spiral rings
-  const rings = 7;
-  ctx.lineWidth = s * 0.016;
-  for (let i = 0; i < rings; i++) {
-    const ry = nby + (nbh / (rings + 1)) * (i + 1);
-    const rx = nbx + u * 0.5;
-    ctx.strokeStyle = '#78909C';
+  // ── Spiral rings ─────────────────────────────────────────
+  const nRings = 8;
+  for (let i = 0; i < nRings; i++) {
+    const ry = by + (bh / (nRings + 1)) * (i + 1);
+    const rx = bx + u * 0.70;
+
+    // ring arc (grey)
+    ctx.strokeStyle = '#90A4AE';
+    ctx.lineWidth = s * 0.013;
+    ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.ellipse(rx, ry, u * 0.2, u * 0.28, 0, Math.PI * 0.15, Math.PI * 1.85);
+    ctx.ellipse(rx, ry, u * 0.32, u * 0.40, 0, Math.PI * 0.05, Math.PI * 1.95);
     ctx.stroke();
-    // hole
-    ctx.fillStyle = grad;
+
+    // hole (orange bg color)
+    ctx.fillStyle = '#FF7A20';
     ctx.beginPath();
-    ctx.ellipse(rx, ry, u * 0.12, u * 0.12, 0, 0, Math.PI * 2);
+    ctx.ellipse(rx, ry, u * 0.16, u * 0.16, 0, 0, Math.PI * 2);
     ctx.fill();
   }
 
-  // Ruled lines
-  ctx.strokeStyle = '#E3F2FD';
+  // ── "SPELL" heading ──────────────────────────────────────
+  const tx = bx + u * 1.7;
+  const ty = by + u * 1.3;
+  ctx.font = `900 ${u * 1.25}px "Arial Black", Arial, sans-serif`;
+  ctx.fillStyle = '#FF5722';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText('SPELL', tx, ty);
+
+  // ── Ruled lines ──────────────────────────────────────────
+  ctx.strokeStyle = '#E8F4FD';
   ctx.lineWidth = s * 0.004;
-  const lx1 = nbx + u * 1.2, lx2 = nbx + nbw - u * 0.3;
-  for (let i = 0; i < 6; i++) {
-    const ly = nby + u * 1.3 + u * 0.72 * i;
-    if (ly < nby + nbh - u * 0.4) {
-      ctx.beginPath(); ctx.moveTo(lx1, ly); ctx.lineTo(lx2, ly); ctx.stroke();
+  const lx1 = bx + u * 1.65;
+  const lx2 = bx + bw - u * 0.4;
+  const lineStart = ty + u * 1.55;
+  for (let i = 0; i < 5; i++) {
+    const ly = lineStart + i * u * 0.90;
+    if (ly < by + bh - u * 0.5) {
+      ctx.beginPath();
+      ctx.moveTo(lx1, ly);
+      ctx.lineTo(lx2, ly);
+      ctx.stroke();
     }
   }
 
-  // "SPELL" text
-  const fs = u * 0.95;
-  ctx.font = `900 ${fs}px Arial Black, Arial, sans-serif`;
-  ctx.fillStyle = '#FF5722';
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('SPELL', nbx + u * 1.3, nby + u * 1.1);
+  // ── Checkboxes + word lines ──────────────────────────────
+  const cbSz = u * 0.70;
+  const cbX = bx + u * 1.65;
+  const cbLineX2 = lx2;
 
-  // Checkboxes
-  const cbSz = u * 0.52;
-  const cbX = nbx + u * 1.3;
   for (let i = 0; i < 3; i++) {
-    const cbCY = nby + u * 2.15 + i * u * 0.95;
-    const cbY = cbCY - cbSz / 2;
+    const cbMidY = lineStart + u * 0.35 + i * u * 0.90;
+    const cbTop = cbMidY - cbSz / 2;
 
+    // checkbox fill
     ctx.fillStyle = i === 0 ? '#FF5722' : '#FFFFFF';
-    roundRect(ctx, cbX, cbY, cbSz, cbSz, s * 0.012);
+    roundRect(ctx, cbX, cbTop, cbSz, cbSz, s * 0.018);
     ctx.fill();
+
+    // checkbox border
     ctx.strokeStyle = '#FF5722';
-    ctx.lineWidth = s * 0.007;
-    roundRect(ctx, cbX, cbY, cbSz, cbSz, s * 0.012);
+    ctx.lineWidth = s * 0.009;
+    roundRect(ctx, cbX, cbTop, cbSz, cbSz, s * 0.018);
     ctx.stroke();
 
+    // checkmark on first box
     if (i === 0) {
       ctx.strokeStyle = '#FFFFFF';
-      ctx.lineWidth = s * 0.017;
-      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.lineWidth = s * 0.022;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
       ctx.beginPath();
-      ctx.moveTo(cbX + cbSz * 0.18, cbCY);
-      ctx.lineTo(cbX + cbSz * 0.42, cbCY + cbSz * 0.26);
-      ctx.lineTo(cbX + cbSz * 0.82, cbCY - cbSz * 0.26);
+      ctx.moveTo(cbX + cbSz * 0.18, cbMidY);
+      ctx.lineTo(cbX + cbSz * 0.44, cbMidY + cbSz * 0.28);
+      ctx.lineTo(cbX + cbSz * 0.82, cbMidY - cbSz * 0.28);
       ctx.stroke();
     }
 
-    // line next to checkbox
-    ctx.strokeStyle = '#ECEFF1';
-    ctx.lineWidth = s * 0.006;
+    // word line beside checkbox
+    ctx.strokeStyle = '#D0E8F8';
+    ctx.lineWidth = s * 0.005;
     ctx.lineCap = 'butt';
     ctx.beginPath();
-    ctx.moveTo(cbX + cbSz + u * 0.18, cbCY);
-    ctx.lineTo(lx2, cbCY);
+    ctx.moveTo(cbX + cbSz + u * 0.22, cbMidY);
+    ctx.lineTo(cbLineX2, cbMidY);
     ctx.stroke();
   }
 
-  // Pencil
+  // ── Pencil (overlapping top-right corner) ────────────────
   ctx.save();
-  const px = nbx + nbw - u * 0.3;
-  const py = nby + u * 0.2;
-  ctx.translate(px, py);
-  ctx.rotate(Math.PI / 6); // tilt
+  // pivot at top-right of book, tilt 35°
+  const pivX = bx + bw + u * 0.1;
+  const pivY = by - u * 0.3;
+  ctx.translate(pivX, pivY);
+  ctx.rotate(Math.PI * 0.20);
 
-  const pw = u * 0.42;
-  const ph = u * 3.2;
+  const pw = u * 0.52;
+  const ph = u * 4.0;
+  const halfW = pw / 2;
 
-  // eraser
+  // eraser (pink cap)
   ctx.fillStyle = '#F48FB1';
-  roundRect(ctx, -pw / 2, -ph / 2, pw, ph * 0.11, pw * 0.2);
+  roundRect(ctx, -halfW, -ph / 2, pw, ph * 0.10, halfW * 0.8);
   ctx.fill();
 
-  // eraser band
-  ctx.fillStyle = '#BDBDBD';
-  ctx.fillRect(-pw / 2, -ph / 2 + ph * 0.11, pw, ph * 0.035);
+  // ferrule (silver band)
+  ctx.fillStyle = '#B0BEC5';
+  ctx.fillRect(-halfW, -ph / 2 + ph * 0.10, pw, ph * 0.04);
 
-  // body
-  const pGrad = ctx.createLinearGradient(-pw / 2, 0, pw / 2, 0);
-  pGrad.addColorStop(0, '#FFD54F');
-  pGrad.addColorStop(0.6, '#FFCA28');
-  pGrad.addColorStop(1, '#FFB300');
-  ctx.fillStyle = pGrad;
-  ctx.fillRect(-pw / 2, -ph / 2 + ph * 0.145, pw, ph * 0.62);
+  // body gradient (yellow pencil)
+  const pg = ctx.createLinearGradient(-halfW, 0, halfW, 0);
+  pg.addColorStop(0,   '#FFE082');
+  pg.addColorStop(0.5, '#FFD54F');
+  pg.addColorStop(1,   '#FFC107');
+  ctx.fillStyle = pg;
+  ctx.fillRect(-halfW, -ph / 2 + ph * 0.14, pw, ph * 0.60);
 
-  // wood tip
-  ctx.fillStyle = '#D4A86A';
+  // wood sharpening cone
+  ctx.fillStyle = '#D4956A';
   ctx.beginPath();
-  ctx.moveTo(-pw / 2, ph * 0.14);
-  ctx.lineTo(pw / 2, ph * 0.14);
-  ctx.lineTo(0, ph * 0.38);
-  ctx.closePath(); ctx.fill();
+  ctx.moveTo(-halfW, ph * 0.14);
+  ctx.lineTo( halfW, ph * 0.14);
+  ctx.lineTo(0, ph * 0.40);
+  ctx.closePath();
+  ctx.fill();
 
-  // graphite
+  // graphite tip
   ctx.fillStyle = '#37474F';
   ctx.beginPath();
-  ctx.moveTo(-pw * 0.14, ph * 0.32);
-  ctx.lineTo(pw * 0.14, ph * 0.32);
-  ctx.lineTo(0, ph * 0.38);
-  ctx.closePath(); ctx.fill();
+  ctx.moveTo(-halfW * 0.28, ph * 0.34);
+  ctx.lineTo( halfW * 0.28, ph * 0.34);
+  ctx.lineTo(0, ph * 0.40);
+  ctx.closePath();
+  ctx.fill();
 
   ctx.restore();
 
@@ -191,7 +220,7 @@ function drawIcon(size, maskable) {
 function save(canvas, path) {
   const buf = canvas.toBuffer('image/png');
   writeFileSync(path, buf);
-  console.log(`Wrote ${path} (${(buf.length / 1024).toFixed(1)} KB)`);
+  console.log(`✓ ${path}  (${(buf.length / 1024).toFixed(1)} KB)`);
 }
 
 save(drawIcon(192, false), 'public/icons/icon-192.png');

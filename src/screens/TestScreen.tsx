@@ -11,6 +11,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Card, Celebration, EmptyState, Notice, PageHeader, ProgressBar } from '../components/ui'
+import ChineseWordInfo from '../components/ChineseWordInfo'
 import { useApp } from '../context/AppContext'
 import { scoringConfig } from '../config/scoring'
 import { answerMatches, diffAnswer } from '../lib/words'
@@ -335,6 +336,10 @@ export default function TestScreen() {
           <p className="mt-1 text-sm text-ink-soft">
             {lastCorrect ? 'Great job!' : "Let's try this one again soon."}
           </p>
+
+          <div className="mt-2 flex justify-center">
+            <ChineseWordInfo word={current.word} lang={current.lang} />
+          </div>
 
           {!lastCorrect && (
             <div className="mt-4">

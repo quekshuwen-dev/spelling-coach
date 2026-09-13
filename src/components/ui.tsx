@@ -1,4 +1,5 @@
 /** Small shared pieces. Kept plain so the screens stay readable. */
+import { useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { STATUS_EMOJI, STATUS_LABEL } from '../config/scoring'
 import type { MasteryStatus } from '../types'
@@ -154,6 +155,42 @@ export function Toast({ message }: { message: string | null }) {
       aria-live="polite"
     >
       {message}
+    </div>
+  )
+}
+
+/**
+ * A simple centred modal. Closes on backdrop click, the ✕, or Escape.
+ * No focus trap: every use so far is a short-lived info panel, not a form.
+ */
+export function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
+    >
+      <div className="card max-h-[85vh] w-full max-w-sm overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="mb-3 flex items-center justify-between">
+          <CardTitle>{title}</CardTitle>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-ink-soft hover:bg-grape-50"
+          >
+            ✕
+          </button>
+        </div>
+        {children}
+      </div>
     </div>
   )
 }

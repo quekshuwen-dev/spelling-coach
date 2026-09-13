@@ -5,6 +5,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardTitle, EmptyState, PageHeader, StatusPill } from '../components/ui'
+import ChineseWordInfo from '../components/ChineseWordInfo'
 import { useApp } from '../context/AppContext'
 import { accuracyOf, needsPractice, statusOf } from '../config/scoring'
 import { speak, stopSpeaking } from '../services/speechService'
@@ -211,6 +212,7 @@ function WordRow({
       </button>
       <div className="min-w-0 flex-1">
         <div className="truncate text-base font-bold">{word.word}</div>
+        <ChineseWordInfo word={word.word} lang={word.lang} compact />
         <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.7rem] text-ink-soft">
           <StatusPill status={statusOf(word)} />
           <span>

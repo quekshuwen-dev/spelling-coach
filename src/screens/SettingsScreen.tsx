@@ -12,6 +12,7 @@ import { Card, CardTitle, Notice, PageHeader } from '../components/ui'
 import { useApp } from '../context/AppContext'
 import { ACCENTS, SPEEDS, describeVoice, speak, speechSupported, stopSpeaking, type Accent } from '../services/speechService'
 import { setNeuralEnabled } from '../services/neuralVoice'
+import { firebaseEnabled } from '../lib/firebase'
 
 export default function SettingsScreen() {
   const { settings, setSettings, storage, serverOcr } = useApp()
@@ -37,6 +38,8 @@ export default function SettingsScreen() {
           <Notice tone="warn">This browser cannot speak. Try Chrome, Safari or Edge.</Notice>
         </div>
       )}
+
+      <AccountCard />
 
       <Card className="mb-3">
         <CardTitle>✨ Natural voice</CardTitle>
@@ -175,5 +178,71 @@ export default function SettingsScreen() {
         </Link>
       </Card>
     </main>
+  )
+}
+
+/**
+ * Sign-in, and what it changes.
+ *
+ * Deliberately framed as an upgrade rather than a gate: the app works fully
+ * signed out, so this card explains what syncing buys rather than demanding it.
+ */
+function AccountCard() {
+  const { account, accountReady, signIn, signOut, storage, words } = useApp()
+  const [busy, setBusy] = useState(false)
+
+  if (!firebaseEnabled()) return null
+
+  const run = async (action: () => Promise<void>) => {
+    setBusy(true)
+    try {
+      await action()
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <Card className="mb-3">
+      <CardTitle>☁️ Sync across devices</CardTitle>
+
+      {!accountReady ? (
+        <p className="mt-2 text-sm text-ink-soft">Checking…</p>
+      ) : account ? (
+        <>
+          <div className="mt-2 flex items-center gap-3">
+            {account.photoURL ? (
+              <img src={account.photoURL} alt="" className="h-10 w-10 rounded-full" />
+            ) : (
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-grape-100 text-lg">
+                👤
+              </span>
+            )}
+            <div className="min-w-0">
+              <p className="truncate text-sm font-bold text-ink">{account.name ?? 'Signed in'}</p>
+              <p className="truncate text-xs text-ink-soft">{account.email}</p>
+            </div>
+          </div>
+          <p className="mt-3 text-xs text-ink-soft">
+            {storage === 'firestore'
+              ? `${words.length} word${words.length === 1 ? '' : 's'} synced. Sign in on another device to see the same list.`
+              : 'Signed in, but words are still saving to this device.'}
+          </p>
+          <button className="btn-quiet mt-3 w-full" onClick={() => void run(signOut)} disabled={busy}>
+            Sign out
+          </button>
+        </>
+      ) : (
+        <>
+          <p className="mt-2 text-sm text-ink-soft">
+            Words are saved on this device. Sign in to use the same list on a phone and a tablet — anything
+            already saved here comes with you.
+          </p>
+          <button className="btn-primary mt-3 w-full" onClick={() => void run(signIn)} disabled={busy}>
+            {busy ? 'Opening Google…' : 'Sign in with Google'}
+          </button>
+        </>
+      )}
+    </Card>
   )
 }

@@ -31,18 +31,30 @@ is no separate `npm run build` step.
 
 Your app lands at **<https://spelling-coach-61d31.web.app>**.
 
-### Two settings to turn on in the console, once
+### Console settings
 
-Both are in the [Firebase console](https://console.firebase.google.com/project/spelling-coach-61d31):
+Google sign-in and the Firestore database are **already enabled** on this
+project. Deploying with `firestore:rules` above installs the rules that confine
+each user to their own subtree — do that rather than leaving the database in test
+mode, which is open to anyone.
 
-1. **Authentication → Sign-in method → Anonymous → Enable.** The app signs every
-   child in anonymously so their words are theirs. Without this, saving to
-   Firestore fails and the app silently falls back to device-only storage.
-2. **Firestore Database → Create database.** Pick a region near you. Deploying
-   with `firestore:rules` above then installs the rules that confine each user to
-   their own subtree — do not leave it in test mode, which is open to anyone.
+One thing to check after the first deploy: **Authentication → Settings →
+Authorized domains** must list the domain you are serving from.
+`spelling-coach-61d31.web.app` and `.firebaseapp.com` are there by default, so
+this only matters if you add a custom domain or deploy to Vercel as well. Signing
+in from a domain that is not listed fails with `auth/unauthorized-domain`, and
+the app reports that as "This web address is not allowed to sign in".
 
-Until both are done the app still works: it stores words on the device instead.
+### Signing in is optional
+
+The app works fully signed out — every feature, words stored on the device. The
+sign-in button lives in **Settings → Sync across devices**, and signing in
+uploads whatever is already on the device so nothing appears to vanish behind a
+suddenly-empty account.
+
+This differs from the anonymous sign-in the app originally used. Anonymous auth
+signed everyone in silently at startup; Google sign-in needs a deliberate tap, so
+"signed out" is a normal, fully-supported state rather than a failure.
 
 ### Updating later
 

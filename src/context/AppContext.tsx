@@ -6,7 +6,15 @@
  * refetch, and swapping Firestore in or out changes nothing above this line.
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { getWordsRepository, type AddWordInput, type WordsRepository } from '../services/wordsRepository'
+import {
+  countLocalWords,
+  getWordsRepository,
+  resetWordsRepository,
+  uploadLocalWords,
+  type AddWordInput,
+  type WordsRepository,
+} from '../services/wordsRepository'
+import { firebaseEnabled, signInWithGoogle, signOutUser, watchAuth } from '../lib/firebase'
 import { isServerOcrConfigured } from '../services/ocrService'
 import type { Accent } from '../services/speechService'
 import { setNeuralEnabled } from '../services/neuralVoice'
@@ -40,6 +48,14 @@ function loadSettings(): Settings {
   }
 }
 
+/** Who is signed in. null means signed out, which is a fully supported state. */
+export interface AccountUser {
+  uid: string
+  name: string | null
+  email: string | null
+  photoURL: string | null
+}
+
 interface AppValue {
   words: SpellingWord[]
   loading: boolean
@@ -48,6 +64,11 @@ interface AppValue {
   serverOcr: boolean | null
   settings: Settings
   toast: string | null
+  /** null while the saved session is still being restored, then a user or null. */
+  account: AccountUser | null
+  accountReady: boolean
+  signIn: () => Promise<void>
+  signOut: () => Promise<void>
   setSettings: (patch: Partial<Settings>) => void
   showToast: (message: string) => void
   clearToast: () => void
@@ -67,6 +88,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null)
   const [storage, setStorage] = useState<WordsRepository['kind'] | null>(null)
   const [serverOcr, setServerOcr] = useState<boolean | null>(null)
+  const [account, setAccount] = useState<AccountUser | null>(null)
+  const [accountReady, setAccountReady] = useState(false)
   const [settings, setSettingsState] = useState<Settings>(loadSettings)
   const [toast, setToast] = useState<string | null>(null)
 
@@ -89,17 +112,79 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  useEffect(() => {
-    void refresh()
-    void isServerOcrConfigured().then(setServerOcr)
-  }, [refresh])
-
   const showToast = useCallback((message: string) => {
     setToast(message)
     window.setTimeout(() => setToast((current) => (current === message ? null : current)), 3200)
   }, [])
 
   const clearToast = useCallback(() => setToast(null), [])
+
+  /**
+   * Follow sign-in and sign-out. Each change swaps the backend, so words move
+   * between the device and the account without a reload.
+   */
+  useEffect(() => {
+    let unwatch: (() => void) | undefined
+    let cancelled = false
+
+    void (async () => {
+      if (!firebaseEnabled()) {
+        setAccountReady(true)
+        return
+      }
+      unwatch = await watchAuth((user) => {
+        if (cancelled) return
+        setAccount(
+          user ? { uid: user.uid, name: user.displayName, email: user.email, photoURL: user.photoURL } : null,
+        )
+        setAccountReady(true)
+        // The previous backend belongs to the previous user.
+        resetWordsRepository()
+        void refresh()
+      })
+    })()
+
+    return () => {
+      cancelled = true
+      unwatch?.()
+    }
+  }, [refresh])
+
+  const signIn = useCallback(async () => {
+    try {
+      const user = await signInWithGoogle()
+      // Null means the user closed the popup, or a redirect is under way.
+      if (!user) return
+
+      // Words added before signing in live on the device. Move them up, or
+      // they look lost behind a suddenly-empty account.
+      const pending = await countLocalWords()
+      if (pending > 0) {
+        resetWordsRepository()
+        try {
+          const { added } = await uploadLocalWords()
+          if (added > 0) showToast(`☁️ ${added} word${added === 1 ? '' : 's'} saved to your account`)
+        } catch {
+          showToast('Signed in, but those words could not be synced yet.')
+        }
+      }
+      resetWordsRepository()
+      await refresh()
+    } catch (err) {
+      showToast((err as Error).message)
+    }
+  }, [refresh, showToast])
+
+  const signOut = useCallback(async () => {
+    await signOutUser()
+    resetWordsRepository()
+    await refresh()
+  }, [refresh])
+
+  useEffect(() => {
+    void refresh()
+    void isServerOcrConfigured().then(setServerOcr)
+  }, [refresh])
 
   const setSettings = useCallback((patch: Partial<Settings>) => {
     setSettingsState((current) => {
@@ -155,6 +240,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       serverOcr,
       settings,
       toast,
+      account,
+      accountReady,
+      signIn,
+      signOut,
       setSettings,
       showToast,
       clearToast,
@@ -173,6 +262,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       serverOcr,
       settings,
       toast,
+      account,
+      accountReady,
+      signIn,
+      signOut,
       setSettings,
       showToast,
       clearToast,

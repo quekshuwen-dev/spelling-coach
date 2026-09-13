@@ -15,7 +15,7 @@
  * race: two devices adding "beautiful" at once converge on one document, and
  * practiceCount keeps counting.
  */
-import { ensureSignedIn, firebaseEnabled, getFirebase } from '../lib/firebase'
+import { currentUser, firebaseEnabled, getFirebase } from '../lib/firebase'
 import { cleanWord, detectLang, normalizeWord } from '../lib/words'
 import type { Attempt, SpellingWord, WordSource } from '../types'
 
@@ -191,8 +191,8 @@ class FirestoreWordsRepository implements WordsRepository {
   private async ctx() {
     const fb = await getFirebase()
     if (!fb) throw new Error('Firebase is not configured.')
-    const user = await ensureSignedIn()
-    if (!user) throw new Error('Could not sign in to Firebase.')
+    const user = await currentUser()
+    if (!user) throw new Error('Not signed in.')
     const fs = await import('firebase/firestore')
     return { db: fb.db, uid: user.uid, fs }
   }
@@ -311,23 +311,58 @@ class FirestoreWordsRepository implements WordsRepository {
 let cached: WordsRepository | null = null
 
 /**
- * Picks the backend once. Firestore if configured and reachable, otherwise
- * local — and if Firestore sign-in fails at runtime we degrade to local rather
- * than leaving the child staring at an error.
+ * Picks the backend. Firestore only when someone is actually signed in;
+ * otherwise the device.
+ *
+ * Signing in is a deliberate act now that auth is Google rather than anonymous,
+ * so being signed out is the normal case rather than a failure, and it must not
+ * cost the child anything. If Firestore errors at runtime we still degrade to
+ * local rather than leaving them staring at an error.
  */
 export async function getWordsRepository(): Promise<WordsRepository> {
   if (cached) return cached
   if (firebaseEnabled()) {
     try {
-      await ensureSignedIn()
-      cached = new FirestoreWordsRepository()
-      return cached
+      const user = await currentUser()
+      if (user) {
+        cached = new FirestoreWordsRepository()
+        return cached
+      }
     } catch (error) {
       console.warn('[words] Firebase unavailable, using on-device storage:', (error as Error).message)
     }
   }
   cached = new LocalWordsRepository()
   return cached
+}
+
+/** Re-pick the backend after a sign-in or sign-out. */
+export function resetWordsRepository(): void {
+  cached = null
+}
+
+/**
+ * Copy device-stored words into the signed-in account.
+ *
+ * Without this, signing in swaps an empty Firestore in behind a child who
+ * already had words, and it reads as data loss. The local copy is deliberately
+ * left alone: if the upload half-fails, the words are still somewhere.
+ */
+export async function uploadLocalWords(): Promise<{ added: number; duplicates: number }> {
+  const local = new LocalWordsRepository()
+  const words = await local.list()
+  if (!words.length) return { added: 0, duplicates: 0 }
+
+  const remote = new FirestoreWordsRepository()
+  const { added, duplicates } = await remote.addMany(
+    words.map((w) => ({ word: w.word, source: w.source, sourceImageId: w.sourceImageId })),
+  )
+  return { added: added.length, duplicates: duplicates.length }
+}
+
+/** How many words are sitting on this device, for "sync these?" prompts. */
+export async function countLocalWords(): Promise<number> {
+  return (await new LocalWordsRepository().list()).length
 }
 
 /** Test seam: lets unit tests exercise the local backend directly. */

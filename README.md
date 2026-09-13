@@ -35,17 +35,17 @@ npm run build        # production build + service worker
 
 | Decision | Choice | Why |
 | --- | --- | --- |
-| Framework | **Vite + React + TypeScript** | Deploys to Vercel as a static build plus `/api/*` functions, and gives a clean PWA story. Next.js's SSR buys nothing for an offline-first app a child opens from their home screen. It also matches the `calories` app, so the two projects share a shape. |
+| Framework | **Vite + React + TypeScript** | A static build, which is all Firebase Hosting serves, and a clean PWA story. Next.js's SSR buys nothing for an offline-first app a child opens from their home screen. It also matches the `calories` app, so the two projects share a shape. |
 | Styling | **Tailwind** | As requested. A small set of component classes (`.btn-primary`, `.card`) in `src/index.css` keeps the screens readable instead of a wall of utilities. |
 | Database | **Firestore**, with a localStorage fallback | Both sit behind one `WordsRepository` interface, so no screen knows which is in use. |
-| Auth | **Anonymous Firebase auth** | Gives every device a stable `uid` for the security rules, with no password for a child to forget. Upgrading to a real account later is `linkWithCredential` on the same uid — no data migration. |
+| Auth | **Google sign-in, and optional** | Gives a stable `uid` for the security rules and syncs words across devices. Unlike the anonymous auth this replaced, it needs a deliberate tap — so *signed out* is a fully supported state, words are stored on the device, and nothing is gated behind an account. Signing in uploads what is already on the device. |
 | OCR | **Serverless vision model, falling back to Tesseract.js** | See below. |
 | Speech | **Web Speech API**, wrapped | See below. |
 
 ### Module map
 
 ```
-api/                    Vercel serverless functions (thin wrappers)
+api/                    Serverless adapters over server/ocrHandler.ts
 server/ocrHandler.ts     The ONLY place an OCR key is used
 server/viteDevApi.ts     Serves /api/* in dev with the same handler code
 src/config/scoring.ts    Every progress threshold, in one file
@@ -182,8 +182,9 @@ OCR_MODEL=claude-sonnet-5     # optional; a sensible default per provider
 OCR_API_KEY=sk-...
 ```
 
-On Vercel: **Project → Settings → Environment Variables**. Locally they go in
-`.env` (already git-ignored) and are read by the dev API middleware.
+Locally they go in `.env` (git-ignored) and are read by the dev API middleware.
+The Firebase web config lives in `.env.production`, which is committed because
+Vite inlines it into the bundle and it is public by design.
 
 ---
 
@@ -273,15 +274,10 @@ a child with no working voice is never stuck.
 
 ---
 
-## Deploying to Vercel
+## Deploying
 
-```bash
-npx vercel
-```
-
-`vercel.json` is already configured: static build from `dist/`, `api/*` as
-functions, SPA rewrites, and `no-store` on the service worker. Add the
-`OCR_*` variables in the dashboard if you want server-side OCR.
+Firebase Hosting, at `spelling-coach-61d31`. Pushing deploys it: see
+[DEPLOY.md](DEPLOY.md) for the CI workflow and the one secret it needs.
 
 The app is a PWA — "Add to Home Screen" on iOS or "Install" on Android gives a
 full-screen app with an icon, and it keeps working offline.

@@ -102,17 +102,20 @@ npx firebase-tools deploy --only hosting
 
 ---
 
-## Vercel — fewer steps, no CLI
+## Not using Vercel
 
-1. Go to <https://vercel.com/new>
-2. Sign in with GitHub
-3. Import `quekshuwen-dev/spelling-coach`
-4. **Change the branch to `claude/beautiful-ride-hi7n1q`.** Left on `main` you
-   will deploy the old single-file app and see none of the new work.
-5. Deploy
+Firebase Hosting is the only target for this app. Vercel was connected to the
+repository at one point and built it automatically; that has been disconnected.
 
-Vercel detects Vite on its own. It also runs the `/api/*` endpoints as
-serverless functions, which Firebase Hosting alone cannot — see below.
+Removing `vercel.json` from the repository is not on its own enough to stop it —
+Vercel builds through a GitHub App integration, so it keeps deploying whatever
+the repo contains. Turning it off is done in the Vercel dashboard: the project's
+**Settings → Git → Disconnect**, or **Settings → Advanced → Delete Project**.
+
+The `/api/*` handlers are still in the repository. They are inert on Firebase
+Hosting, which serves static files only, and the app falls back to on-device OCR
+as designed. They are kept because they are the server-OCR implementation and
+would be the starting point for a Cloud Function — see the OCR note at the end.
 
 ---
 
@@ -153,10 +156,15 @@ The app reads printed lists on-device with Tesseract, needing no key. Handwritin
 is genuinely hard for it. A server OCR provider reads handwriting far better, and
 the key stays on the server rather than in the browser.
 
-This needs somewhere to run `/api/ocr`:
+This needs somewhere to run `/api/ocr`, and Firebase Hosting serves static files
+only. So it needs a Cloud Function, which means the paid Blaze plan.
 
-- **On Vercel** — it works as-is. Set `OCR_PROVIDER` and the matching API key in
-  the project's environment variables.
-- **On Firebase Hosting** — Hosting serves static files only, so `/api/*` needs
-  Cloud Functions, which requires the paid Blaze plan. Without it the app quietly
-  falls back to on-device OCR, which is the intended behaviour, not an error.
+**Without it nothing is broken.** The app probes `/api/config`, gets no answer,
+and uses the on-device reader — the intended behaviour, not an error. Printed
+spelling lists, which is what this app is for, read well that way.
+
+To add it later: `server/ocrHandler.ts` holds the provider logic and is already
+independent of any host. `api/ocr.ts` and `api/config.ts` are thin adapters, and
+a Cloud Function would be a third one alongside them. Set `OCR_PROVIDER` and the
+matching key in the function's environment — never with a `VITE_` prefix, or the
+key lands in the browser bundle.

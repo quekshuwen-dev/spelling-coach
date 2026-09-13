@@ -40,7 +40,7 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Deploy to Firebase
+      - name: Write the deploy key
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: |
@@ -51,15 +51,31 @@ jobs:
           fi
           # RUNNER_TEMP is outside the checkout, so the key can never be picked
           # up by the build or committed by accident.
-          key="$RUNNER_TEMP/firebase-key.json"
-          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$key"
-          trap 'rm -f "$key"' EXIT
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/firebase-key.json"
 
-          # firebase.json's predeploy hook runs the build, so this covers it.
-          GOOGLE_APPLICATION_CREDENTIALS="$key" \
-            npx firebase-tools deploy \
-              --only hosting,firestore:rules \
-              --non-interactive
+      # This is the step that must reach the child: the app itself. It gates
+      # the job, so a failure here is loud and the run is red.
+      - name: Deploy hosting
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-key.json
+        # firebase.json's predeploy hook runs the build, so this covers it.
+        run: npx firebase-tools deploy --only hosting --non-interactive
+
+      # Best-effort, deliberately: failing the job here would also block the
+      # app itself going live over what is usually a separate IAM permission
+      # from the one hosting needs. But this is a SECURITY-RELEVANT step, not
+      # a nice-to-have — see the loud warning below and DEPLOY.md.
+      - name: Deploy Firestore rules
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-key.json
+        run: |
+          if ! npx firebase-tools deploy --only firestore:rules --non-interactive; then
+            echo "::warning::Firestore rules did NOT deploy. This repo's firestore.rules (confines each user to their own data) is NOT what is protecting your database right now — whatever was last set in the Firebase console is. If the database was created in test mode, IT IS OPEN TO ANYONE until this is fixed. See DEPLOY.md's IAM note."
+          fi
+
+      - name: Clean up the deploy key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/firebase-key.json"
 
       - name: Where it went
         run: echo "### Live at https://spelling-coach-61d31.web.app" >> "$GITHUB_STEP_SUMMARY"

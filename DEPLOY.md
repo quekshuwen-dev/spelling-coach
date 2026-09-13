@@ -41,9 +41,28 @@ Repo → **Settings → Secrets and variables → Actions → New repository sec
 That is it. Watch it under the repo's **Actions** tab; the run summary links to
 the live site.
 
-If the deploy fails on permissions, grant the service account **Firebase Hosting
-Admin** and **Firebase Rules Admin** in the [Google Cloud IAM
-console](https://console.cloud.google.com/iam-admin/iam?project=spelling-coach-61d31).
+### If the Firestore rules step fails
+
+Hosting and the rules need different permissions, and the default key from step 1
+carries only enough to deploy the app itself. Deploying the app never blocks on
+this — the workflow treats the rules step as best-effort and turns the failure
+into a `::warning::` on the run, precisely so a missing IAM role does not also
+keep the app itself offline.
+
+But **do not ignore that warning**. The rules in `firestore.rules` — the ones
+that confine each user to their own data — are not the ones protecting your
+database until this deploys at least once. Whatever you set up when you
+created the database in the console is what is actually in force. If that was
+"test mode," the database is open to anyone who finds the project id.
+
+Fix it once: [Cloud IAM
+console](https://console.cloud.google.com/iam-admin/iam?project=spelling-coach-61d31)
+→ find the account ending `@spelling-coach-61d31.iam.gserviceaccount.com` → **Edit
+principal** → **Add another role** → **Service Usage Consumer**. Re-run the
+workflow from the Actions tab afterwards (no need to push again).
+
+If hosting itself fails instead, the account is missing **Firebase Hosting
+Admin**, added the same way.
 
 ---
 

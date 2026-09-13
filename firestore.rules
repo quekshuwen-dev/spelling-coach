@@ -7,6 +7,12 @@ service cloud.firestore {
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
 
+      // "Who is practising" — up to a few people sharing one account, each
+      // with their own word list (see profileId on spellingWords below).
+      match /profiles/{profileId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
       match /spellingWords/{wordId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
 

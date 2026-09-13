@@ -188,20 +188,55 @@ Vite inlines it into the bundle and it is public by design.
 
 ---
 
+## Profiles and folders
+
+Up to three profiles — "who is practising" — can share one device or account,
+each with their own word list. A profile switcher is pinned to the top of
+every screen (`src/components/ProfileSwitcher.tsx`), and switching between
+Chloe and her brother shows a different list, a different Progress screen, a
+different everything, with no way to accidentally see or overwrite a
+sibling's words.
+
+Every word is also filed into one of three fixed subject folders — School
+English, School Chinese, Tuition (`src/config/folders.ts`) — chosen when it is
+saved and changeable later from My Words. Testing can be scoped to one folder,
+so "just quiz me on Tuition words" is one tap.
+
+Profiles are stored the same way words are (Firestore when signed in, the
+device otherwise, see `src/services/profileService.ts`), but *which* profile
+is currently active is always local: a shared family account can still show a
+different child on each device, the way a streaming service's profile picker
+does.
+
+### Migrating from before profiles existed
+
+Every word saved before this shipped has no `profileId`. Rather than a
+migration screen, `wordsRepository.list()` adopts any such word onto whichever
+profile is active the moment it is next seen — see `migrateLocalWords()` and
+the equivalent Firestore branch in `list()`. Nothing is lost; it just quietly
+becomes the first profile's word.
+
 ## Firestore shape
 
 ```
 users/{userId}
+users/{userId}/profiles/{profileId}
 users/{userId}/spellingWords/{wordId}
 users/{userId}/spellingWords/{wordId}/attempts/{attemptId}
 ```
 
 ```ts
-// spellingWords/{wordId}   — the document id IS the normalised word
+// profiles/{profileId}
+{ id, name, emoji, createdAt }
+
+// spellingWords/{wordId} — the document id is `${profileId}_${normalisedWord}`,
+// so two profiles saving the same word never collide
 {
   word: "Beautiful",          // as the user wants to see it
-  normalizedWord: "beautiful",// de-duplication key
+  normalizedWord: "beautiful",// de-duplication key, scoped per profile
   lang: "en",                 // en | zh | py
+  profileId: "p_m1x2…",       // whose word list this is
+  folderId: "school-english", // school-english | school-chinese | tuition
   createdAt: 1757635200000,
   updatedAt: 1757635200000,
   source: "image",            // image | manual | voice | sample
@@ -215,13 +250,15 @@ users/{userId}/spellingWords/{wordId}/attempts/{attemptId}
 }
 
 // …/attempts/{attemptId}     — append-only; the rules forbid update and delete
-{ wordId, word, answer, correct, createdAt, elapsedMs }
+{ wordId, word, answer, correct, createdAt, elapsedMs, profileId }
 ```
 
-**Why the document id is the normalised word:** duplicates become impossible by
-construction rather than by a read-then-write check. Two devices adding
-"beautiful" at the same moment converge on one document, and `practiceCount`
-keeps counting. Statistics are updated with `increment()` for the same reason.
+**Why the document id folds in the profile id:** duplicates become impossible
+by construction, per profile, rather than by a read-then-write check. Two
+devices signed into the same profile adding "beautiful" at the same moment
+converge on one document, and `practiceCount` keeps counting — while a sibling
+profile adding the identical word gets its own document rather than colliding
+with the first. Statistics are updated with `increment()` for the same reason.
 
 ---
 

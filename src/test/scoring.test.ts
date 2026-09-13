@@ -15,6 +15,8 @@ const base: SpellingWord = {
   correctCount: 0,
   incorrectCount: 0,
   streak: 0,
+  profileId: 'p1',
+  folderId: 'school-english',
 }
 
 const word = (patch: Partial<SpellingWord>): SpellingWord => ({ ...base, ...patch })

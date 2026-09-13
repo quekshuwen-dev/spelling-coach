@@ -15,6 +15,8 @@ const make = (id: string, patch: Partial<SpellingWord> = {}): SpellingWord => ({
   correctCount: 0,
   incorrectCount: 0,
   streak: 0,
+  profileId: 'p1',
+  folderId: 'school-english',
   ...patch,
 })
 

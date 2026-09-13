@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { applyAttempt, wordIdFor, __localRepository } from '../services/wordsRepository'
+import { createProfile, ensureActiveProfile, resetActiveProfileCache, switchActiveProfile } from '../services/profileService'
 import type { SpellingWord } from '../types'
 
 /** Minimal localStorage so the local backend can be tested in node. */
@@ -21,22 +22,32 @@ class MemoryStorage {
 
 beforeEach(() => {
   ;(globalThis as { localStorage?: unknown }).localStorage = new MemoryStorage()
+  // ensureActiveProfile() caches the active profile at module scope, not in
+  // localStorage — without this, a profile created by an earlier test would
+  // leak into the next one even though its storage is otherwise wiped clean.
+  resetActiveProfileCache()
 })
 
 describe('wordIdFor', () => {
   it('gives the same id to the same word however it is written', () => {
-    expect(wordIdFor('Beautiful')).toBe(wordIdFor('beautiful,'))
-    expect(wordIdFor(' BEAUTIFUL ')).toBe(wordIdFor('beautiful'))
+    expect(wordIdFor('Beautiful', 'p1')).toBe(wordIdFor('beautiful,', 'p1'))
+    expect(wordIdFor(' BEAUTIFUL ', 'p1')).toBe(wordIdFor('beautiful', 'p1'))
   })
 
   it('gives different ids to different words', () => {
-    expect(wordIdFor('cat')).not.toBe(wordIdFor('cats'))
+    expect(wordIdFor('cat', 'p1')).not.toBe(wordIdFor('cats', 'p1'))
   })
 
   it('produces a safe document id for non-Latin words', () => {
-    const id = wordIdFor('水')
-    expect(id).toMatch(/^[A-Za-z0-9'-]+$/)
-    expect(wordIdFor('水')).toBe(id)
+    const id = wordIdFor('水', 'p1')
+    expect(id).toMatch(/^[A-Za-z0-9'_-]+$/)
+    expect(wordIdFor('水', 'p1')).toBe(id)
+  })
+
+  it('gives two profiles different ids for the same word', () => {
+    // The whole point of scoping by profile: siblings can each save "cat"
+    // without one overwriting the other.
+    expect(wordIdFor('cat', 'p1')).not.toBe(wordIdFor('cat', 'p2'))
   })
 })
 
@@ -54,6 +65,8 @@ describe('applyAttempt', () => {
     correctCount: 1,
     incorrectCount: 1,
     streak: 1,
+    profileId: 'p1',
+    folderId: 'school-english',
   }
 
   it('counts a correct answer and extends the streak', () => {
@@ -127,5 +140,80 @@ describe('local words repository', () => {
     const { added } = await repo.addMany([{ word: 'cat', source: 'manual' }])
     await repo.remove(added[0].id)
     expect(await repo.list()).toHaveLength(0)
+  })
+})
+
+describe('profiles', () => {
+  it('gives each profile its own list, even for the identical word', async () => {
+    const repo = new __localRepository()
+
+    const chloe = await ensureActiveProfile('Chloe')
+    await repo.addMany([{ word: 'cat', source: 'manual' }])
+
+    const sam = await createProfile('Sam')
+    await switchActiveProfile(sam.id)
+    await repo.addMany([{ word: 'cat', source: 'manual' }])
+
+    // Sam's list has his "cat" — not two, and not Chloe's.
+    const samWords = await repo.list()
+    expect(samWords).toHaveLength(1)
+    expect(samWords[0].profileId).toBe(sam.id)
+
+    await switchActiveProfile(chloe.id)
+    const chloeWords = await repo.list()
+    expect(chloeWords).toHaveLength(1)
+    expect(chloeWords[0].profileId).toBe(chloe.id)
+  })
+
+  it('does not let attempts or a clearAll leak between profiles', async () => {
+    const repo = new __localRepository()
+
+    const chloe = await ensureActiveProfile('Chloe')
+    const [chloeCat] = (await repo.addMany([{ word: 'cat', source: 'manual' }])).added
+    await repo.recordAttempt(chloeCat, 'cat', true)
+
+    const sam = await createProfile('Sam')
+    await switchActiveProfile(sam.id)
+    const [samCat] = (await repo.addMany([{ word: 'cat', source: 'manual' }])).added
+    await repo.recordAttempt(samCat, 'kat', false)
+
+    // Sam clearing his list must not touch Chloe's word or her attempt history.
+    await repo.clearAll()
+    expect(await repo.list()).toHaveLength(0)
+    expect(await repo.listAttempts()).toHaveLength(0)
+
+    await switchActiveProfile(chloe.id)
+    expect(await repo.list()).toHaveLength(1)
+    expect(await repo.listAttempts()).toHaveLength(1)
+  })
+
+  it('migrates a word saved before profiles existed onto whichever profile is active', async () => {
+    // Exactly what data saved by the pre-profiles app looks like: no
+    // profileId, no folderId. Written as raw JSON, not a typed fixture,
+    // because that is what is actually sitting in a real browser's
+    // localStorage — the type system would not let this compile as a literal.
+    const legacyWord = {
+      id: 'legacy_cat',
+      word: 'cat',
+      normalizedWord: 'cat',
+      lang: 'en',
+      createdAt: 0,
+      updatedAt: 0,
+      source: 'manual',
+      status: 'active',
+      practiceCount: 0,
+      correctCount: 0,
+      incorrectCount: 0,
+      streak: 0,
+    }
+    localStorage.setItem('sc2_words', JSON.stringify([legacyWord]))
+
+    const repo = new __localRepository()
+    const list = await repo.list()
+
+    expect(list).toHaveLength(1)
+    expect(list[0].folderId).toBe('school-english') // inferred from lang: 'en'
+    expect(typeof list[0].profileId).toBe('string')
+    expect((list[0].profileId as string).length).toBeGreaterThan(0)
   })
 })

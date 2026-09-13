@@ -6,6 +6,8 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardTitle, EmptyState, PageHeader, StatusPill } from '../components/ui'
 import ChineseWordInfo from '../components/ChineseWordInfo'
+import { FOLDERS } from '../config/folders'
+import type { FolderId } from '../types'
 import { useApp } from '../context/AppContext'
 import { accuracyOf, needsPractice, statusOf } from '../config/scoring'
 import { speak, stopSpeaking } from '../services/speechService'
@@ -16,10 +18,11 @@ type Sort = 'recent' | 'az' | 'weakest'
 
 export default function WordListScreen() {
   const navigate = useNavigate()
-  const { words, loading, removeWord, showToast, settings, storage } = useApp()
+  const { words, loading, removeWord, updateWord, showToast, settings, storage } = useApp()
 
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<Filter>('all')
+  const [folderFilter, setFolderFilter] = useState<FolderId | 'all'>('all')
   const [sort, setSort] = useState<Sort>('recent')
   const [selected, setSelected] = useState<Set<string>>(new Set())
 
@@ -28,13 +31,14 @@ export default function WordListScreen() {
     let list = words.filter((w) => (query ? w.normalizedWord.includes(query) || w.word.toLowerCase().includes(query) : true))
     if (filter === 'needs-practice') list = list.filter(needsPractice)
     if (filter === 'mastered') list = list.filter((w) => statusOf(w) === 'mastered')
+    if (folderFilter !== 'all') list = list.filter((w) => w.folderId === folderFilter)
 
     return [...list].sort((a, b) => {
       if (sort === 'az') return a.normalizedWord.localeCompare(b.normalizedWord)
       if (sort === 'weakest') return accuracyOf(a) - accuracyOf(b) || b.incorrectCount - a.incorrectCount
       return b.createdAt - a.createdAt
     })
-  }, [words, search, filter, sort])
+  }, [words, search, filter, folderFilter, sort])
 
   const toggle = (id: string) =>
     setSelected((current) => {
@@ -98,6 +102,16 @@ export default function WordListScreen() {
             <option value="weakest">Weakest first</option>
           </select>
         </div>
+        <div className="flex flex-wrap gap-2 border-t border-grape-50 pt-3">
+          <FilterChip active={folderFilter === 'all'} onClick={() => setFolderFilter('all')}>
+            📂 All folders
+          </FilterChip>
+          {FOLDERS.map((f) => (
+            <FilterChip key={f.id} active={folderFilter === f.id} onClick={() => setFolderFilter(f.id)}>
+              {f.emoji} {f.label}
+            </FilterChip>
+          ))}
+        </div>
       </Card>
 
       {loading ? (
@@ -136,6 +150,7 @@ export default function WordListScreen() {
                 void speak(word.word, { lang: word.lang, accent: settings.accent, rate: settings.rate })
               }}
               onDelete={() => void handleDelete(word)}
+              onRefile={(folderId) => void updateWord(word.id, { folderId })}
             />
           ))}
         </Card>
@@ -183,12 +198,14 @@ function WordRow({
   onToggle,
   onSpeak,
   onDelete,
+  onRefile,
 }: {
   word: SpellingWord
   checked: boolean
   onToggle: () => void
   onSpeak: () => void
   onDelete: () => void
+  onRefile: (folderId: FolderId) => void
 }) {
   const accuracy = word.practiceCount ? Math.round(accuracyOf(word) * 100) : null
   const added = new Date(word.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
@@ -222,6 +239,18 @@ function WordRow({
           </span>
           <span>· added {added}</span>
         </div>
+        <select
+          className="mt-1 rounded-full border border-grape-100 bg-white px-2 py-1 text-[0.7rem] font-bold text-ink-soft"
+          value={word.folderId}
+          onChange={(e) => onRefile(e.target.value as FolderId)}
+          aria-label={`Move "${word.word}" to a different folder`}
+        >
+          {FOLDERS.map((f) => (
+            <option key={f.id} value={f.id}>
+              {f.emoji} {f.label}
+            </option>
+          ))}
+        </select>
       </div>
       <button
         onClick={onDelete}

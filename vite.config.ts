@@ -93,6 +93,17 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     include: ['src/test/**/*.test.ts'],
+    // Forces isFirebaseConfigured to false regardless of what a developer's
+    // own .env happens to hold — without this, a local .env with real
+    // credentials sends the profile/repository tests down the live Firestore
+    // path (a real, network-dependent SDK call that only fails slowly, since
+    // this environment cannot reach it) purely because of what is sitting on
+    // one machine. Tests must behave the same on every machine and in CI.
+    env: {
+      VITE_FIREBASE_API_KEY: '',
+      VITE_FIREBASE_PROJECT_ID: '',
+      VITE_FIREBASE_APP_ID: '',
+    },
   },
   server: { port: 5173, host: true },
 })

@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import BottomNav from './components/BottomNav'
+import ProfileSwitcher from './components/ProfileSwitcher'
 import { Toast } from './components/ui'
 import { useApp } from './context/AppContext'
 import HomeScreen from './screens/HomeScreen'
@@ -13,6 +14,7 @@ export default function App() {
   const { toast } = useApp()
   return (
     <>
+      <ProfileSwitcher />
       <Routes>
         <Route path="/" element={<HomeScreen />} />
         <Route path="/scan" element={<ScanScreen />} />

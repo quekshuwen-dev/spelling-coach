@@ -8,9 +8,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import CameraCapture from '../components/CameraCapture'
 import WordPicker from '../components/WordPicker'
+import FolderPicker from '../components/FolderPicker'
 import { Card, CardTitle, EmptyState, Notice, PageHeader, ProgressBar, Spinner } from '../components/ui'
 import { useApp } from '../context/AppContext'
 import { cleanWord, detectLang, isPlausibleWord } from '../lib/words'
+import { DEFAULT_FOLDER } from '../config/folders'
 import {
   ImageTooDarkError,
   ImageUnreadableError,
@@ -19,7 +21,17 @@ import {
   type PreparedImage,
 } from '../services/imageProcessingService'
 import { OcrError, recognise } from '../services/ocrService'
-import type { OcrResult, OcrWord } from '../types'
+import type { FolderId, OcrResult, OcrWord } from '../types'
+
+const LAST_FOLDER_KEY = 'sc2_last_folder'
+
+function loadLastFolder(): FolderId {
+  try {
+    return (localStorage.getItem(LAST_FOLDER_KEY) as FolderId) || DEFAULT_FOLDER
+  } catch {
+    return DEFAULT_FOLDER
+  }
+}
 
 type Stage = 'capture' | 'review-photo' | 'reading' | 'pick' | 'error'
 
@@ -37,6 +49,17 @@ export default function ScanScreen() {
   const [saving, setSaving] = useState(false)
   const [showRawText, setShowRawText] = useState(false)
   const [showUnsure, setShowUnsure] = useState(false)
+  // Remembered per device, not per profile: whoever scans next is usually
+  // filing into the same folder as the last scan.
+  const [folderId, setFolderId] = useState<FolderId>(loadLastFolder)
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(LAST_FOLDER_KEY, folderId)
+    } catch {
+      /* the remembered folder is a convenience; losing it is not fatal */
+    }
+  }, [folderId])
 
   const imageRef = useRef<PreparedImage | null>(null)
   imageRef.current = image
@@ -148,6 +171,7 @@ export default function ScanScreen() {
           word: w.text,
           source: w.id.startsWith('manual_') ? ('manual' as const) : ('image' as const),
           sourceImageId: image?.imageId,
+          folderId,
         })),
       )
       const parts = [`✅ ${added.length} word${added.length === 1 ? '' : 's'} added`]
@@ -227,6 +251,10 @@ export default function ScanScreen() {
           title="Tap the words you want"
           subtitle="Tap a word to tick it. Tap ✏️ to fix a spelling the reader got wrong."
         />
+
+        <Card className="mb-3">
+          <FolderPicker value={folderId} onChange={setFolderId} label="Save these words to" />
+        </Card>
 
         <Card className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -356,8 +384,9 @@ export default function ScanScreen() {
       <PageHeader emoji="📷" title="Scan a word list" subtitle="A worksheet, a textbook page, or a list on paper." />
       <CameraCapture onCapture={handleCapture} hint="Fit the whole list in the frame, straight on." />
 
-      <Card className="mt-4">
+      <Card className="mt-4 space-y-3">
         <CardTitle>✏️ Or add a word by hand</CardTitle>
+        <FolderPicker value={folderId} onChange={setFolderId} label="Save to" />
         <ManualAdd
           value={manualWord}
           onChange={setManualWord}
@@ -367,7 +396,7 @@ export default function ScanScreen() {
               showToast('Please type a word first.')
               return
             }
-            void addWords([{ word: text, source: 'manual' }]).then(({ added, duplicates }) => {
+            void addWords([{ word: text, source: 'manual', folderId }]).then(({ added, duplicates }) => {
               showToast(added.length ? `✅ "${text}" added` : `"${duplicates[0] ?? text}" is already on the list`)
               setManualWord('')
             })

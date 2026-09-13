@@ -17,7 +17,8 @@ import { scoringConfig } from '../config/scoring'
 import { answerMatches, diffAnswer } from '../lib/words'
 import { buildSession, describeMode } from '../services/practiceSelection'
 import { hasVoiceFor, speak, stopSpeaking } from '../services/speechService'
-import type { PracticeMode, SpellingWord } from '../types'
+import { FOLDERS, folderFor } from '../config/folders'
+import type { FolderId, PracticeMode, SpellingWord } from '../types'
 
 type Phase = 'choose' | 'answering' | 'feedback' | 'summary'
 
@@ -33,6 +34,7 @@ export default function TestScreen() {
   const { words, recordAttempt, settings, showToast, clearToast } = useApp()
 
   const [phase, setPhase] = useState<Phase>('choose')
+  const [folderFilter, setFolderFilter] = useState<FolderId | 'all'>('all')
   const [queue, setQueue] = useState<SpellingWord[]>([])
   const [index, setIndex] = useState(0)
   const [answer, setAnswer] = useState('')
@@ -62,9 +64,14 @@ export default function TestScreen() {
 
   const start = useCallback(
     (mode: PracticeMode, selectedIds: string[] = []) => {
-      const session = buildSession(words, { mode, selectedIds, size: scoringConfig.defaultSessionSize })
+      const pool = folderFilter === 'all' ? words : words.filter((w) => w.folderId === folderFilter)
+      const session = buildSession(pool, { mode, selectedIds, size: scoringConfig.defaultSessionSize })
       if (!session.length) {
-        showToast('There are no words to practise yet.')
+        showToast(
+          folderFilter === 'all'
+            ? 'There are no words to practise yet.'
+            : `No words in ${folderFor(folderFilter).label} yet.`,
+        )
         return
       }
       setQueue(session)
@@ -74,7 +81,7 @@ export default function TestScreen() {
       setRevealed(false)
       setPhase('answering')
     },
-    [words, showToast],
+    [words, folderFilter, showToast],
   )
 
   // Coming from My Words with a mode already chosen: start straight away.
@@ -160,9 +167,31 @@ export default function TestScreen() {
 
   if (phase === 'choose') {
     const modes: PracticeMode[] = ['all', 'needs-practice', 'random']
+    const folderChip = (id: FolderId | 'all', label: string, emoji: string) => (
+      <button
+        key={id}
+        aria-pressed={folderFilter === id}
+        onClick={() => setFolderFilter(id)}
+        className={`chip min-h-[2.25rem] px-3 ${
+          folderFilter === id ? 'bg-grape text-white' : 'bg-grape-50 text-grape-600'
+        }`}
+      >
+        <span aria-hidden>{emoji}</span> {label}
+      </button>
+    )
+
     return (
       <main className="page">
         <PageHeader emoji="🎧" title="Spelling Test" subtitle="Listen to the word, then type it. Ready?" />
+
+        <Card className="mb-3">
+          <p className="mb-2 text-xs font-bold uppercase tracking-wide text-ink-soft">Practise from</p>
+          <div className="flex flex-wrap gap-2">
+            {folderChip('all', 'All folders', '📂')}
+            {FOLDERS.map((f) => folderChip(f.id, f.label, f.emoji))}
+          </div>
+        </Card>
+
         <Card className="space-y-2">
           {modes.map((mode) => (
             <button key={mode} className="btn-ghost w-full justify-start text-left" onClick={() => start(mode)}>

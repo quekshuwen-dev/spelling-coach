@@ -20,6 +20,21 @@ export type WordSource = 'image' | 'manual' | 'voice' | 'sample'
 
 export type MasteryStatus = 'new' | 'needs-practice' | 'learning' | 'good' | 'mastered'
 
+/** The fixed set of subject folders a word can be filed into. See config/folders.ts. */
+export type FolderId = 'school-english' | 'school-chinese' | 'tuition'
+
+/**
+ * "Who is practising." Up to a handful of people can share one device or
+ * account, each with their own word list, filed into the same three folders.
+ */
+export interface Profile {
+  id: string
+  name: string
+  /** A kid-friendly avatar rather than a photo — see profileService's picker. */
+  emoji: string
+  createdAt: number
+}
+
 /**
  * One saved spelling word. Mirrors the Firestore document at
  * users/{userId}/spellingWords/{wordId} exactly — see README "Firestore shape".
@@ -46,6 +61,10 @@ export interface SpellingWord {
   streak: number
   /** Optional extras a future AI feature can fill in without a migration. */
   notes?: string
+  /** Whose list this is. Part of the document id, so two profiles can each save "cat". */
+  profileId: string
+  /** Which of the three subject folders this word is filed under. */
+  folderId: FolderId
 }
 
 /** users/{userId}/spellingWords/{wordId}/attempts/{attemptId} */
@@ -58,6 +77,8 @@ export interface Attempt {
   createdAt: number
   /** Milliseconds from hearing the word to pressing Check. */
   elapsedMs?: number
+  /** Optional so attempts recorded before profiles existed still load. */
+  profileId?: string
 }
 
 export interface WordStats {

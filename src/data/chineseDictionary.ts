@@ -1,12 +1,28 @@
 /**
- * A small offline Chinese dictionary for the words Singapore P1–P3 听写 lists
- * actually use. It exists so the app can:
- *   1. show pinyin + meaning with no network, and
- *   2. turn a pinyin-only word ("shuǐ") back into the character ("水") so
- *      text-to-speech has something it can genuinely pronounce.
+ * Chinese lookups: pinyin, meaning, and the pinyin -> character conversion the
+ * speech service needs.
  *
- * Entry: character(s) -> [pinyin with tone marks, plain-English meaning].
+ * This used to be a hand-written table of 89 entries, which meant that any
+ * character outside it — which is most of them — had no pinyin and no meaning
+ * at all. Now:
+ *
+ *  - PINYIN comes from pinyin-pro, which reads a word in context. That matters
+ *    more than it sounds: 咳 alone is "hāi", but 止咳 is "zhǐ ké", and 银行 is
+ *    "yín háng" rather than "yín xíng". No static per-character table can get
+ *    those right.
+ *  - MEANINGS come from a CC-CEDICT subset built by scripts/build-chinese-dict.cjs,
+ *    trimmed to every single character plus common vocabulary (~27k entries).
+ *
+ * Both are loaded on demand, so a child practising English spelling never
+ * downloads either.
+ *
+ * The curated table below stays as a hand-checked override: CC-CEDICT glosses
+ * are written for adult learners, and for the words a Singapore P1-P3 list
+ * actually uses a short child's definition reads better.
  */
+import type { ChineseInfo } from '../types'
+
+/** Hand-checked entries: character(s) -> [pinyin with tone marks, meaning]. */
 export const CHINESE_DICTIONARY: Record<string, [pinyin: string, meaning: string]> = {
   我: ['wǒ', 'I, me'],
   你: ['nǐ', 'you'],
@@ -113,11 +129,68 @@ const PINYIN_INDEX: Record<string, string> = (() => {
  *
  * This is what stops the app reading "shuǐ" out letter-by-letter through a
  * Mandarin voice, which is the single worst-sounding bug in the old version.
+ * Deliberately synchronous and limited to the curated table: the speech path
+ * needs an answer immediately, and a 27k-entry reverse index would be riddled
+ * with homophones anyway — every syllable has dozens of characters, and
+ * guessing the wrong one is worse than not guessing.
  */
 export function pinyinToHanzi(pinyin: string): string | null {
   return PINYIN_INDEX[stripTones(pinyin)] ?? null
 }
 
-export function lookupChinese(word: string): [pinyin: string, meaning: string] | null {
-  return CHINESE_DICTIONARY[word] ?? null
+/* --------------------------- the loaded layers --------------------------- */
+
+interface Loaded {
+  toPinyin: (word: string) => string
+  meanings: Record<string, string>
+}
+
+let loading: Promise<Loaded | null> | null = null
+
+/**
+ * Fetches pinyin-pro and the meanings table. Both are large and only matter to
+ * a child with Chinese words, so they are a separate chunk rather than part of
+ * the app bundle.
+ */
+function load(): Promise<Loaded | null> {
+  if (!loading) {
+    loading = Promise.all([import('pinyin-pro'), import('./generated/chineseMeanings.json')])
+      .then(([pinyinPro, meanings]) => ({
+        toPinyin: (word: string) => pinyinPro.pinyin(word),
+        meanings: (meanings.default ?? meanings) as Record<string, string>,
+      }))
+      .catch(() => {
+        // Offline on first use. Reset so a later attempt can retry rather than
+        // caching the failure for the rest of the session.
+        loading = null
+        return null
+      })
+  }
+  return loading
+}
+
+/** Start fetching before the user needs it, e.g. when a Chinese word is shown. */
+export function preloadChinese(): void {
+  void load()
+}
+
+/**
+ * Everything we know about a Chinese word. Returns nulls rather than throwing:
+ * pinyin and meaning are enrichment, and a missing one must never stop the
+ * child practising the word.
+ */
+export async function lookupChinese(word: string): Promise<ChineseInfo> {
+  const curated = CHINESE_DICTIONARY[word]
+  const loaded = await load()
+
+  const pinyin = curated?.[0] ?? (loaded ? loaded.toPinyin(word) || null : null)
+  // The curated gloss wins: it is written for a child, CC-CEDICT is not.
+  const meaning = curated?.[1] ?? loaded?.meanings[word] ?? null
+
+  return { word, pinyin, meaning }
+}
+
+/** Testing seam — drops the loaded chunk so a case can start clean. */
+export function resetChineseCache(): void {
+  loading = null
 }

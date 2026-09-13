@@ -8,6 +8,14 @@ export type WordLang = 'en' | 'zh' | 'py'
  */
 export type WordQuality = 'likely' | 'unsure'
 
+/** What we can tell a child about a Chinese word. Either field may be missing. */
+export interface ChineseInfo {
+  word: string
+  /** Tone-marked, read in context: 止咳 is "zhǐ ké", not "zhǐ hāi". */
+  pinyin: string | null
+  meaning: string | null
+}
+
 export type WordSource = 'image' | 'manual' | 'voice' | 'sample'
 
 export type MasteryStatus = 'new' | 'needs-practice' | 'learning' | 'good' | 'mastered'

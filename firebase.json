@@ -6,11 +6,31 @@
   "hosting": {
     "public": "dist",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "predeploy": ["npm run build"],
     "rewrites": [{ "source": "**", "destination": "/index.html" }],
     "headers": [
       {
+        "comment": "The service worker decides when the app updates. Cache it and users stay on an old build forever.",
         "source": "/sw.js",
         "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
+      },
+      {
+        "comment": "Same for the shell: it names the current hashed bundles.",
+        "source": "/index.html",
+        "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
+      },
+      {
+        "comment": "Vite fingerprints these, so a changed file always has a new name.",
+        "source": "/assets/**",
+        "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      },
+      {
+        "source": "/manifest.webmanifest",
+        "headers": [{ "key": "Content-Type", "value": "application/manifest+json" }]
+      },
+      {
+        "source": "/icons/**",
+        "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }]
       }
     ]
   }

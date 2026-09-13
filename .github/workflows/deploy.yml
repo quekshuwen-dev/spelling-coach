@@ -1,0 +1,65 @@
+# Builds, checks and deploys Spelling Coach to Firebase Hosting.
+#
+# Needs one repository secret, FIREBASE_SERVICE_ACCOUNT — see DEPLOY.md.
+# Nothing else: the project id lives in .firebaserc and the (public) Firebase
+# web config in .env.production, so there is nothing else to configure here.
+name: Deploy
+
+on:
+  push:
+    branches: [main, claude/beautiful-ride-hi7n1q]
+  # Lets you redeploy the current commit from the Actions tab without pushing.
+  workflow_dispatch:
+
+# A second push while one deploy is running would otherwise race it, and the
+# older build could land last. Newer always wins.
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # Gates, not decoration: a red build must not reach a child mid-practice.
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Deploy to Firebase
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          if [ -z "${FIREBASE_SERVICE_ACCOUNT:-}" ]; then
+            echo "::error::FIREBASE_SERVICE_ACCOUNT is not set. See DEPLOY.md for how to create it."
+            exit 1
+          fi
+          # RUNNER_TEMP is outside the checkout, so the key can never be picked
+          # up by the build or committed by accident.
+          key="$RUNNER_TEMP/firebase-key.json"
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$key"
+          trap 'rm -f "$key"' EXIT
+
+          # firebase.json's predeploy hook runs the build, so this covers it.
+          GOOGLE_APPLICATION_CREDENTIALS="$key" \
+            npx firebase-tools deploy \
+              --only hosting,firestore:rules \
+              --non-interactive
+
+      - name: Where it went
+        run: echo "### Live at https://spelling-coach-61d31.web.app" >> "$GITHUB_STEP_SUMMARY"

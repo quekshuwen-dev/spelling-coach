@@ -10,7 +10,44 @@ Firestore and server OCR are optional extras, covered at the end.
 
 ---
 
-## Firebase Hosting
+## Automatic deploys (recommended)
+
+`.github/workflows/deploy.yml` typechecks, tests and deploys on every push to
+`main` or the working branch, and from the Actions tab on demand. Set it up once
+and you never touch a CLI again.
+
+It needs **one repository secret**.
+
+### 1. Create a service account key
+
+[Firebase console → Project settings → Service
+accounts](https://console.firebase.google.com/project/spelling-coach-61d31/settings/serviceaccounts/adminsdk)
+→ **Generate new private key**. A `.json` file downloads.
+
+> ⚠️ **This file is a real secret.** Unlike the web config in `.env.production`,
+> which is public by design, this key grants full access to the project. Put it
+> only in the GitHub secret below. Never commit it, and never paste it into a
+> chat or an issue. If it leaks, revoke it on that same console page.
+
+### 2. Put it in GitHub
+
+Repo → **Settings → Secrets and variables → Actions → New repository secret**
+
+- Name: `FIREBASE_SERVICE_ACCOUNT`
+- Value: the entire contents of the downloaded `.json`, pasted as-is
+
+### 3. Push
+
+That is it. Watch it under the repo's **Actions** tab; the run summary links to
+the live site.
+
+If the deploy fails on permissions, grant the service account **Firebase Hosting
+Admin** and **Firebase Rules Admin** in the [Google Cloud IAM
+console](https://console.cloud.google.com/iam-admin/iam?project=spelling-coach-61d31).
+
+---
+
+## Deploying by hand
 
 The project is **already configured**: `.firebaserc` points at
 `spelling-coach-61d31` and `.env.production` carries its web config, so there is

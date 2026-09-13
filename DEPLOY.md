@@ -12,7 +12,9 @@ Firestore and server OCR are optional extras, covered at the end.
 
 ## Firebase Hosting
 
-Run these on your own machine, from the project root:
+The project is **already configured**: `.firebaserc` points at
+`spelling-coach-61d31` and `.env.production` carries its web config, so there is
+nothing to fill in.
 
 ```bash
 git clone https://github.com/quekshuwen-dev/spelling-coach
@@ -20,20 +22,27 @@ cd spelling-coach
 git checkout claude/beautiful-ride-hi7n1q
 npm install
 
-npx firebase-tools login                               # opens a browser once
-npx firebase-tools projects:create spelling-coach-app  # pick any unused id
-npx firebase-tools use spelling-coach-app
-npx firebase-tools deploy --only hosting
+npx firebase-tools login                    # opens a browser once
+npx firebase-tools deploy --only hosting,firestore:rules
 ```
 
 `firebase.json` has a `predeploy` hook, so `deploy` builds the app first — there
 is no separate `npm run build` step.
 
-Your app lands at `https://<project-id>.web.app`.
+Your app lands at **<https://spelling-coach-61d31.web.app>**.
 
-> Firebase needs a **Google** account. If the one you use day to day is not a
-> Google account, sign in with whichever Google account you want the project to
-> live under.
+### Two settings to turn on in the console, once
+
+Both are in the [Firebase console](https://console.firebase.google.com/project/spelling-coach-61d31):
+
+1. **Authentication → Sign-in method → Anonymous → Enable.** The app signs every
+   child in anonymously so their words are theirs. Without this, saving to
+   Firestore fails and the app silently falls back to device-only storage.
+2. **Firestore Database → Create database.** Pick a region near you. Deploying
+   with `firestore:rules` above then installs the rules that confine each user to
+   their own subtree — do not leave it in test mode, which is open to anyone.
+
+Until both are done the app still works: it stores words on the device instead.
 
 ### Updating later
 
@@ -76,17 +85,14 @@ Neither is needed for the app to work.
 
 ### Syncing words across devices (Firestore)
 
-Without this, words are stored in the browser on one device. To sync, create a
-`.env` from `.env.example` and fill in the web app config from
-**Firebase console → Project settings → Your apps**:
+Already wired up in `.env.production`. It starts working once Anonymous auth and
+the Firestore database are switched on, as above. Until then words are stored in
+the browser on one device.
 
-```
-VITE_FIREBASE_API_KEY=...
-VITE_FIREBASE_PROJECT_ID=...
-```
-
-These values are safe in the browser — `firestore.rules` is what protects the
-data, and it confines every user to their own subtree. Deploy the rules too:
+The config values in that file are public by design: Vite inlines them into the
+bundle, so they are served to every visitor regardless. Firebase documents the
+apiKey as an identifier, not a secret — `firestore.rules` is what protects the
+data. Redeploy the rules whenever they change:
 
 ```bash
 npx firebase-tools deploy --only firestore:rules
